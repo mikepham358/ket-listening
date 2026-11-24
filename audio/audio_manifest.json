@@ -1,0 +1,298 @@
+{
+  "test_1": {
+    "part_1": {
+      "path": "audio/test_1/part_1.mp3",
+      "start_sec": 60.04,
+      "end_sec": 406.4,
+      "duration_sec": 346.36,
+      "size_mb": 6.01
+    },
+    "part_2": {
+      "path": "audio/test_1/part_2.mp3",
+      "start_sec": 406.44,
+      "end_sec": 595.04,
+      "duration_sec": 188.6,
+      "size_mb": 4.0
+    },
+    "part_3": {
+      "path": "audio/test_1/part_3.mp3",
+      "start_sec": 596.84,
+      "end_sec": 800.48,
+      "duration_sec": 203.64,
+      "size_mb": 3.63
+    },
+    "part_4": {
+      "path": "audio/test_1/part_4.mp3",
+      "start_sec": 801.72,
+      "end_sec": 1160.56,
+      "duration_sec": 358.84,
+      "size_mb": 6.19
+    },
+    "part_5": {
+      "path": "audio/test_1/part_5.mp3",
+      "start_sec": 1162.44,
+      "end_sec": 1391.68,
+      "duration_sec": 229.24,
+      "size_mb": 3.93
+    }
+  },
+  "test_2": {
+    "part_1": {
+      "path": "audio/test_2/part_1.mp3",
+      "start_sec": 1423.24,
+      "end_sec": 1788.8,
+      "duration_sec": 365.56,
+      "size_mb": 5.53
+    },
+    "part_2": {
+      "path": "audio/test_2/part_2.mp3",
+      "start_sec": 1798.76,
+      "end_sec": 2001.84,
+      "duration_sec": 203.08,
+      "size_mb": 3.92
+    },
+    "part_3": {
+      "path": "audio/test_2/part_3.mp3",
+      "start_sec": 2013.08,
+      "end_sec": 2200.32,
+      "duration_sec": 187.24,
+      "size_mb": 3.44
+    },
+    "part_4": {
+      "path": "audio/test_2/part_4.mp3",
+      "start_sec": 2209.16,
+      "end_sec": 2570.96,
+      "duration_sec": 361.8,
+      "size_mb": 6.1
+    },
+    "part_5": {
+      "path": "audio/test_2/part_5.mp3",
+      "start_sec": 2582.2,
+      "end_sec": 2787.68,
+      "duration_sec": 205.48,
+      "size_mb": 3.55
+    }
+  },
+  "test_3": {
+    "part_1": {
+      "path": "audio/test_3/part_1.mp3",
+      "start_sec": 2816.52,
+      "end_sec": 3189.6,
+      "duration_sec": 373.08,
+      "size_mb": 6.09
+    },
+    "part_2": {
+      "path": "audio/test_3/part_2.mp3",
+      "start_sec": 3203.72,
+      "end_sec": 3425.04,
+      "duration_sec": 221.32,
+      "size_mb": 3.76
+    },
+    "part_3": {
+      "path": "audio/test_3/part_3.mp3",
+      "start_sec": 3428.68,
+      "end_sec": 3629.04,
+      "duration_sec": 200.36,
+      "size_mb": 3.64
+    },
+    "part_4": {
+      "path": "audio/test_3/part_4.mp3",
+      "start_sec": 3637.56,
+      "end_sec": 3988.88,
+      "duration_sec": 351.32,
+      "size_mb": 5.82
+    },
+    "part_5": {
+      "path": "audio/test_3/part_5.mp3",
+      "start_sec": 3993.0,
+      "end_sec": 4198.32,
+      "duration_sec": 205.32,
+      "size_mb": 3.49
+    }
+  },
+  "test_4": {
+    "part_1": {
+      "path": "audio/test_4/part_1.mp3",
+      "start_sec": 4226.04,
+      "end_sec": 4601.68,
+      "duration_sec": 375.64,
+      "size_mb": 5.73
+    },
+    "part_2": {
+      "path": "audio/test_4/part_2.mp3",
+      "start_sec": 4605.48,
+      "end_sec": 4819.2,
+      "duration_sec": 213.72,
+      "size_mb": 4.3
+    },
+    "part_3": {
+      "path": "audio/test_4/part_3.mp3",
+      "start_sec": 4819.64,
+      "end_sec": 5008.88,
+      "duration_sec": 189.24,
+      "size_mb": 3.31
+    },
+    "part_4": {
+      "path": "audio/test_4/part_4.mp3",
+      "start_sec": 5008.92,
+      "end_sec": 5353.28,
+      "duration_sec": 344.36,
+      "size_mb": 5.3
+    },
+    "part_5": {
+      "path": "audio/test_4/part_5.mp3",
+      "start_sec": 5358.68,
+      "end_sec": 5578.96,
+      "duration_sec": 220.28,
+      "size_mb": 3.36
+    }
+  },
+  "test_5": {
+    "part_1": {
+      "path": "audio/test_5/part_1.mp3",
+      "start_sec": 5598.68,
+      "end_sec": 5941.44,
+      "duration_sec": 342.76,
+      "size_mb": 5.27
+    },
+    "part_2": {
+      "path": "audio/test_5/part_2.mp3",
+      "start_sec": 5943.64,
+      "end_sec": 6132.32,
+      "duration_sec": 188.68,
+      "size_mb": 3.34
+    },
+    "part_3": {
+      "path": "audio/test_5/part_3.mp3",
+      "start_sec": 6132.76,
+      "end_sec": 6337.44,
+      "duration_sec": 204.68,
+      "size_mb": 3.29
+    },
+    "part_4": {
+      "path": "audio/test_5/part_4.mp3",
+      "start_sec": 6338.92,
+      "end_sec": 6718.64,
+      "duration_sec": 379.72,
+      "size_mb": 6.6
+    },
+    "part_5": {
+      "path": "audio/test_5/part_5.mp3",
+      "start_sec": 6723.64,
+      "end_sec": 6912.8,
+      "duration_sec": 189.16,
+      "size_mb": 3.04
+    }
+  },
+  "test_6": {
+    "part_1": {
+      "path": "audio/test_6/part_1.mp3",
+      "start_sec": 6945.16,
+      "end_sec": 7327.36,
+      "duration_sec": 382.2,
+      "size_mb": 5.72
+    },
+    "part_2": {
+      "path": "audio/test_6/part_2.mp3",
+      "start_sec": 7329.64,
+      "end_sec": 7550.48,
+      "duration_sec": 220.84,
+      "size_mb": 4.55
+    },
+    "part_3": {
+      "path": "audio/test_6/part_3.mp3",
+      "start_sec": 7556.36,
+      "end_sec": 7758.32,
+      "duration_sec": 201.96,
+      "size_mb": 3.52
+    },
+    "part_4": {
+      "path": "audio/test_6/part_4.mp3",
+      "start_sec": 7760.52,
+      "end_sec": 8133.68,
+      "duration_sec": 373.16,
+      "size_mb": 5.98
+    },
+    "part_5": {
+      "path": "audio/test_6/part_5.mp3",
+      "start_sec": 8137.48,
+      "end_sec": 8357.68,
+      "duration_sec": 220.2,
+      "size_mb": 3.29
+    }
+  },
+  "test_7": {
+    "part_1": {
+      "path": "audio/test_7/part_1.mp3",
+      "start_sec": 8385.96,
+      "end_sec": 8763.28,
+      "duration_sec": 377.32,
+      "size_mb": 6.63
+    },
+    "part_2": {
+      "path": "audio/test_7/part_2.mp3",
+      "start_sec": 8764.76,
+      "end_sec": 8956.56,
+      "duration_sec": 191.8,
+      "size_mb": 3.42
+    },
+    "part_3": {
+      "path": "audio/test_7/part_3.mp3",
+      "start_sec": 8958.36,
+      "end_sec": 9146.24,
+      "duration_sec": 187.88,
+      "size_mb": 3.2
+    },
+    "part_4": {
+      "path": "audio/test_7/part_4.mp3",
+      "start_sec": 9147.56,
+      "end_sec": 9504.48,
+      "duration_sec": 356.92,
+      "size_mb": 6.16
+    },
+    "part_5": {
+      "path": "audio/test_7/part_5.mp3",
+      "start_sec": 9506.36,
+      "end_sec": 9723.28,
+      "duration_sec": 216.92,
+      "size_mb": 3.64
+    }
+  },
+  "test_8": {
+    "part_1": {
+      "path": "audio/test_8/part_1.mp3",
+      "start_sec": 9740.28,
+      "end_sec": 10135.04,
+      "duration_sec": 394.76,
+      "size_mb": 6.01
+    },
+    "part_2": {
+      "path": "audio/test_8/part_2.mp3",
+      "start_sec": 10137.64,
+      "end_sec": 10333.76,
+      "duration_sec": 196.12,
+      "size_mb": 3.06
+    },
+    "part_3": {
+      "path": "audio/test_8/part_3.mp3",
+      "start_sec": 10340.84,
+      "end_sec": 10533.52,
+      "duration_sec": 192.68,
+      "size_mb": 3.39
+    },
+    "part_4": {
+      "path": "audio/test_8/part_4.mp3",
+      "start_sec": 10535.96,
+      "end_sec": 10892.88,
+      "duration_sec": 356.92,
+      "size_mb": 5.62
+    },
+    "part_5": {
+      "path": "audio/test_8/part_5.mp3",
+      "start_sec": 10901.48,
+      "end_sec": 11116.52,
+      "duration_sec": 215.04,
+      "size_mb": 3.21
+    }
+  }
+}

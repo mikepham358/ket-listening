@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KET Listening Engine — Succeed in A2 Key (8 Practice Tests)</title>
+
+  <!-- Typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+
+  <!-- SheetJS: Đọc và xuất file Excel (.xlsx) 100% từ Client -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- App Header -->
+  <header id="app-header">
+    <div class="brand-section">
+      <span class="brand-logo">🎧</span>
+      <div>
+        <h1 class="brand-title" data-i18n="app_title">KET Listening Engine</h1>
+        <p style="font-size: 0.72rem; color: var(--text-muted);" data-i18n="subtitle">Succeed in A2 Key (8 Practice Tests)</p>
+      </div>
+    </div>
+
+    <!-- Audio Player Toolbar -->
+    <div id="audio-toolbar">
+      <button id="audio-replay-btn" class="audio-btn" title="Replay 5s (Left Arrow)">⏮️</button>
+      <button id="audio-play-btn" class="audio-btn" title="Play / Pause (Space)">▶️</button>
+      <button id="audio-forward-btn" class="audio-btn" title="Forward 5s (Right Arrow)">⏭️</button>
+      <input type="range" id="audio-progress-bar" class="audio-progress" min="0" max="100" value="0" />
+      <span id="audio-time-display" class="audio-time">0:00 / 0:00</span>
+      <button id="audio-speed-btn" class="audio-btn" style="font-size:0.75rem; font-family:var(--font-mono); width: auto; padding: 0 0.4rem;" title="Change Playback Speed">1.0x</button>
+    </div>
+
+    <div class="header-controls">
+      <select id="select-active-test" class="select-custom">
+        <option value="1">Practice Test 1</option>
+        <option value="2">Practice Test 2</option>
+        <option value="3">Practice Test 3</option>
+        <option value="4">Practice Test 4</option>
+        <option value="5">Practice Test 5</option>
+        <option value="6">Practice Test 6</option>
+        <option value="7">Practice Test 7</option>
+        <option value="8">Practice Test 8</option>
+      </select>
+      <span id="header-session-counter" class="badge-session" title="Tổng số câu hỏi đã làm">0</span>
+    </div>
+  </header>
+
+  <!-- 3-Tier Mode Switcher -->
+  <nav id="mode-switcher-bar">
+    <div class="tier-tabs">
+      <button class="tier-tab" data-mode="beginner">
+        <span>🌱</span>
+        <span data-i18n="mode_beginner">Mức 1: Beginner (Dictation)</span>
+      </button>
+      <button class="tier-tab active" data-mode="intermediate">
+        <span>⚡</span>
+        <span data-i18n="mode_intermediate">Mức 2: Intermediate (Socratic)</span>
+      </button>
+      <button class="tier-tab" data-mode="exam">
+        <span>🎓</span>
+        <span data-i18n="mode_exam">Mức 3: Exam Mode (Như Sách)</span>
+      </button>
+    </div>
+    <div style="font-size: 0.8rem; color: var(--text-muted);">
+      Phím tắt: <kbd style="background:var(--bg-card); padding: 0.15rem 0.4rem; border-radius:4px; font-family:var(--font-mono);">Space</kbd> Play/Pause &nbsp;|&nbsp; <kbd style="background:var(--bg-card); padding: 0.15rem 0.4rem; border-radius:4px; font-family:var(--font-mono);">Z</kbd> Zen Mode
+    </div>
+  </nav>
+
+  <!-- Split-Screen Workspace -->
+  <main id="workspace-container">
+    <!-- Left Pane: Guidance / PDF / Waveform -->
+    <section id="pane-left" class="workspace-pane"></section>
+
+    <!-- Right Pane: Interactive Question Workspace -->
+    <section id="pane-right" class="workspace-pane"></section>
+  </main>
+
+  <!-- Listening Trap Gate Modal -->
+  <div id="modal-trap-gate" class="modal-overlay">
+    <div class="modal-dialog">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+        <h3 style="color:var(--accent-gold); font-size:1.15rem;" data-i18n="trap_gate_title">⚠️ Sổ Bắt Bẫy Nghe Cambridge</h3>
+        <button class="audio-btn" onclick="App.closeTrapGateModal()">✕</button>
+      </div>
+      <p id="trap-gate-question-title" style="font-size:0.9rem; color:var(--text-secondary); margin-bottom:1.25rem;"></p>
+      <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:1rem;" data-i18n="trap_gate_desc">
+        Bạn vừa chọn chưa đúng. Hãy xác định bẫy đề thi mình vừa gặp trước khi tiếp tục:
+      </p>
+
+      <div style="display:flex; flex-direction:column; gap:0.6rem; margin-bottom:1.5rem;">
+        <button class="btn-secondary" style="text-align:left; padding:0.75rem 1rem;" onclick="App.submitTrapLog('mind_change')">
+          🔄 <strong>Bẫy Đổi Ý Phút Chót:</strong> Người nói ban đầu nói một đằng sau đổi ý (Actually / Wait...)
+        </button>
+        <button class="btn-secondary" style="text-align:left; padding:0.75rem 1rem;" onclick="App.submitTrapLog('tense_time')">
+          ⏳ <strong>Bẫy Thì Thời Gian:</strong> Nhắc đến sự việc tuần trước/quá khứ thay vì việc sẽ làm
+        </button>
+        <button class="btn-secondary" style="text-align:left; padding:0.75rem 1rem;" onclick="App.submitTrapLog('all_options_mentioned')">
+          🎯 <strong>Bẫy Liệt Kê Tất Cả:</strong> Cả 3 phương án đều xuất hiện trong audio nhưng 2 cái bị từ chối
+        </button>
+        <button class="btn-secondary" style="text-align:left; padding:0.75rem 1rem;" onclick="App.submitTrapLog('paraphrase_synonym')">
+          🪞 <strong>Bẫy Từ Đồng Nghĩa:</strong> Từ y hệt trong câu hỏi là bẫy, đáp án đúng dùng từ đồng nghĩa
+        </button>
+        <button class="btn-secondary" style="text-align:left; padding:0.75rem 1rem;" onclick="App.submitTrapLog('spelling_number')">
+          🔢 <strong>Bẫy Số Liệu / Chính Tả:</strong> Nhầm lẫn số 13/30, giá gốc vs giá sau giảm, đánh vần tên
+        </button>
+      </div>
+
+      <div style="text-align:right;">
+        <button class="btn-secondary" onclick="App.closeTrapGateModal()">Bỏ qua và xem gợi ý ➡️</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="i18n.js"></script>
+  <script src="audio-player.js"></script>
+  <script src="ket-tracker.js"></script>
+  <script src="data/tests.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

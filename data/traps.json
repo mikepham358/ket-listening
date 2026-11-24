@@ -1,0 +1,59 @@
+{
+  "listening_traps": [
+    {
+      "id": "mind_change",
+      "code": "TRAP-01",
+      "name_vi": "Bẫy Đổi Ý Phút Chót (Self-Correction)",
+      "name_en": "Mind Change & Self-Correction Trap",
+      "description_vi": "Người nói ban đầu đưa ra một mốc thông tin nhưng ngay sau đó sử dụng các từ chuyển tiếp (Wait, Actually, No, On second thought) để thay đổi quyết định sang thông tin đúng.",
+      "description_en": "The speaker initially proposes one option but quickly corrects themselves with markers like 'Actually', 'Wait', 'No', or 'On second thoughts'.",
+      "signal_words": ["Actually", "Wait", "No", "Let's instead", "On second thoughts", "I was going to, but"],
+      "strategy_vi": "Đừng vội vàng chọn ngay khi nghe thấy danh từ/số đầu tiên. Hãy nghe hết cả câu thoại xem người nói có đổi ý không.",
+      "strategy_en": "Never pick the first mentioned answer. Wait for the speaker to confirm their final decision."
+    },
+    {
+      "id": "tense_time",
+      "code": "TRAP-02",
+      "name_vi": "Bẫy Thì Thời Gian (Past vs Future)",
+      "name_en": "Time Frame & Tense Trap",
+      "description_vi": "Câu hỏi hỏi về hành động trong tương lai (will/going to) hoặc sự việc hiện tại, nhưng audio cố tình nhắc đến hoạt động đã diễn ra trong quá khứ (last week, yesterday) để gây nhiễu.",
+      "description_en": "The question asks about a future plan, but the audio mentions past activities or usual routines as distractors.",
+      "signal_words": ["Last week", "Yesterday", "Used to", "In the past", "Normally", "Usually", "Tomorrow", "Next week"],
+      "strategy_vi": "Xác định rõ câu hỏi hỏi về: ĐÃ LÀM (past), THƯỜNG LÀM (routine) hay SẼ LÀM (future plan).",
+      "strategy_en": "Highlight the tense in the prompt: past action, regular habit, or future plan."
+    },
+    {
+      "id": "paraphrase_synonym",
+      "code": "TRAP-03",
+      "name_vi": "Bẫy Từ Đồng Nghĩa & Diễn Đạt Khác",
+      "name_en": "Paraphrase & Synonym Trap",
+      "description_vi": "Từ khóa xuất hiện y hệt trong audio thường là phương án sai (bẫy lặp từ). Đáp án đúng thường được thay thế bằng từ đồng nghĩa hoặc cách nói phủ định ngược lại.",
+      "description_en": "Exact word matches in the recording are often distractors. The correct answer is typically paraphrased.",
+      "signal_words": ["cheap -> not expensive", "warm clothes -> jumper / sweater", "start -> begin", "repair -> fix"],
+      "strategy_vi": "Cảnh giác với những từ giống hệt trong câu hỏi. Tập trung tìm kiếm từ đồng nghĩa (synonyms) hoặc cách giải thích tương đương.",
+      "strategy_en": "Beware of exact lexical overlap; look for conceptual equivalents and paraphrases."
+    },
+    {
+      "id": "all_options_mentioned",
+      "code": "TRAP-04",
+      "name_vi": "Bẫy Liệt Kê Tất Cả Các Lựa Chọn",
+      "name_en": "All Options Mentioned Trap",
+      "description_vi": "Cả 3 bức tranh hoặc 3 phương án A, B, C đều được người nói nhắc đến trong bài. Tuy nhiên, 2 phương án bị loại trừ bằng các lý do như: hết hàng, quá đắt, bận rộn.",
+      "description_en": "All 3 choices are mentioned in the conversation, but two are ruled out with specific negative conditions.",
+      "signal_words": ["too big", "too expensive", "out of stock", "closed", "couldn't find", "didn't like"],
+      "strategy_vi": "Ghi chú nhanh lý do bị loại của từng đáp án. Chỉ chọn phương án người nói chốt lại đồng ý thực hiện.",
+      "strategy_en": "Note down the rejection reason for each distractor and only select the confirmed item."
+    },
+    {
+      "id": "spelling_number",
+      "code": "TRAP-05",
+      "name_vi": "Bẫy Chính Tả & Số Liệu Dễ Nhầm (Part 2)",
+      "name_en": "Spelling, Numbers & Currency Trap",
+      "description_vi": "Trong phần điền form (Part 2), người nói nhắc đến nhiều số tiền/giờ khác nhau (giá gốc vs giá sau giảm giá; giờ có mặt vs giờ xe chạy), hoặc đánh vần tên riêng có chữ kép.",
+      "description_en": "Distinction between original vs discounted price, departure vs arrival time, and spellings with double letters.",
+      "signal_words": ["discount", "was £10 now £6.50", "leaves at 8:30 meet at 8:00", "double", "capital"],
+      "strategy_vi": "Chỉ ghi kết quả cuối cùng (giá thực trả sau giảm, giờ xe chạy thực tế). Chú ý quy tắc viết hoa tên riêng.",
+      "strategy_en": "Write the final discounted price or actual departure time. Capitalize proper nouns correctly."
+    }
+  ]
+}
