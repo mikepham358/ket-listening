@@ -1,4 +1,4 @@
-// app.js — KET Listening Engine (Lego Colorful Theme & Zero-Transcript Dictation)
+// app.js — Succeed in A2 Key Listening (Lego Colorful Theme, Zero-Transcript Dictation & Live Telemetry)
 window.App = {
   currentTestId: 1,
   currentMode: 'beginner', // Mặc định mở Beginner cho học sinh
@@ -14,6 +14,7 @@ window.App = {
   socraticHintsRevealed: {}, // { qId: tierNumber }
   examTimerInterval: null,
   examSecondsRemaining: 30 * 60, // 30 mins
+  _profileModalPendingAction: null,
   
   async init() {
     window.KetAudioPlayer.init();
@@ -22,6 +23,9 @@ window.App = {
     // Bind global keybindings
     window.addEventListener('keydown', (e) => this.handleKeydown(e));
     
+    // Setup Student Profile & Telemetry Onboarding
+    this.initStudentProfile();
+
     // Load Test 1 by default
     await this.loadTest(this.currentTestId);
     
@@ -83,6 +87,180 @@ window.App = {
       progBar.addEventListener('input', (e) => {
         window.KetAudioPlayer.seek(parseFloat(e.target.value));
       });
+    }
+  },
+
+  /* ==========================================================================
+     Hồ Sơ Học Sinh & Live Telemetry Smart Interceptor
+     ========================================================================== */
+  initStudentProfile() {
+    // Setup target selector chips
+    const targetGrid = document.getElementById('profile-target-selector');
+    if (targetGrid) {
+      targetGrid.addEventListener('click', (e) => {
+        const btn = e.target.closest('.lego-target-card');
+        if (!btn) return;
+        targetGrid.querySelectorAll('.lego-target-card').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+      });
+    }
+
+    this.updateHeaderProfileBadge();
+
+    // Check if user has entered profile; if not, gently prompt after 700ms
+    if (window.KetTracker && !window.KetTracker.hasProfile()) {
+      setTimeout(() => {
+        if (!window.KetTracker.hasProfile()) {
+          this.openStudentProfileModal({ autoPrompt: true });
+        }
+      }, 700);
+    }
+  },
+
+  updateHeaderProfileBadge() {
+    const prof = window.KetTracker ? window.KetTracker.getProfile() : null;
+    const btnProfile = document.getElementById('btn-student-profile');
+    const nameEl = document.getElementById('header-student-name');
+    if (!btnProfile || !nameEl) return;
+
+    if (window.KetTracker && window.KetTracker.hasProfile() && prof && prof.student_name) {
+      btnProfile.classList.remove('unregistered');
+      const shortTarget = (prof.target_score || 'Distinction').split(' ')[0];
+      nameEl.textContent = `${prof.student_name.trim()} · ${shortTarget} ✏️`;
+      btnProfile.title = `Học sinh: ${prof.student_name} (${prof.student_email || 'Chưa có email'}) · Bấm để đổi thông tin`;
+    } else {
+      btnProfile.classList.add('unregistered');
+      nameEl.textContent = 'Nhập Tên Học Sinh ✍️';
+      btnProfile.title = 'Nhập họ tên & email để lưu kết quả và đồng bộ lên Google Sheets Live Telemetry';
+    }
+  },
+
+  openStudentProfileModal(opts = {}) {
+    this._profileModalPendingAction = opts.pendingAction || null;
+    const modal = document.getElementById('modal-student-profile');
+    if (!modal) return;
+
+    const prof = window.KetTracker ? window.KetTracker.getProfile() : {};
+    const inputName = document.getElementById('input-student-name');
+    const inputEmail = document.getElementById('input-student-email');
+    if (inputName) inputName.value = prof.student_name || '';
+    if (inputEmail) inputEmail.value = prof.student_email || '';
+
+    // Set target card
+    const targetGrid = document.getElementById('profile-target-selector');
+    if (targetGrid) {
+      targetGrid.querySelectorAll('.lego-target-card').forEach(btn => {
+        const val = btn.getAttribute('data-target');
+        btn.classList.toggle('active', val === prof.target_score || (!prof.target_score && val.includes('Distinction')));
+      });
+    }
+
+    // Hide previous error messages
+    const errName = document.getElementById('error-student-name');
+    const errEmail = document.getElementById('error-student-email');
+    if (errName) errName.style.display = 'none';
+    if (errEmail) errEmail.style.display = 'none';
+
+    modal.style.display = 'flex';
+    setTimeout(() => {
+      if (inputName) inputName.focus();
+    }, 150);
+  },
+
+  closeStudentProfileModal() {
+    const modal = document.getElementById('modal-student-profile');
+    if (modal) modal.style.display = 'none';
+    this._profileModalPendingAction = null;
+  },
+
+  skipOrCloseProfileModal() {
+    const modal = document.getElementById('modal-student-profile');
+    if (modal) modal.style.display = 'none';
+    this._profileModalPendingAction = null;
+  },
+
+  saveStudentProfileFromForm() {
+    const inputName = document.getElementById('input-student-name');
+    const inputEmail = document.getElementById('input-student-email');
+    const errName = document.getElementById('error-student-name');
+    const errEmail = document.getElementById('error-student-email');
+
+    const name = inputName ? inputName.value.trim() : '';
+    const email = inputEmail ? inputEmail.value.trim() : '';
+
+    let hasError = false;
+    if (!name || name.length < 2) {
+      if (errName) errName.style.display = 'block';
+      if (inputName) inputName.focus();
+      hasError = true;
+    } else {
+      if (errName) errName.style.display = 'none';
+    }
+
+    if (!email || !email.includes('@') || !email.includes('.')) {
+      if (errEmail) errEmail.style.display = 'block';
+      if (!hasError && inputEmail) inputEmail.focus();
+      hasError = true;
+    } else {
+      if (errEmail) errEmail.style.display = 'none';
+    }
+
+    if (hasError) return;
+
+    // Get selected target
+    const activeTargetBtn = document.querySelector('#profile-target-selector .lego-target-card.active');
+    const targetScore = activeTargetBtn ? activeTargetBtn.getAttribute('data-target') : 'Distinction (140-150)';
+
+    if (window.KetTracker) {
+      window.KetTracker.setProfile({
+        student_name: name,
+        student_email: email,
+        target_score: targetScore
+      });
+
+      // Send Telemetry Session Start
+      window.KetTracker.track('SESSION_START', {
+        student_name: name,
+        student_email: email,
+        target_score: targetScore,
+        test_id: `Practice Test ${this.currentTestId}`,
+        mode: this.currentMode
+      }, {
+        result: 'ĐĂNG KÝ HỌC SINH THÀNH CÔNG'
+      });
+    }
+
+    this.updateHeaderProfileBadge();
+    const modal = document.getElementById('modal-student-profile');
+    if (modal) modal.style.display = 'none';
+
+    // Execute pending action if any
+    if (this._profileModalPendingAction && typeof this._profileModalPendingAction === 'function') {
+      const pending = this._profileModalPendingAction;
+      this._profileModalPendingAction = null;
+      pending();
+    }
+  },
+
+  requireStudentProfile(action) {
+    if (window.KetTracker && window.KetTracker.hasProfile()) {
+      action();
+    } else {
+      this.openStudentProfileModal({
+        requiredForAction: true,
+        pendingAction: action
+      });
+    }
+  },
+
+  promptCustomWebhook() {
+    const cur = window.KetTracker ? window.KetTracker.getWebhookUrl() : '';
+    const url = prompt("Nhập URL Google Apps Script Webhook của bạn (dạng https://script.google.com/macros/s/.../exec):\n\n(Để trống nếu muốn quay lại Webhook mặc định của hệ thống)", cur);
+    if (url !== null) {
+      if (window.KetTracker) {
+        window.KetTracker.setWebhookUrl(url);
+      }
+      alert("✅ Đã cập nhật Webhook URL thành công!");
     }
   },
 
@@ -468,6 +646,11 @@ window.App = {
   },
 
   checkSentenceDictation() {
+    // Smart Intercept: Yêu cầu học sinh nhập tên & email trước khi kiểm tra
+    if (window.KetTracker && !window.KetTracker.hasProfile()) {
+      return this.requireStudentProfile(() => this.checkSentenceDictation());
+    }
+
     const q = this.testData.questions[this.currentQuestionIndex];
     if (!q) return;
     const sentences = q.dictation_sentences || [];
@@ -488,8 +671,30 @@ window.App = {
     const targetText = curSent.text;
 
     const isMatch = this.renderDiffFeedback(typedText, targetText, sKey);
+    const duration = window.KetTracker ? window.KetTracker.getQuestionDuration(`${q.id}_${this.currentSentenceIndex}`) : 0;
+    const currentAttempt = (this.sentenceAttempts[sKey] || 0) + 1;
+
+    // Truyền dữ liệu lớn về Google Sheets Live Telemetry
+    if (window.KetTracker) {
+      window.KetTracker.track('DICTATION_CHECK', {
+        question_id: q.id,
+        sentence_index: this.currentSentenceIndex + 1,
+        total_sentences: sentences.length,
+        typed_text: typedText,
+        target_text: targetText,
+        is_match: isMatch,
+        attempt: currentAttempt
+      }, {
+        question_number: `Câu ${q.q_number || q.id} (Thoại ${this.currentSentenceIndex + 1}/${sentences.length})`,
+        result: isMatch ? `ĐÚNG (Lần ${currentAttempt})` : `CHƯA ĐÚNG (Lần ${currentAttempt})`,
+        duration: duration
+      });
+    }
+
     if (isMatch) {
       this.sentenceSolved[sKey] = true;
+      if (window.KetTracker) window.KetTracker.incrementSessionCounter();
+
       // Auto move to next sentence if available
       if (this.currentSentenceIndex < sentences.length - 1) {
         setTimeout(() => {
@@ -497,7 +702,7 @@ window.App = {
         }, 1200);
       }
     } else {
-      this.sentenceAttempts[sKey] = (this.sentenceAttempts[sKey] || 0) + 1;
+      this.sentenceAttempts[sKey] = currentAttempt;
       this.renderBeginnerWorkspace(q);
     }
   },
@@ -574,6 +779,18 @@ window.App = {
     inputEl.value = hintText;
     this.sentenceAnswers[sKey] = hintText;
 
+    if (window.KetTracker) {
+      window.KetTracker.track('HINT_USED', {
+        question_id: q.id,
+        sentence_index: this.currentSentenceIndex + 1,
+        hint_type: 'letter_first',
+        attempts_before: attempts
+      }, {
+        question_number: `Câu ${q.q_number || q.id} (Thoại ${this.currentSentenceIndex + 1})`,
+        result: 'DÙNG GỢI Ý CHỮ CÁI (1 LẦN)'
+      });
+    }
+
     // Reset số lần thử sai về 0 để tạo vòng lặp: dùng 1 lần xong phải thử sai tiếp 3 lần!
     this.sentenceAttempts[sKey] = 0;
     this.lastHintConsumed[sKey] = true;
@@ -611,6 +828,19 @@ window.App = {
       const newText = currentWords.join(' ');
       inputEl.value = newText;
       this.sentenceAnswers[sKey] = newText;
+    }
+
+    if (window.KetTracker) {
+      window.KetTracker.track('HINT_USED', {
+        question_id: q.id,
+        sentence_index: this.currentSentenceIndex + 1,
+        hint_type: 'next_word',
+        revealed_word: targetWords[nextIdx] || '',
+        attempts_before: attempts
+      }, {
+        question_number: `Câu ${q.q_number || q.id} (Thoại ${this.currentSentenceIndex + 1})`,
+        result: 'DÙNG MỞ 1 TỪ (1 LẦN)'
+      });
     }
 
     // Reset số lần thử sai về 0 để tạo vòng lặp: dùng 1 lần xong phải thử sai tiếp 3 lần!
@@ -722,6 +952,11 @@ window.App = {
   },
 
   checkIntermediateAnswer() {
+    // Smart Intercept: Yêu cầu học sinh nhập tên & email trước khi kiểm tra
+    if (window.KetTracker && !window.KetTracker.hasProfile()) {
+      return this.requireStudentProfile(() => this.checkIntermediateAnswer());
+    }
+
     const q = this.testData.questions[this.currentQuestionIndex];
     if (!q) return;
 
@@ -736,9 +971,26 @@ window.App = {
     this.attempts[q.id] = currentAttempts;
 
     const isCorrect = q.acceptable_answers.some(a => a.toLowerCase() === ans.toLowerCase());
+    const duration = window.KetTracker ? window.KetTracker.getQuestionDuration(q.id) : 0;
+
+    // Send Live Telemetry
+    if (window.KetTracker) {
+      window.KetTracker.track('INTERMEDIATE_CHECK', {
+        question_id: q.id,
+        user_answer: ans,
+        correct_answer: q.correct_answer || q.acceptable_answers[0],
+        attempt: currentAttempts,
+        is_correct: isCorrect
+      }, {
+        question_number: `Câu ${q.q_number || q.id}`,
+        result: isCorrect ? `ĐÚNG (Lần ${currentAttempts})` : `CHƯA ĐÚNG (Lần ${currentAttempts})`,
+        duration: duration
+      });
+    }
 
     if (isCorrect) {
       this.socraticHintsRevealed[q.id] = 3;
+      if (window.KetTracker) window.KetTracker.incrementSessionCounter();
       const feedback = document.getElementById('answer-feedback');
       if (feedback) {
         feedback.innerHTML = `<div style="color:var(--lego-green); font-weight:800; font-size:1.05rem;">🎉 Chính xác! Đáp án hoàn toàn đúng!</div>`;
@@ -768,10 +1020,13 @@ window.App = {
   submitTrapLog(trapType) {
     const q = this.testData.questions[this.currentQuestionIndex];
     if (window.KetTracker) {
-      window.KetTracker.logEvent('TRAP_LOGGED', {
+      window.KetTracker.track('TRAP_LOGGED', {
         question_id: q.id,
         trap_selected: trapType,
         duration_sec: window.KetTracker.getQuestionDuration()
+      }, {
+        question_number: `Câu ${q.q_number || q.id}`,
+        result: `BẪY ĐỀ: ${trapType}`
       });
     }
     this.closeTrapGateModal();
@@ -860,16 +1115,37 @@ window.App = {
 
   recordExamAnswer(qId, val) {
     this.userAnswers[qId] = val;
+    if (window.KetTracker) {
+      window.KetTracker.track('EXAM_ANSWER', {
+        question_id: qId,
+        chosen_option: val
+      }, {
+        question_number: `Câu ${qId}`,
+        result: `CHỌN: ${val}`
+      });
+    }
     this.renderExamWorkspace(this.testData.questions[this.currentQuestionIndex]);
   },
 
   submitExamTest() {
+    // Smart Intercept: Yêu cầu học sinh nhập tên & email trước khi nộp bài
+    if (window.KetTracker && !window.KetTracker.hasProfile()) {
+      return this.requireStudentProfile(() => this.submitExamTest());
+    }
+
     let score = 0;
+    const total = (this.testData && this.testData.questions) ? this.testData.questions.length : 25;
+    const breakdown = [];
+
     this.testData.questions.forEach(q => {
       const ans = this.userAnswers[q.id];
-      if (ans && q.acceptable_answers.some(a => a.toLowerCase() === ans.toLowerCase())) {
-        score++;
-      }
+      const isRight = Boolean(ans && q.acceptable_answers.some(a => a.toLowerCase() === ans.toLowerCase()));
+      if (isRight) score++;
+      breakdown.push({
+        q_id: q.id,
+        user_ans: ans || '',
+        is_correct: isRight
+      });
     });
 
     let grade = "Pass (Level A2)";
@@ -878,7 +1154,30 @@ window.App = {
     else if (score >= 14) grade = "Level A1";
     else grade = "Fail (Cố gắng luyện tập thêm nhé!)";
 
-    alert(`🏁 Kết quả bài thi Test ${this.currentTestId}:\n- Điểm số: ${score} / 25\n- Đánh giá: ${grade}`);
+    const percentage = Math.round((score / total) * 100);
+    const prof = window.KetTracker ? window.KetTracker.getProfile() : {};
+
+    // Truyền dữ liệu lớn về Google Sheets Live Telemetry
+    if (window.KetTracker) {
+      window.KetTracker.track('EXAM_SUBMIT', {
+        score: score,
+        total: total,
+        percentage: percentage,
+        grade: grade,
+        breakdown: breakdown
+      }, {
+        question_number: `Tổng kết Test ${this.currentTestId}`,
+        result: `NỘP BÀI: ${score}/${total} (${percentage}%) - ${grade}`
+      });
+      window.KetTracker.incrementSessionCounter();
+    }
+
+    alert(`🏁 KẾT QUẢ BÀI THI TEST ${this.currentTestId}:\n\n` +
+          `👤 Học sinh: ${prof.student_name || 'Học sinh'}\n` +
+          `📧 Email: ${prof.student_email || 'Chưa có email'}\n` +
+          `📊 Điểm số: ${score} / ${total} (${percentage}%)\n` +
+          `🎖️ Xếp loại: ${grade}\n\n` +
+          `✅ Toàn bộ kết quả đã được gửi tự động lên Google Sheets Live Telemetry cho Thầy Cô!`);
   },
 
   prevQuestion() {

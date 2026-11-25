@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>KET Listening Engine — Học Nghe & Chép Chính Tả A2 Key (Lego Style)</title>
+  <title>Succeed in A2 Key Listening — Học Nghe & Chép Chính Tả (Lego Style)</title>
 
   <!-- Google Fonts: Plus Jakarta Sans & Quicksand (Kid-Friendly & Highly Legible) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -22,7 +22,7 @@
     <div class="brand-section">
       <span class="brand-logo">🧩</span>
       <div>
-        <h1 class="brand-title" data-i18n="app_title">KET Listening Engine</h1>
+        <h1 class="brand-title" data-i18n="app_title">Succeed in A2 Key Listening</h1>
         <p style="font-size: 0.76rem; font-weight:700; color: var(--text-muted);" data-i18n="subtitle">Succeed in A2 Key · Dành cho học sinh 10-12 tuổi</p>
       </div>
     </div>
@@ -38,6 +38,12 @@
     </div>
 
     <div class="header-controls">
+      <!-- Smart Student Profile Pill (Lego Style) -->
+      <button id="btn-student-profile" class="lego-btn-profile-top unregistered" onclick="App.openStudentProfileModal()" title="Hồ sơ học sinh & Google Sheets Live Telemetry">
+        <span class="profile-avatar">👤</span>
+        <span id="header-student-name">Nhập Tên Học Sinh ✍️</span>
+      </button>
+
       <!-- Quick Lego Dictionary Button -->
       <button class="lego-btn-dict-top" onclick="KetDictionary.openModal()" title="Mở từ điển tra IPA, phát âm và nghĩa tiếng Việt">
         📚 Tra Từ Điển
@@ -129,6 +135,97 @@
 
         <div style="text-align:right;">
           <button class="lego-btn-secondary" onclick="App.closeTrapGateModal()">Bỏ qua và xem gợi ý ➡️</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Smart Student Profile & Live Telemetry Modal (Lego Style) -->
+  <div id="modal-student-profile" class="lego-modal-overlay" style="display:none;">
+    <div class="lego-modal-card" style="max-width: 520px;">
+      <div class="lego-modal-header" style="background:#e0f2fe; border-color:#bae6fd;">
+        <div class="lego-studs-bar">
+          <span class="lego-stud red" style="background:var(--lego-red);"></span>
+          <span class="lego-stud yellow" style="background:var(--lego-yellow);"></span>
+          <span class="lego-stud green" style="background:var(--lego-green);"></span>
+          <span class="lego-stud blue" style="background:var(--lego-blue);"></span>
+        </div>
+        <div class="lego-modal-title-row" style="color:var(--lego-blue-shadow);">
+          <span style="font-size:1.15rem; font-weight:800;">👤 Hồ Sơ Học Sinh & Live Telemetry</span>
+          <button class="lego-close-btn" onclick="App.closeStudentProfileModal()">✕</button>
+        </div>
+      </div>
+      <div class="lego-modal-body">
+        <div class="profile-intro-banner">
+          <div style="font-size:2rem; margin-bottom:0.25rem;">👋</div>
+          <h3 style="font-size:1.05rem; font-weight:800; color:var(--text-primary); margin-bottom:0.35rem;">Chào mừng bạn đến với Succeed in A2 Key Listening!</h3>
+          <p style="font-size:0.86rem; color:var(--text-secondary); line-height:1.45; margin:0;">
+            Để lưu điểm số, tích lũy huy hiệu và đồng bộ dữ liệu lớn lên <strong>Google Sheets Live Telemetry</strong> cho Thầy Cô, bạn hãy điền tên và email nhé:
+          </p>
+        </div>
+
+        <form id="form-student-profile" onsubmit="event.preventDefault(); App.saveStudentProfileFromForm();" style="display:flex; flex-direction:column; gap:0.9rem; margin-top:1rem;">
+          <div class="lego-form-field">
+            <label for="input-student-name" style="font-weight:700; font-size:0.88rem; color:var(--text-primary); display:block; margin-bottom:0.3rem;">
+              🏷️ Họ và tên học sinh <span style="color:var(--lego-red);">*</span>
+            </label>
+            <input type="text" id="input-student-name" class="lego-input-custom" placeholder="Ví dụ: Nguyễn Minh An" required autocomplete="name" />
+            <div class="field-error-msg" id="error-student-name" style="color:var(--lego-red); display:none; font-size:0.8rem; font-weight:700; margin-top:0.25rem;">Vui lòng điền họ và tên học sinh!</div>
+          </div>
+
+          <div class="lego-form-field">
+            <label for="input-student-email" style="font-weight:700; font-size:0.88rem; color:var(--text-primary); display:block; margin-bottom:0.3rem;">
+              📧 Địa chỉ Email <span style="color:var(--lego-red);">*</span>
+            </label>
+            <input type="email" id="input-student-email" class="lego-input-custom" placeholder="Ví dụ: student@vinschool.edu.vn hoặc email cá nhân" required autocomplete="email" />
+            <div class="field-error-msg" id="error-student-email" style="color:var(--lego-red); display:none; font-size:0.8rem; font-weight:700; margin-top:0.25rem;">Vui lòng nhập email hợp lệ (có chứa @)!</div>
+          </div>
+
+          <div class="lego-form-field">
+            <label style="font-weight:700; font-size:0.88rem; color:var(--text-primary); display:block; margin-bottom:0.35rem;">
+              🎯 Mục tiêu điểm số A2 Key (Cambridge English)
+            </label>
+            <div class="target-cards-grid" id="profile-target-selector">
+              <button type="button" class="lego-target-card active" data-target="Distinction (140-150)">
+                <div class="target-badge-icon">🏅</div>
+                <div class="target-name">Xuất Sắc (B1)</div>
+                <div class="target-score">140 - 150 điểm</div>
+              </button>
+              <button type="button" class="lego-target-card" data-target="Merit (133-139)">
+                <div class="target-badge-icon">🥈</div>
+                <div class="target-name">Giỏi (A2)</div>
+                <div class="target-score">133 - 139 điểm</div>
+              </button>
+              <button type="button" class="lego-target-card" data-target="Pass (120-132)">
+                <div class="target-badge-icon">🥉</div>
+                <div class="target-name">Đạt Chuẩn (A2)</div>
+                <div class="target-score">120 - 132 điểm</div>
+              </button>
+            </div>
+          </div>
+
+          <div style="display:flex; gap:0.75rem; margin-top:0.5rem; justify-content:flex-end;">
+            <button type="button" class="lego-btn-secondary" onclick="App.skipOrCloseProfileModal()" style="padding:0.65rem 1.15rem; font-size:0.9rem;">Để sau</button>
+            <button type="submit" class="lego-btn-primary" style="padding:0.65rem 1.4rem; font-size:0.95rem;">
+              🚀 Lưu & Bắt Đầu Học Nghe
+            </button>
+          </div>
+        </form>
+
+        <!-- Telemetry Status Bar -->
+        <div class="telemetry-status-box">
+          <div style="display:flex; align-items:center; gap:0.5rem;">
+            <span class="status-dot-live"></span>
+            <span>Google Sheets Telemetry: <strong>Sẵn sàng</strong></span>
+          </div>
+          <div style="display:flex; gap:0.4rem; align-items:center;">
+            <button type="button" onclick="App.promptCustomWebhook()" class="btn-ping-test" title="Đổi URL Google Apps Script Webhook nếu muốn dùng bảng tính riêng">
+              ⚙️ Webhook URL
+            </button>
+            <button type="button" onclick="KetTracker.testPing().then(r => alert(r.message))" class="btn-ping-test" title="Gửi 1 dòng test ngầm lên Google Sheets">
+              ⚡ Gửi Ping Thử
+            </button>
+          </div>
         </div>
       </div>
     </div>

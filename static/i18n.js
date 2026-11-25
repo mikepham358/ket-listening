@@ -1,11 +1,13 @@
-// i18n.js - Song ngữ Anh - Việt cho KET Succeed in A2 Key Listening Engine
+// i18n.js - Song ngữ Anh - Việt cho Succeed in A2 Key Listening Engine
 window.I18N = {
   currentLang: localStorage.getItem('ket_listening_lang') || 'vi',
 
   dict: {
     vi: {
-      app_title: "KET Listening Engine",
+      app_title: "Succeed in A2 Key Listening",
       subtitle: "Luyện Kỹ Năng Nghe A2 Key Chuẩn Cambridge",
+      student_profile: "Hồ sơ học sinh",
+      enter_name: "Nhập Tên Học Sinh ✍️",
       mode_beginner: "Mức 1: Beginner",
       mode_beginner_desc: "Luyện tai nhạy & chép chính tả (Dictation & Cloze)",
       mode_intermediate: "Mức 2: Intermediate",
@@ -48,8 +50,10 @@ window.I18N = {
       accuracy: "Độ chính xác"
     },
     en: {
-      app_title: "KET Listening Engine",
+      app_title: "Succeed in A2 Key Listening",
       subtitle: "Cambridge A2 Key Listening Practice App",
+      student_profile: "Student Profile",
+      enter_name: "Enter Student Name ✍️",
       mode_beginner: "Tier 1: Beginner",
       mode_beginner_desc: "Ear training, Dictation & Cloze Gap-Fill",
       mode_intermediate: "Tier 2: Intermediate",

@@ -514,6 +514,17 @@ window.KetDictionary = {
 
     this.currentWordData = data;
 
+    // Track Vocab Lookup in Live Telemetry
+    if (window.KetTracker) {
+      window.KetTracker.track('VOCAB_LOOKUP', {
+        word: data.word,
+        ipa: data.ipa,
+        primary_meaning: data.viMeanings && data.viMeanings[0] ? data.viMeanings[0] : ''
+      }, {
+        result: `TRA TỪ: ${data.word}`
+      });
+    }
+
     // Vietnamese Meaning Tags
     const meaningsHtml = data.viMeanings.map(m => `
       <span class="lego-tag-meaning">⭐ ${m}</span>
@@ -609,13 +620,16 @@ window.KetDictionary = {
             <span class="lego-ipa-badge">${data.ipa}</span>
           </div>
 
-          <!-- Dual Pronunciation Audio Buttons -->
-          <div style="display:flex; gap:0.5rem;">
+          <!-- Dual Pronunciation Audio Buttons & Save Button -->
+          <div style="display:flex; gap:0.5rem; align-items:center;">
             <button class="lego-btn-audio uk" onclick="KetDictionary.speak('uk')" title="Phát âm giọng Anh (UK)">
               🇬🇧 UK Audio
             </button>
             <button class="lego-btn-audio us" onclick="KetDictionary.speak('us')" title="Phát âm giọng Mỹ (US)">
               🇺🇸 US Audio
+            </button>
+            <button class="lego-btn-audio" style="background:#e0f2fe; color:#0369a1; border-color:#7dd3fc; border-bottom:3px solid #0284c7;" onclick="KetDictionary.saveCurrentWordToNotebook()" title="Lưu vào sổ tay từ vựng & đồng bộ Google Sheets">
+              💾 Lưu Từ
             </button>
           </div>
         </div>
@@ -651,6 +665,34 @@ window.KetDictionary = {
       if (voice) utterance.voice = voice;
       window.speechSynthesis.speak(utterance);
     }
+  },
+
+  saveCurrentWordToNotebook() {
+    if (!this.currentWordData) return;
+    const d = this.currentWordData;
+    let list = [];
+    try {
+      list = JSON.parse(localStorage.getItem('ket_vocab_notebook_v1') || '[]');
+    } catch(e) {}
+    if (!list.some(item => item.word.toLowerCase() === d.word.toLowerCase())) {
+      list.push({
+        word: d.word,
+        ipa: d.ipa,
+        meaning: d.viMeanings && d.viMeanings[0] ? d.viMeanings[0] : '',
+        saved_at: new Date().toISOString()
+      });
+      localStorage.setItem('ket_vocab_notebook_v1', JSON.stringify(list));
+    }
+    if (window.KetTracker) {
+      window.KetTracker.track('VOCAB_SAVED', {
+        word: d.word,
+        ipa: d.ipa,
+        meaning: d.viMeanings && d.viMeanings[0] ? d.viMeanings[0] : ''
+      }, {
+        result: `LƯU TỪ VỰNG: ${d.word}`
+      });
+    }
+    alert(`🌟 Đã lưu từ "${d.word}" vào Sổ Tay Từ Vựng và đồng bộ lên Google Sheets!`);
   }
 };
 

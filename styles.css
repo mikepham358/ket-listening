@@ -1293,3 +1293,172 @@ body.zen-mode #mode-switcher-bar {
     margin-bottom: 1rem !important;
   }
 }
+
+/* ==========================================================================
+   Student Profile Button in Header (Lego Style)
+   ========================================================================== */
+.lego-btn-profile-top {
+  background: #f0fdf4;
+  color: #166534;
+  border: 2px solid #86efac;
+  border-bottom: 4px solid #22c55e;
+  border-radius: var(--radius-md);
+  font-size: 0.88rem;
+  font-weight: 800;
+  padding: 0.45rem 0.85rem;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.lego-btn-profile-top:hover {
+  background: #dcfce7;
+  transform: translateY(-1px);
+}
+
+.lego-btn-profile-top:active {
+  transform: translateY(2px);
+  border-bottom-width: 2px;
+}
+
+.lego-btn-profile-top.unregistered {
+  background: #fffbeb;
+  color: #92400e;
+  border: 2px solid #fde68a;
+  border-bottom: 4px solid #f59e0b;
+  animation: pulse-badge-glow 2.5s infinite ease-in-out;
+}
+
+@keyframes pulse-badge-glow {
+  0%, 100% {
+    box-shadow: 0 0 0 rgba(245, 158, 11, 0);
+  }
+  50% {
+    box-shadow: 0 0 10px rgba(245, 158, 11, 0.45);
+    border-color: #f59e0b;
+  }
+}
+
+/* ==========================================================================
+   Student Profile Modal & Big Data Telemetry Controls
+   ========================================================================== */
+.profile-intro-banner {
+  background: #f0fdf4;
+  border: 2px dashed #bbf7d0;
+  border-radius: var(--radius-lg);
+  padding: 1rem 1.25rem;
+  text-align: center;
+}
+
+.lego-form-field {
+  display: flex;
+  flex-direction: column;
+}
+
+.lego-input-custom {
+  background: #ffffff;
+  border: 2px solid var(--border-strong);
+  border-bottom: 3px solid var(--border-strong);
+  border-radius: var(--radius-md);
+  padding: 0.65rem 0.85rem;
+  font-size: 0.95rem;
+  font-family: inherit;
+  font-weight: 600;
+  color: var(--text-primary);
+  outline: none;
+  transition: all 0.15s ease;
+}
+
+.lego-input-custom:focus {
+  border-color: var(--lego-blue);
+  border-bottom-color: var(--lego-blue-shadow);
+  box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.15);
+}
+
+.target-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.5rem;
+}
+
+.lego-target-card {
+  background: #ffffff;
+  border: 2px solid var(--border-subtle);
+  border-bottom: 3px solid var(--border-strong);
+  border-radius: var(--radius-md);
+  padding: 0.65rem 0.4rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  outline: none;
+}
+
+.lego-target-card:hover {
+  background: #f8fafc;
+  transform: translateY(-1px);
+}
+
+.lego-target-card.active {
+  background: #eff6ff;
+  border-color: var(--lego-blue);
+  border-bottom: 4px solid var(--lego-blue-shadow);
+  box-shadow: 0 2px 6px rgba(2, 132, 199, 0.15);
+}
+
+.lego-target-card .target-badge-icon {
+  font-size: 1.35rem;
+  margin-bottom: 0.2rem;
+}
+
+.lego-target-card .target-name {
+  font-size: 0.82rem;
+  font-weight: 800;
+  color: var(--text-primary);
+}
+
+.lego-target-card .target-score {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin-top: 0.15rem;
+}
+
+.telemetry-status-box {
+  margin-top: 1.25rem;
+  padding: 0.75rem 1rem;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: var(--radius-md);
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.status-dot-live {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #22c55e;
+  display: inline-block;
+  box-shadow: 0 0 6px #22c55e;
+}
+
+.btn-ping-test {
+  background: #e0e7ff;
+  border: none;
+  color: #4338ca;
+  padding: 0.3rem 0.65rem;
+  border-radius: 6px;
+  font-weight: 700;
+  cursor: pointer;
+  font-size: 0.75rem;
+  transition: all 0.15s ease;
+}
+
+.btn-ping-test:hover {
+  background: #c7d2fe;
+}
