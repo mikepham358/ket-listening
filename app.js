@@ -130,23 +130,48 @@ window.App = {
     if (!pane) return;
 
     if (this.currentMode === 'exam') {
+      const existingFrame = document.getElementById('exam-pdf-frame');
+      if (existingFrame) {
+        // Cập nhật số trang gợi ý mà không reload iframe để giữ nguyên vị trí cuộn & phóng to của học sinh
+        const pageBadge = document.getElementById('exam-pdf-page-indicator');
+        if (pageBadge && q.pdf_page) {
+          pageBadge.textContent = `📖 Trang gợi ý: ${q.pdf_page}`;
+        }
+        return;
+      }
+
       pane.innerHTML = `
-        <div class="lego-card">
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 1rem;">
-            <span class="part-badge">📖 Trang Sách Gốc: ${q.pdf_page}</span>
-            <span class="badge-session">Cambridge A2 Key</span>
-          </div>
-          <div style="background: #eff6ff; border: 2px solid #bfdbfe; border-radius: var(--radius-md); padding: 1.5rem; text-align:center;">
-            <h3 style="color:var(--lego-blue); margin-bottom: 0.5rem;">Succeed in A2 Key — Test ${this.currentTestId}</h3>
-            <p style="font-size:0.95rem; font-weight:600; color:#334155; margin-bottom: 1rem;">
-              Phần thi này đối chiếu với Trang <strong>${q.pdf_page}</strong> trong sách giáo trình.
-            </p>
-            <div style="padding: 0.75rem; background: #ffffff; border-radius: 8px; font-family: var(--font-mono); font-size: 0.85rem; color: #0284c7; font-weight:700;">
-              Audio Part ${q.part}: Phát liên tục theo chuẩn phòng thi thật
+        <div class="lego-card lego-pdf-card">
+          <div class="lego-pdf-header-row">
+            <div style="display:flex; align-items:center; gap:0.5rem; flex-wrap:wrap;">
+              <span class="part-badge" id="exam-pdf-page-indicator">📖 Trang gợi ý: ${q.pdf_page || 'Đề thi'}</span>
+              <span class="badge-session">Cambridge A2 Key</span>
             </div>
+            <div style="display:flex; gap:0.4rem; align-items:center;">
+              <a href="https://drive.google.com/file/d/1OVNzYe_ZYOm9xVlfBB9nISHOuLF4_joT/view?usp=drive_open" target="_blank" rel="noopener" class="lego-btn-secondary" style="text-decoration:none; font-size:0.8rem; padding:0.3rem 0.65rem;" title="Mở file PDF trong tab mới">
+                Mở tab mới ↗️
+              </a>
+              <button class="lego-btn-secondary" onclick="App.reloadExamPdf()" style="font-size:0.8rem; padding:0.3rem 0.65rem;" title="Tải lại PDF">
+                🔄 Tải lại
+              </button>
+            </div>
+          </div>
+
+          <!-- Google Drive PDF Viewer Embed (SUCCEED in A2 Key 2020) -->
+          <div class="lego-pdf-viewer-wrap">
+            <iframe 
+              id="exam-pdf-frame" 
+              src="https://drive.google.com/file/d/1OVNzYe_ZYOm9xVlfBB9nISHOuLF4_joT/preview" 
+              width="100%" 
+              height="100%" 
+              allow="autoplay"
+              loading="lazy"
+              title="Đề thi SUCCEED in A2 Key New 2020 Format"
+            ></iframe>
           </div>
         </div>
       `;
+      return;
     } else if (this.currentMode === 'beginner') {
       // BEGINNER: ZERO TRANSCRIPT! CHỈ HIỆN ĐIỀU KHIỂN ÂM THANH CÂU THOẠI LẺ
       const sentences = q.dictation_sentences || [];
@@ -772,6 +797,13 @@ window.App = {
         </div>
       </div>
     `;
+  },
+
+  reloadExamPdf() {
+    const frame = document.getElementById('exam-pdf-frame');
+    if (frame) {
+      frame.src = "https://drive.google.com/file/d/1OVNzYe_ZYOm9xVlfBB9nISHOuLF4_joT/preview?t=" + Date.now();
+    }
   },
 
   recordExamAnswer(qId, val) {
