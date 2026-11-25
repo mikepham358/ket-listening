@@ -11,6 +11,7 @@ window.TESTS_MANIFEST = {
       "title": "Practice Test 1",
       "book_pages": [22, 23, 24, 25],
       "audio_folder": "audio/test_1",
+      "audio_full": "audio/test_1/full.mp3",
       "parts_count": 5,
       "questions_count": 25
     },
@@ -20,6 +21,7 @@ window.TESTS_MANIFEST = {
       "title": "Practice Test 2",
       "book_pages": [34, 35, 36, 37],
       "audio_folder": "audio/test_2",
+      "audio_full": "audio/test_2/full.mp3",
       "parts_count": 5,
       "questions_count": 25
     },
@@ -29,6 +31,7 @@ window.TESTS_MANIFEST = {
       "title": "Practice Test 3",
       "book_pages": [46, 47, 48, 49],
       "audio_folder": "audio/test_3",
+      "audio_full": "audio/test_3/full.mp3",
       "parts_count": 5,
       "questions_count": 25
     },
@@ -38,6 +41,7 @@ window.TESTS_MANIFEST = {
       "title": "Practice Test 4",
       "book_pages": [58, 59, 60, 61],
       "audio_folder": "audio/test_4",
+      "audio_full": "audio/test_4/full.mp3",
       "parts_count": 5,
       "questions_count": 25
     },
@@ -47,6 +51,7 @@ window.TESTS_MANIFEST = {
       "title": "Practice Test 5",
       "book_pages": [70, 71, 72, 73],
       "audio_folder": "audio/test_5",
+      "audio_full": "audio/test_5/full.mp3",
       "parts_count": 5,
       "questions_count": 25
     },
@@ -56,6 +61,7 @@ window.TESTS_MANIFEST = {
       "title": "Practice Test 6",
       "book_pages": [82, 83, 84, 85],
       "audio_folder": "audio/test_6",
+      "audio_full": "audio/test_6/full.mp3",
       "parts_count": 5,
       "questions_count": 25
     },
@@ -65,6 +71,7 @@ window.TESTS_MANIFEST = {
       "title": "Practice Test 7",
       "book_pages": [94, 95, 96, 97],
       "audio_folder": "audio/test_7",
+      "audio_full": "audio/test_7/full.mp3",
       "parts_count": 5,
       "questions_count": 25
     },
@@ -74,6 +81,7 @@ window.TESTS_MANIFEST = {
       "title": "Practice Test 8",
       "book_pages": [106, 107, 108, 109],
       "audio_folder": "audio/test_8",
+      "audio_full": "audio/test_8/full.mp3",
       "parts_count": 5,
       "questions_count": 25
     }

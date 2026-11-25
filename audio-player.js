@@ -23,14 +23,17 @@ window.KetAudioPlayer = {
     });
   },
 
-  loadTrack(src, startSec = 0, endSec = null) {
-    if (this.audio.src !== src && !this.audio.src.endsWith(src)) {
+  loadTrack(src, startSec = 0, endSec = null, keepCurrentTimeIfSame = false) {
+    const isSame = this.audio.src.endsWith(src);
+    if (!isSame) {
       this.audio.src = src;
+      this.audio.currentTime = startSec || 0;
+    } else if (!keepCurrentTimeIfSame) {
+      this.audio.currentTime = startSec || 0;
     }
     this.segmentStart = startSec;
     this.segmentEnd = endSec;
     
-    this.audio.currentTime = startSec || 0;
     this.updateTimeDisplay();
   },
 

@@ -102,9 +102,18 @@ window.App = {
     if (window.KetTracker) window.KetTracker.startQuestionTimer();
 
     // Auto load audio
-    if (this.currentMode === 'beginner' && q.dictation_sentences && q.dictation_sentences[this.currentSentenceIndex]) {
+    if (this.currentMode === 'exam') {
+      const fullAudio = this.testData?.audio_full || `audio/test_${this.currentTestId}/full.mp3`;
+      window.KetAudioPlayer.loadTrack(fullAudio, 0, null, true);
+    } else if (this.currentMode === 'beginner' && q.dictation_sentences && q.dictation_sentences[this.currentSentenceIndex]) {
       const s = q.dictation_sentences[this.currentSentenceIndex];
       window.KetAudioPlayer.loadTrack(s.audio_file);
+    } else if (this.currentMode === 'intermediate') {
+      if (q.audio_question) {
+        window.KetAudioPlayer.loadTrack(q.audio_question);
+      } else if (q.audio_file) {
+        window.KetAudioPlayer.loadTrack(q.audio_file);
+      }
     } else if (q.audio_question) {
       window.KetAudioPlayer.loadTrack(q.audio_question);
     } else if (q.audio_file) {
@@ -781,6 +790,24 @@ window.App = {
         <span class="stopwatch-badge" style="background:#fef3c7; color:#b45309;">
           ⏱️ 30:00
         </span>
+      </div>
+
+      <!-- Exam Continuous Audio Status Banner -->
+      <div class="exam-audio-banner">
+        <div style="display:flex; align-items:center; gap:0.65rem;">
+          <span style="font-size:1.45rem;">🎧</span>
+          <div>
+            <div style="font-weight:800; font-size:0.92rem; color:#1e40af;">
+              Audio Toàn Bài Thi Test ${this.currentTestId} (Phát liên tục Part 1 ➔ Part 5)
+            </div>
+            <div style="font-size:0.8rem; color:#475569; font-weight:600;">
+              Chuẩn phòng thi thật Cambridge: ~23 phút cho cả 5 phần · Không bị ngắt quãng
+            </div>
+          </div>
+        </div>
+        <button class="lego-btn-green" style="font-size:0.85rem; padding:0.4rem 0.9rem; display:inline-flex; align-items:center; gap:0.35rem;" onclick="window.KetAudioPlayer.togglePlay()">
+          <span>▶️ / ⏸️</span> <span>Nghe bài thi</span>
+        </button>
       </div>
 
       <div class="lego-card">
