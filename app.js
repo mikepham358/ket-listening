@@ -9,6 +9,7 @@ window.App = {
   userAnswers: {}, // { qId: selectedOption or text }
   sentenceAnswers: {}, // { `${qId}_${sIdx}`: text }
   sentenceSolved: {}, // { `${qId}_${sIdx}`: boolean }
+  sentenceAttempts: {}, // { `${qId}_${sIdx}`: failCount }
   socraticHintsRevealed: {}, // { qId: tierNumber }
   examTimerInterval: null,
   examSecondsRemaining: 30 * 60, // 30 mins
@@ -35,6 +36,7 @@ window.App = {
     this.userAnswers = {};
     this.sentenceAnswers = {};
     this.sentenceSolved = {};
+    this.sentenceAttempts = {};
     this.socraticHintsRevealed = {};
 
     try {
@@ -260,6 +262,8 @@ window.App = {
     const sKey = `${q.id}_${this.currentSentenceIndex}`;
     const savedText = this.sentenceAnswers[sKey] || '';
     const isSolved = this.sentenceSolved[sKey] || false;
+    const attempts = this.sentenceAttempts[sKey] || 0;
+    const isUnlocked = attempts >= 3;
 
     // Sentence Switcher Tabs
     const sentenceTabsHtml = sentences.map((s, idx) => {
@@ -321,17 +325,26 @@ window.App = {
         </div>
 
         <!-- Diff & Feedback Container -->
-        <div id="dictation-diff-${sKey}" class="dict-diff-result" style="display:${isSolved ? 'block' : 'none'};"></div>
+        <div id="dictation-diff-${sKey}" class="dict-diff-result" style="display:${isSolved || savedText ? 'block' : 'none'};"></div>
 
-        <!-- Action Buttons -->
+        <!-- Action Buttons & Conditional 3-Attempt Gate -->
         <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem; margin-top:1.25rem;">
-          <div style="display:flex; gap:0.45rem;">
-            <button class="lego-btn-yellow" onclick="App.giveLetterHint()">
-              💡 Gợi ý chữ cái đầu
-            </button>
-            <button class="lego-btn-orange" onclick="App.revealNextWord()">
-              🔤 Mở 1 từ kế tiếp
-            </button>
+          <div style="display:flex; gap:0.45rem; align-items:center; flex-wrap:wrap;">
+            ${isUnlocked ? `
+              <button class="lego-btn-yellow" onclick="App.giveLetterHint()">
+                💡 Gợi ý chữ cái đầu
+              </button>
+              <button class="lego-btn-orange" onclick="App.revealNextWord()">
+                🔤 Mở 1 từ kế tiếp
+              </button>
+            ` : `
+              <button class="lego-btn-locked" onclick="App.notifyHintLocked(${attempts})" title="Chỉ kích hoạt sau khi thử sai 3 lần">
+                🔒 Gợi ý chữ cái (${attempts}/3)
+              </button>
+              <button class="lego-btn-locked" onclick="App.notifyHintLocked(${attempts})" title="Chỉ kích hoạt sau khi thử sai 3 lần">
+                🔒 Mở 1 từ (${attempts}/3)
+              </button>
+            `}
           </div>
           <div>
             <button class="lego-btn-green" onclick="App.checkSentenceDictation()">
@@ -339,6 +352,17 @@ window.App = {
             </button>
           </div>
         </div>
+
+        ${!isUnlocked && attempts > 0 ? `
+          <div style="margin-top:0.6rem; font-size:0.82rem; font-weight:700; color:#b45309;">
+            💪 Bạn đã thử ${attempts}/3 lần. Thử thêm ${3 - attempts} lần nữa để mở khóa trợ giúp (Gợi ý chữ cái & Mở từ)!
+          </div>
+        ` : ''}
+        ${isUnlocked ? `
+          <div style="margin-top:0.6rem; font-size:0.82rem; font-weight:800; color:#15803d;">
+            🎉 Bạn đã thử đủ 3 lần! Nút Gợi ý chữ cái và Mở từ đã được mở khóa!
+          </div>
+        ` : ''}
       </div>
 
       <!-- Bottom Question Navigation -->
@@ -366,7 +390,7 @@ window.App = {
       });
     }
 
-    if (isSolved) {
+    if (savedText) {
       this.renderDiffFeedback(savedText, curSent.text, sKey);
     }
   },
@@ -429,6 +453,9 @@ window.App = {
           this.switchSentence(this.currentSentenceIndex + 1);
         }, 1200);
       }
+    } else {
+      this.sentenceAttempts[sKey] = (this.sentenceAttempts[sKey] || 0) + 1;
+      this.renderBeginnerWorkspace(q);
     }
   },
 
@@ -481,11 +508,16 @@ window.App = {
   giveLetterHint() {
     const q = this.testData.questions[this.currentQuestionIndex];
     if (!q) return;
+    const sKey = `${q.id}_${this.currentSentenceIndex}`;
+    const attempts = this.sentenceAttempts[sKey] || 0;
+    if (attempts < 3) {
+      this.notifyHintLocked(attempts);
+      return;
+    }
     const sentences = q.dictation_sentences || [];
     const curSent = sentences[this.currentSentenceIndex];
     if (!curSent) return;
 
-    const sKey = `${q.id}_${this.currentSentenceIndex}`;
     const inputEl = document.getElementById(`dictation-input-${sKey}`);
     if (!inputEl) return;
 
@@ -502,11 +534,16 @@ window.App = {
   revealNextWord() {
     const q = this.testData.questions[this.currentQuestionIndex];
     if (!q) return;
+    const sKey = `${q.id}_${this.currentSentenceIndex}`;
+    const attempts = this.sentenceAttempts[sKey] || 0;
+    if (attempts < 3) {
+      this.notifyHintLocked(attempts);
+      return;
+    }
     const sentences = q.dictation_sentences || [];
     const curSent = sentences[this.currentSentenceIndex];
     if (!curSent) return;
 
-    const sKey = `${q.id}_${this.currentSentenceIndex}`;
     const inputEl = document.getElementById(`dictation-input-${sKey}`);
     if (!inputEl) return;
 
@@ -523,6 +560,11 @@ window.App = {
       inputEl.value = currentWords.join(' ');
       inputEl.focus();
     }
+  },
+
+  notifyHintLocked(attempts) {
+    const remaining = Math.max(0, 3 - attempts);
+    alert(`🔒 Quyền trợ giúp đang bị khóa!\n\nBạn cần tự nghe và thử gõ thêm ${remaining} lần nữa (đã thử sai: ${attempts}/3 lần) để kích hoạt nút Gợi ý chữ cái & Mở từ nhé!\n\nHãy tập trung luyện đôi tai của mình trước nào! 💪`);
   },
 
   /* ==========================================================================

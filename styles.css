@@ -574,6 +574,31 @@ body {
 .lego-btn-secondary:hover { background: #f1f5f9; }
 .lego-btn-secondary:active { transform: translateY(3px); border-bottom-width: 1px; }
 
+.lego-btn-locked {
+  background: #f1f5f9;
+  color: #94a3b8;
+  border: 2px dashed #cbd5e1;
+  border-bottom: 3px solid #cbd5e1;
+  border-radius: var(--radius-md);
+  padding: 0.65rem 1.15rem;
+  font-size: 0.88rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  transition: all 0.1s ease;
+}
+.lego-btn-locked:hover {
+  background: #e2e8f0;
+  color: #64748b;
+  border-color: #94a3b8;
+}
+.lego-btn-locked:active {
+  transform: translateY(2px);
+  border-bottom-width: 1px;
+}
+
 /* ==========================================================================
    Mức 2 & 3: Options, Socratic & Exam Sheet
    ========================================================================== */
