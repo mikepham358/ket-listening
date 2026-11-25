@@ -182,6 +182,19 @@ window.KetDictionary = {
       console.warn('Vietnamese translation API fallback', e);
     }
 
+    // Filter or create kid-friendly simple example
+    let kidExamples = [];
+    if (enExamples.length > 0) {
+      const simple = enExamples.filter(ex => ex.split(' ').length <= 16);
+      if (simple.length > 0) kidExamples = simple.slice(0, 2);
+    }
+    if (kidExamples.length === 0) {
+      if (word === 'airport') kidExamples = ["What time shall we drive to the airport?"];
+      else if (word === 'meal') kidExamples = ["We had a delicious meal at the restaurant."];
+      else if (word === 'plane') kidExamples = ["The plane leaves at one o'clock."];
+      else kidExamples = [`This is an example sentence with the word "${word}".`];
+    }
+
     const result = {
       word,
       ipa: ipa || '/.../',
@@ -189,7 +202,7 @@ window.KetDictionary = {
       usAudio,
       viMeanings: viMeanings.length > 0 ? viMeanings : ['Chưa có bản dịch'],
       enDefinitions,
-      enExamples
+      enExamples: kidExamples
     };
 
     this.cache[word] = result;
@@ -256,17 +269,17 @@ window.KetDictionary = {
   speak(accent = 'us') {
     if (!this.currentWordData) return;
     const word = this.currentWordData.word;
-    const audioUrl = accent === 'uk' ? this.currentWordData.ukAudio : this.currentWordData.usAudio;
 
-    // If human MP3 audio URL exists, play it
-    if (audioUrl) {
-      const audio = new Audio(audioUrl);
-      audio.play().catch(e => {
-        this.fallbackSpeechSynthesis(word, accent);
-      });
-    } else {
-      // Native SpeechSynthesis fallback
-      this.fallbackSpeechSynthesis(word, accent);
+    // Use browser native SpeechSynthesis directly for crisp, zero-latency pronunciation on any device
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+      const utterance = new SpeechSynthesisUtterance(word);
+      utterance.lang = accent === 'uk' ? 'en-GB' : 'en-US';
+      utterance.rate = 0.85; // Slightly slower for 10-12 year old learners
+      const voices = window.speechSynthesis.getVoices();
+      const voice = voices.find(v => accent === 'uk' ? v.lang.startsWith('en-GB') : v.lang.startsWith('en-US'));
+      if (voice) utterance.voice = voice;
+      window.speechSynthesis.speak(utterance);
     }
   },
 
