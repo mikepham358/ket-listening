@@ -3,12 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>KET Listening Engine — Succeed in A2 Key (8 Practice Tests)</title>
+  <title>KET Listening Engine — Học Nghe & Chép Chính Tả A2 Key (Lego Style)</title>
 
-  <!-- Typography -->
+  <!-- Google Fonts: Plus Jakarta Sans & Quicksand (Kid-Friendly & Highly Legible) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Quicksand:wght@600;700&family=JetBrains+Mono:wght@600;700&display=swap" rel="stylesheet">
 
   <!-- SheetJS: Đọc và xuất file Excel (.xlsx) 100% từ Client -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
@@ -17,27 +17,32 @@
 </head>
 <body>
 
-  <!-- App Header -->
+  <!-- Lego Header -->
   <header id="app-header">
     <div class="brand-section">
-      <span class="brand-logo">🎧</span>
+      <span class="brand-logo">🧩</span>
       <div>
         <h1 class="brand-title" data-i18n="app_title">KET Listening Engine</h1>
-        <p style="font-size: 0.72rem; color: var(--text-muted);" data-i18n="subtitle">Succeed in A2 Key (8 Practice Tests)</p>
+        <p style="font-size: 0.76rem; font-weight:700; color: var(--text-muted);" data-i18n="subtitle">Succeed in A2 Key · Dành cho học sinh 10-12 tuổi</p>
       </div>
     </div>
 
     <!-- Audio Player Toolbar -->
     <div id="audio-toolbar">
-      <button id="audio-replay-btn" class="audio-btn" title="Replay 5s (Left Arrow)">⏮️</button>
-      <button id="audio-play-btn" class="audio-btn" title="Play / Pause (Space)">▶️</button>
-      <button id="audio-forward-btn" class="audio-btn" title="Forward 5s (Right Arrow)">⏭️</button>
+      <button id="audio-replay-btn" class="audio-btn" title="Replay 5s (Mũi tên trái)">⏮️</button>
+      <button id="audio-play-btn" class="audio-btn" title="Play / Pause (Phím Space)">▶️</button>
+      <button id="audio-forward-btn" class="audio-btn" title="Forward 5s (Mũi tên phải)">⏭️</button>
       <input type="range" id="audio-progress-bar" class="audio-progress" min="0" max="100" value="0" />
       <span id="audio-time-display" class="audio-time">0:00 / 0:00</span>
-      <button id="audio-speed-btn" class="audio-btn" style="font-size:0.75rem; font-family:var(--font-mono); width: auto; padding: 0 0.4rem;" title="Change Playback Speed">1.0x</button>
+      <button id="audio-speed-btn" class="audio-btn" style="font-size:0.78rem; font-family:var(--font-mono); width: auto; padding: 0 0.5rem;" title="Thay đổi tốc độ phát">1.0x</button>
     </div>
 
     <div class="header-controls">
+      <!-- Quick Lego Dictionary Button -->
+      <button class="lego-btn-dict-top" onclick="KetDictionary.openModal('airport')" title="Mở từ điển tra IPA, phát âm và nghĩa tiếng Việt">
+        📚 Tra Từ Điển
+      </button>
+
       <select id="select-active-test" class="select-custom">
         <option value="1">Practice Test 1</option>
         <option value="2">Practice Test 2</option>
@@ -48,72 +53,83 @@
         <option value="7">Practice Test 7</option>
         <option value="8">Practice Test 8</option>
       </select>
-      <span id="header-session-counter" class="badge-session" title="Tổng số câu hỏi đã làm">0</span>
+
+      <span id="header-session-counter" class="badge-session" title="Tổng số câu đã hoàn thành">
+        ⭐ 0 câu
+      </span>
     </div>
   </header>
 
-  <!-- 3-Tier Mode Switcher -->
+  <!-- 3-Tier Mode Switcher (Lego Brick Tabs) -->
   <nav id="mode-switcher-bar">
     <div class="tier-tabs">
-      <button class="tier-tab" data-mode="beginner">
+      <button class="tier-tab active" data-mode="beginner">
         <span>🌱</span>
-        <span data-i18n="mode_beginner">Mức 1: Beginner (Dictation)</span>
+        <span data-i18n="mode_beginner">Mức 1: Chép Chính Tả (Dictation)</span>
       </button>
-      <button class="tier-tab active" data-mode="intermediate">
+      <button class="tier-tab" data-mode="intermediate">
         <span>⚡</span>
-        <span data-i18n="mode_intermediate">Mức 2: Intermediate (Socratic)</span>
+        <span data-i18n="mode_intermediate">Mức 2: Luyện Phản Xạ (Socratic)</span>
       </button>
       <button class="tier-tab" data-mode="exam">
         <span>🎓</span>
-        <span data-i18n="mode_exam">Mức 3: Exam Mode (Như Sách)</span>
+        <span data-i18n="mode_exam">Mức 3: Thi Thật (Exam Mode)</span>
       </button>
     </div>
-    <div style="font-size: 0.8rem; color: var(--text-muted);">
-      Phím tắt: <kbd style="background:var(--bg-card); padding: 0.15rem 0.4rem; border-radius:4px; font-family:var(--font-mono);">Space</kbd> Play/Pause &nbsp;|&nbsp; <kbd style="background:var(--bg-card); padding: 0.15rem 0.4rem; border-radius:4px; font-family:var(--font-mono);">Z</kbd> Zen Mode
+    <div style="font-size: 0.85rem; font-weight:700; color: var(--text-muted);">
+      Phím tắt: <kbd style="background:#e2e8f0; padding: 0.2rem 0.5rem; border-radius:6px; font-family:var(--font-mono); font-size:0.8rem;">Space / R</kbd> Nghe lại &nbsp;|&nbsp; <kbd style="background:#e2e8f0; padding: 0.2rem 0.5rem; border-radius:6px; font-family:var(--font-mono); font-size:0.8rem;">Enter</kbd> Kiểm tra &nbsp;|&nbsp; <kbd style="background:#e2e8f0; padding: 0.2rem 0.5rem; border-radius:6px; font-family:var(--font-mono); font-size:0.8rem;">Z</kbd> Zen Mode
     </div>
   </nav>
 
   <!-- Split-Screen Workspace -->
   <main id="workspace-container">
-    <!-- Left Pane: Guidance / PDF / Waveform -->
+    <!-- Left Pane: Guidance / PDF / Audio Controls (NO TRANSCRIPT IN BEGINNER) -->
     <section id="pane-left" class="workspace-pane"></section>
 
-    <!-- Right Pane: Interactive Question Workspace -->
+    <!-- Right Pane: Interactive Question Workspace / Dictation Station -->
     <section id="pane-right" class="workspace-pane"></section>
   </main>
 
   <!-- Listening Trap Gate Modal -->
-  <div id="modal-trap-gate" class="modal-overlay">
-    <div class="modal-dialog">
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
-        <h3 style="color:var(--accent-gold); font-size:1.15rem;" data-i18n="trap_gate_title">⚠️ Sổ Bắt Bẫy Nghe Cambridge</h3>
-        <button class="audio-btn" onclick="App.closeTrapGateModal()">✕</button>
+  <div id="modal-trap-gate" class="lego-modal-overlay" style="display:none;">
+    <div class="lego-modal-card">
+      <div class="lego-modal-header" style="background:#fff7ed; border-color:#fed7aa;">
+        <div class="lego-studs-bar">
+          <span class="lego-stud orange" style="background:var(--lego-orange);"></span>
+          <span class="lego-stud yellow" style="background:var(--lego-yellow);"></span>
+        </div>
+        <div class="lego-modal-title-row" style="color:var(--lego-orange-shadow);">
+          <span style="font-size:1.25rem;">⚠️ Sổ Bắt Bẫy Nghe Cambridge</span>
+          <button class="lego-close-btn" onclick="App.closeTrapGateModal()">✕</button>
+        </div>
       </div>
-      <p id="trap-gate-question-title" style="font-size:0.9rem; color:var(--text-secondary); margin-bottom:1.25rem;"></p>
-      <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:1rem;" data-i18n="trap_gate_desc">
-        Bạn vừa chọn chưa đúng. Hãy xác định bẫy đề thi mình vừa gặp trước khi tiếp tục:
-      </p>
+      <div class="lego-modal-body">
+        <p id="trap-gate-question-title" style="font-size:1rem; font-weight:700; color:var(--text-primary); margin-bottom:1rem;"></p>
+        <p style="font-size:0.92rem; color:var(--text-secondary); margin-bottom:1.25rem;" data-i18n="trap_gate_desc">
+          Bạn vừa chọn chưa đúng. Hãy xác định bẫy đề thi mình vừa gặp trước khi tiếp tục nhé:
+        </p>
 
-      <div style="display:flex; flex-direction:column; gap:0.6rem; margin-bottom:1.5rem;">
-        <button class="btn-secondary" style="text-align:left; padding:0.75rem 1rem;" onclick="App.submitTrapLog('mind_change')">
-          🔄 <strong>Bẫy Đổi Ý Phút Chót:</strong> Người nói ban đầu nói một đằng sau đổi ý (Actually / Wait...)
-        </button>
-        <button class="btn-secondary" style="text-align:left; padding:0.75rem 1rem;" onclick="App.submitTrapLog('tense_time')">
-          ⏳ <strong>Bẫy Thì Thời Gian:</strong> Nhắc đến sự việc tuần trước/quá khứ thay vì việc sẽ làm
-        </button>
-        <button class="btn-secondary" style="text-align:left; padding:0.75rem 1rem;" onclick="App.submitTrapLog('all_options_mentioned')">
-          🎯 <strong>Bẫy Liệt Kê Tất Cả:</strong> Cả 3 phương án đều xuất hiện trong audio nhưng 2 cái bị từ chối
-        </button>
-        <button class="btn-secondary" style="text-align:left; padding:0.75rem 1rem;" onclick="App.submitTrapLog('paraphrase_synonym')">
-          🪞 <strong>Bẫy Từ Đồng Nghĩa:</strong> Từ y hệt trong câu hỏi là bẫy, đáp án đúng dùng từ đồng nghĩa
-        </button>
-        <button class="btn-secondary" style="text-align:left; padding:0.75rem 1rem;" onclick="App.submitTrapLog('spelling_number')">
-          🔢 <strong>Bẫy Số Liệu / Chính Tả:</strong> Nhầm lẫn số 13/30, giá gốc vs giá sau giảm, đánh vần tên
-        </button>
-      </div>
+        <div style="display:flex; flex-direction:column; gap:0.6rem; margin-bottom:1.5rem;">
+          <button class="lego-btn-secondary" style="text-align:left; padding:0.75rem 1rem;" onclick="App.submitTrapLog('mind_change')">
+            🔄 <strong>Bẫy Đổi Ý Phút Chót:</strong> Người nói ban đầu nói một đằng sau đổi ý (Actually / Wait...)
+          </button>
+          <button class="lego-btn-secondary" style="text-align:left; padding:0.75rem 1rem;" onclick="App.submitTrapLog('tense_time')">
+            ⏳ <strong>Bẫy Thì Thời Gian:</strong> Nhắc đến sự việc tuần trước/quá khứ thay vì việc sẽ làm
+          </button>
+          <button class="lego-btn-secondary" style="text-align:left; padding:0.75rem 1rem;" onclick="App.submitTrapLog('all_options_mentioned')">
+            🎯 <strong>Bẫy Liệt Kê Tất Cả:</strong> Cả 3 phương án đều xuất hiện trong audio nhưng 2 cái bị từ chối
+          </button>
+          <button class="lego-btn-secondary" style="text-align:left; padding:0.75rem 1rem;" onclick="App.submitTrapLog('paraphrase_synonym')">
+            🪞 <strong>Bẫy Từ Đồng Nghĩa:</strong> Từ y hệt trong câu hỏi là bẫy, đáp án đúng dùng từ đồng nghĩa
+          </button>
+          <button class="lego-btn-secondary" style="text-align:left; padding:0.75rem 1rem;" onclick="App.submitTrapLog('spelling_number')">
+            🔢 <strong>Bẫy Số Liệu / Chính Tả:</strong> Nhầm lẫn số 13/30, giá gốc vs giá sau giảm, đánh vần tên
+          </button>
+        </div>
 
-      <div style="text-align:right;">
-        <button class="btn-secondary" onclick="App.closeTrapGateModal()">Bỏ qua và xem gợi ý ➡️</button>
+        <div style="text-align:right;">
+          <button class="lego-btn-secondary" onclick="App.closeTrapGateModal()">Bỏ qua và xem gợi ý ➡️</button>
+        </div>
       </div>
     </div>
   </div>
@@ -123,6 +139,7 @@
   <script src="audio-player.js"></script>
   <script src="ket-tracker.js"></script>
   <script src="data/tests.js"></script>
+  <script src="dictionary.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

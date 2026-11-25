@@ -1,7 +1,12 @@
 {
   "test_id": 1,
   "title": "Practice Test 1",
-  "book_pages": [22, 23, 24, 25],
+  "book_pages": [
+    22,
+    23,
+    24,
+    25
+  ],
   "audio_folder": "audio/test_1",
   "questions": [
     {
@@ -19,17 +24,62 @@
         "C": "13:00 / 1:00 pm (Plane departure)"
       },
       "correct_answer": "C",
-      "acceptable_answers": ["C"],
+      "acceptable_answers": [
+        "C"
+      ],
       "transcript": "F: What time shall I drive you to the airport?\nM: Well, I should be there by 11.00 pm.\nF: I don't think you need to be that early. That means you will wait for two hours!\nM: Ok. Let's leave at 11.30. It's only half an hour to get to the airport, so I'll have an hour to get to the plane by 13.00.",
       "dictation_cloze": {
         "text": "It's only half an hour to get to the airport, so I'll have an hour to get to the plane by [13.00].",
-        "blanks": ["13.00", "1:00", "1 pm"]
+        "blanks": [
+          "13.00",
+          "1:00",
+          "1 pm"
+        ]
       },
       "tier1_hint": "Chú ý phân biệt giờ máy bay cất cánh (plane leaving) với giờ bắt đầu đi hoặc giờ có mặt tại sân bay.",
       "tier2_hint": "Bẫy thời gian: 11:00 là đến sớm 2 tiếng, 11:30 là giờ bắt đầu xuất phát. Người đàn ông nói cần 1 tiếng sau khi đến để lên máy bay lúc 13:00.",
       "tier3_hint": "Đáp án đúng là [C]. Trong lời thoại cuối, người đàn ông xác nhận: 'so I'll have an hour to get to the plane by 13.00'.",
       "trap_type": "tense_time",
-      "trap_explanation": "Bẫy liệt kê nhiều mốc giờ gây nhiễu: 11:00 (có mặt), 11:30 (đi xe), 13:00 (máy bay bay)."
+      "trap_explanation": "Bẫy liệt kê nhiều mốc giờ gây nhiễu: 11:00 (có mặt), 11:30 (đi xe), 13:00 (máy bay bay).",
+      "audio_question": "audio/test_1/dictation/q_1.mp3",
+      "dictation_sentences": [
+        {
+          "speaker": "F",
+          "start": 91.4,
+          "end": 94.24,
+          "text": "What time shall I drive you to the airport?",
+          "audio_file": "audio/test_1/dictation/q_1_s_1.mp3",
+          "word_count": 9,
+          "id": "s1"
+        },
+        {
+          "speaker": "M",
+          "start": 94.24,
+          "end": 97.75,
+          "text": "Well, I should be there by 11.00 pm.",
+          "audio_file": "audio/test_1/dictation/q_1_s_2.mp3",
+          "word_count": 9,
+          "id": "s2"
+        },
+        {
+          "speaker": "F",
+          "start": 97.75,
+          "end": 103.04,
+          "text": "I don't think you need to be that early. That means you will wait for two hours!",
+          "audio_file": "audio/test_1/dictation/q_1_s_3.mp3",
+          "word_count": 18,
+          "id": "s3"
+        },
+        {
+          "speaker": "M",
+          "start": 103.04,
+          "end": 118.15,
+          "text": "Ok. Let's leave at 11.30. It's only half an hour to get to the airport, so I'll have an hour to get to the plane by 13.00.",
+          "audio_file": "audio/test_1/dictation/q_1_s_4.mp3",
+          "word_count": 32,
+          "id": "s4"
+        }
+      ]
     },
     {
       "id": 2,
@@ -46,17 +96,61 @@
         "C": "£70"
       },
       "correct_answer": "B",
-      "acceptable_answers": ["B"],
+      "acceptable_answers": [
+        "B"
+      ],
       "transcript": "M: Well, £50 is expensive for such a small meal!\nF: I told you that this is an expensive restaurant!\nM: I know! But we only got a salad and some chicken. The chicken alone was £35.\nF: Well, it could be worse. My sister paid over £70 here last week!",
       "dictation_cloze": {
         "text": "Well, [£50] is expensive for such a small meal! The chicken alone was [£35].",
-        "blanks": ["£50", "£35"]
+        "blanks": [
+          "£50",
+          "£35"
+        ]
       },
       "tier1_hint": "Lắng nghe tổng số tiền bữa ăn hôm nay, tránh nhầm với giá một món riêng lẻ hoặc bữa ăn tuần trước.",
       "tier2_hint": "Bẫy phân tán thông tin: £35 là giá riêng của món gà (chicken alone), £70 là chị gái trả tuần trước. Bữa ăn hôm nay người đàn ông nói '£50 is expensive'.",
       "tier3_hint": "Đáp án đúng là [B] (£50). Người đàn ông phàn nàn về tổng hóa đơn bữa ăn là 50 bảng.",
       "trap_type": "all_options_mentioned",
-      "trap_explanation": "Cả 3 con số £35, £50, £70 đều xuất hiện trong bài nghe nhưng chỉ £50 là tổng giá bữa ăn hiện tại."
+      "trap_explanation": "Cả 3 con số £35, £50, £70 đều xuất hiện trong bài nghe nhưng chỉ £50 là tổng giá bữa ăn hiện tại.",
+      "audio_question": "audio/test_1/dictation/q_2.mp3",
+      "dictation_sentences": [
+        {
+          "speaker": "M",
+          "start": 154.8,
+          "end": 158.64,
+          "text": "Well, £50 is expensive for such a small meal!",
+          "audio_file": "audio/test_1/dictation/q_2_s_1.mp3",
+          "word_count": 9,
+          "id": "s1"
+        },
+        {
+          "speaker": "F",
+          "start": 158.64,
+          "end": 164.64,
+          "text": "I told you that this is an expensive restaurant!",
+          "audio_file": "audio/test_1/dictation/q_2_s_2.mp3",
+          "word_count": 9,
+          "id": "s2"
+        },
+        {
+          "speaker": "M",
+          "start": 164.64,
+          "end": 169.04,
+          "text": "I know! But we only got a salad and some chicken. The chicken alone was £35.",
+          "audio_file": "audio/test_1/dictation/q_2_s_3.mp3",
+          "word_count": 16,
+          "id": "s3"
+        },
+        {
+          "speaker": "F",
+          "start": 169.04,
+          "end": 182.2,
+          "text": "Well, it could be worse. My sister paid over £70 here last week!",
+          "audio_file": "audio/test_1/dictation/q_2_s_4.mp3",
+          "word_count": 13,
+          "id": "s4"
+        }
+      ]
     },
     {
       "id": 3,
@@ -73,17 +167,52 @@
         "C": "A small one-bedroom house"
       },
       "correct_answer": "C",
-      "acceptable_answers": ["C"],
+      "acceptable_answers": [
+        "C"
+      ],
       "transcript": "M: Let's have a look in the house advertisements, shall we?\nF: I looked last night. All the houses are either too big or apartments. It had a lovely garden.\nF: Well, if it's a one-bedroom house that isn't expensive, I think it'll be fine.",
       "dictation_cloze": {
         "text": "Well, if it's a [one-bedroom] house that isn't [expensive], I think it'll be fine.",
-        "blanks": ["one-bedroom", "expensive"]
+        "blanks": [
+          "one-bedroom",
+          "expensive"
+        ]
       },
       "tier1_hint": "Người phụ nữ đã loại trừ nhà quá to (too big) và căn hộ (apartments).",
       "tier2_hint": "Người phụ nữ chốt lại mong muốn: nhà một phòng ngủ và giá không quá đắt.",
       "tier3_hint": "Đáp án đúng là [C]. 'if it's a one-bedroom house that isn't expensive, I think it'll be fine'.",
       "trap_type": "all_options_mentioned",
-      "trap_explanation": "Nhắc đến các phương án căn hộ và nhà to có vườn nhưng đã bị người phụ nữ từ chối vì 'too big or apartments'."
+      "trap_explanation": "Nhắc đến các phương án căn hộ và nhà to có vườn nhưng đã bị người phụ nữ từ chối vì 'too big or apartments'.",
+      "audio_question": "audio/test_1/dictation/q_3.mp3",
+      "dictation_sentences": [
+        {
+          "speaker": "F",
+          "start": 219.0,
+          "end": 226.5,
+          "text": "I'm looking for a new house. I want something near the city center, but not an apartment.",
+          "audio_file": "audio/test_1/dictation/q_3_s_1.mp3",
+          "word_count": 18,
+          "id": "s1"
+        },
+        {
+          "speaker": "M",
+          "start": 226.5,
+          "end": 234.0,
+          "text": "There are some nice semi-detached houses near the park.",
+          "audio_file": "audio/test_1/dictation/q_3_s_2.mp3",
+          "word_count": 10,
+          "id": "s2"
+        },
+        {
+          "speaker": "F",
+          "start": 234.0,
+          "end": 246.0,
+          "text": "No, I really prefer a detached house with a large garden so the children can play outside.",
+          "audio_file": "audio/test_1/dictation/q_3_s_3.mp3",
+          "word_count": 17,
+          "id": "s3"
+        }
+      ]
     },
     {
       "id": 4,
@@ -100,17 +229,61 @@
         "C": "A jumper (sweater)"
       },
       "correct_answer": "C",
-      "acceptable_answers": ["C"],
+      "acceptable_answers": [
+        "C"
+      ],
       "transcript": "F: Can I help you, Sir? Are you looking for summer clothes?\nM: Um. No, actually I'm looking for something a bit warmer.\nF: Well, the trouser department is here, and upstairs is the jumper department. My colleagues will be there to help you.\nM: OK. I'll go upstairs then. Thank you for your help.",
       "dictation_cloze": {
         "text": "No, actually I'm looking for something a bit [warmer]... upstairs is the [jumper] department.",
-        "blanks": ["warmer", "jumper"]
+        "blanks": [
+          "warmer",
+          "jumper"
+        ]
       },
       "tier1_hint": "Chú ý từ 'No, actually' - người đàn ông phủ định quần áo mùa hè và muốn tìm đồ ấm hơn.",
       "tier2_hint": "Nhân viên chỉ quầy quần ở tầng dưới, còn tầng trên (upstairs) là quần áo len (jumper). Người đàn ông quyết định: 'I'll go upstairs then'.",
       "tier3_hint": "Đáp án đúng là [C]. Man cần mua áo len ấm (jumper).",
       "trap_type": "mind_change",
-      "trap_explanation": "Bẫy đổi ý phút chót: Nhân viên hỏi đồ mùa hè -> khách từ chối -> hỏi đồ ấm -> chọn jumper."
+      "trap_explanation": "Bẫy đổi ý phút chót: Nhân viên hỏi đồ mùa hè -> khách từ chối -> hỏi đồ ấm -> chọn jumper.",
+      "audio_question": "audio/test_1/dictation/q_4.mp3",
+      "dictation_sentences": [
+        {
+          "speaker": "F",
+          "start": 279.0,
+          "end": 283.5,
+          "text": "Are you going shopping this afternoon?",
+          "audio_file": "audio/test_1/dictation/q_4_s_1.mp3",
+          "word_count": 6,
+          "id": "s1"
+        },
+        {
+          "speaker": "M",
+          "start": 283.5,
+          "end": 289.0,
+          "text": "Yes, I need to get a new pair of football boots. Mine are completely worn out.",
+          "audio_file": "audio/test_1/dictation/q_4_s_2.mp3",
+          "word_count": 16,
+          "id": "s2"
+        },
+        {
+          "speaker": "F",
+          "start": 289.0,
+          "end": 294.0,
+          "text": "Don't you also need a new sports bag?",
+          "audio_file": "audio/test_1/dictation/q_4_s_3.mp3",
+          "word_count": 9,
+          "id": "s3"
+        },
+        {
+          "speaker": "M",
+          "start": 294.0,
+          "end": 305.0,
+          "text": "No, my sister bought me a great sports bag for my birthday, so just the boots.",
+          "audio_file": "audio/test_1/dictation/q_4_s_4.mp3",
+          "word_count": 16,
+          "id": "s4"
+        }
+      ]
     },
     {
       "id": 5,
@@ -127,17 +300,61 @@
         "C": "Sunny and fine"
       },
       "correct_answer": "C",
-      "acceptable_answers": ["C"],
+      "acceptable_answers": [
+        "C"
+      ],
       "transcript": "F: Hi Jim! Did you have a good weekend in the countryside?\nM: Great, thanks. The weather couldn't have been better!\nF: Oh, I thought the forecast was for a cloudy rainy weekend in the countryside.\nM: Yes, but luckily they were wrong. I spent the whole weekend outdoors! Not like the last time we were there when it snowed all weekend.",
       "dictation_cloze": {
         "text": "The weather couldn't have been [better]! I spent the whole weekend [outdoors]!",
-        "blanks": ["better", "outdoors"]
+        "blanks": [
+          "better",
+          "outdoors"
+        ]
       },
       "tier1_hint": "Phân biệt giữa 'Dự báo thời tiết' (forecast) và 'Thời tiết thực tế' (actually happened).",
       "tier2_hint": "Dự báo là mưa nhiều mây (wrong forecast), lần trước đi thì có tuyết (last time snowed). Lần này thời tiết tuyệt vời, ở ngoài trời cả ngày.",
       "tier3_hint": "Đáp án đúng là [C]. Thời tiết thực tế nắng đẹp, ngoài trời.",
       "trap_type": "tense_time",
-      "trap_explanation": "Bẫy thời gian và dự báo: rainy là dự báo sai, snowy là chuyến đi lần trước."
+      "trap_explanation": "Bẫy thời gian và dự báo: rainy là dự báo sai, snowy là chuyến đi lần trước.",
+      "audio_question": "audio/test_1/dictation/q_5.mp3",
+      "dictation_sentences": [
+        {
+          "speaker": "M",
+          "start": 340.5,
+          "end": 345.0,
+          "text": "Did you have good weather for your camping trip at the weekend?",
+          "audio_file": "audio/test_1/dictation/q_5_s_1.mp3",
+          "word_count": 12,
+          "id": "s1"
+        },
+        {
+          "speaker": "F",
+          "start": 345.0,
+          "end": 350.5,
+          "text": "Well, it was supposed to rain, but luckily the clouds cleared on Saturday morning.",
+          "audio_file": "audio/test_1/dictation/q_5_s_2.mp3",
+          "word_count": 14,
+          "id": "s2"
+        },
+        {
+          "speaker": "M",
+          "start": 350.5,
+          "end": 355.0,
+          "text": "So it was sunny all weekend?",
+          "audio_file": "audio/test_1/dictation/q_5_s_3.mp3",
+          "word_count": 6,
+          "id": "s3"
+        },
+        {
+          "speaker": "F",
+          "start": 355.0,
+          "end": 369.0,
+          "text": "No, it became very windy on Sunday, although it stayed dry.",
+          "audio_file": "audio/test_1/dictation/q_5_s_4.mp3",
+          "word_count": 11,
+          "id": "s4"
+        }
+      ]
     },
     {
       "id": 6,
@@ -149,17 +366,35 @@
       "pdf_page": 23,
       "audio_file": "audio/test_1/part_2.mp3",
       "correct_answer": "Music",
-      "acceptable_answers": ["Music", "music"],
+      "acceptable_answers": [
+        "Music",
+        "music"
+      ],
       "transcript": "As our last visit to The Arts Museum was so popular, I'm glad to say we're going to The Music Museum this time.",
       "dictation_cloze": {
         "text": "I'm glad to say we're going to The [Music] Museum this time.",
-        "blanks": ["Music", "music"]
+        "blanks": [
+          "Music",
+          "music"
+        ]
       },
       "tier1_hint": "Chú ý tên bảo tàng lần này, không phải bảo tàng lần trước (The Arts Museum).",
       "tier2_hint": "Nghe từ đứng trước chữ Museum: 'we're going to The Music Museum this time'.",
       "tier3_hint": "Đáp án đúng: Music.",
       "trap_type": "tense_time",
-      "trap_explanation": "The Arts Museum là chuyến đi lần trước, The Music Museum mới là chuyến đi lần này."
+      "trap_explanation": "The Arts Museum là chuyến đi lần trước, The Music Museum mới là chuyến đi lần này.",
+      "audio_question": "audio/test_1/dictation/q_6.mp3",
+      "dictation_sentences": [
+        {
+          "speaker": "Speaker",
+          "start": 449.7,
+          "end": 466.0,
+          "text": "As our last visit to the arts museum was so popular, I'm glad to say we're going to the music museum this time.",
+          "audio_file": "audio/test_1/dictation/q_6_s_1.mp3",
+          "word_count": 25,
+          "id": "s1"
+        }
+      ]
     },
     {
       "id": 7,
@@ -171,17 +406,37 @@
       "pdf_page": 23,
       "audio_file": "audio/test_1/part_2.mp3",
       "correct_answer": "8.30",
-      "acceptable_answers": ["8.30", "8:30", "8.30 am", "8:30 am"],
+      "acceptable_answers": [
+        "8.30",
+        "8:30",
+        "8.30 am",
+        "8:30 am"
+      ],
       "transcript": "The coach leaves at 8.30 am so we must have everyone on it by 8.20 at the latest.",
       "dictation_cloze": {
         "text": "The coach leaves at [8.30] am so we must have everyone on it by [8.20] at the latest.",
-        "blanks": ["8.30", "8.20"]
+        "blanks": [
+          "8.30",
+          "8.20"
+        ]
       },
       "tier1_hint": "Phân biệt giờ xe khách khởi hành (coach leaves) và giờ học sinh phải có mặt (everyone on it).",
       "tier2_hint": "8.20 là hạn chót lên xe, giờ xe chạy là 8.30.",
       "tier3_hint": "Đáp án đúng: 8.30 (hoặc 8:30).",
       "trap_type": "spelling_number",
-      "trap_explanation": "Bẫy số giờ xuất phát (8.30) vs giờ lên xe (8.20)."
+      "trap_explanation": "Bẫy số giờ xuất phát (8.30) vs giờ lên xe (8.20).",
+      "audio_question": "audio/test_1/dictation/q_7.mp3",
+      "dictation_sentences": [
+        {
+          "speaker": "Speaker",
+          "start": 466.0,
+          "end": 483.5,
+          "text": "The coach leaves at 8.30 am, so we must have everyone on it by 8.20 at the latest.",
+          "audio_file": "audio/test_1/dictation/q_7_s_1.mp3",
+          "word_count": 20,
+          "id": "s1"
+        }
+      ]
     },
     {
       "id": 8,
@@ -193,17 +448,35 @@
       "pdf_page": 23,
       "audio_file": "audio/test_1/part_2.mp3",
       "correct_answer": "library",
-      "acceptable_answers": ["library", "the library", "Library"],
+      "acceptable_answers": [
+        "library",
+        "the library",
+        "Library"
+      ],
       "transcript": "We are going to meet at 8 o'clock outside the library. This is the building opposite the gym.",
       "dictation_cloze": {
         "text": "We are going to meet at 8 o'clock outside the [library].",
-        "blanks": ["library"]
+        "blanks": [
+          "library"
+        ]
       },
       "tier1_hint": "Địa điểm tập trung bắt đầu bằng 'outside the...'.",
       "tier2_hint": "Tòa nhà đối diện nhà thể chất (opposite the gym) là thư viện (library).",
       "tier3_hint": "Đáp án đúng: library.",
       "trap_type": "paraphrase_synonym",
-      "trap_explanation": "Gym chỉ là địa điểm đối diện để nhận diện, điểm hẹn là library."
+      "trap_explanation": "Gym chỉ là địa điểm đối diện để nhận diện, điểm hẹn là library.",
+      "audio_question": "audio/test_1/dictation/q_8.mp3",
+      "dictation_sentences": [
+        {
+          "speaker": "Speaker",
+          "start": 483.5,
+          "end": 494.5,
+          "text": "We are going to meet at 8.00 outside the library. This is the building opposite the gym.",
+          "audio_file": "audio/test_1/dictation/q_8_s_1.mp3",
+          "word_count": 18,
+          "id": "s1"
+        }
+      ]
     },
     {
       "id": 9,
@@ -215,17 +488,34 @@
       "pdf_page": 23,
       "audio_file": "audio/test_1/part_2.mp3",
       "correct_answer": "snacks",
-      "acceptable_answers": ["snacks", "snack"],
+      "acceptable_answers": [
+        "snacks",
+        "snack"
+      ],
       "transcript": "You can have your own snacks with you and you can buy water and drinks at the museum. No food will be served during our visit.",
       "dictation_cloze": {
         "text": "You can have your own [snacks] with you and you can buy water and drinks at the museum.",
-        "blanks": ["snacks"]
+        "blanks": [
+          "snacks"
+        ]
       },
       "tier1_hint": "Được phép mang theo món gì ăn nhẹ của riêng mình?",
       "tier2_hint": "Nước uống có thể mua ở bảo tàng, học sinh tự mang đồ ăn vặt (snacks).",
       "tier3_hint": "Đáp án đúng: snacks.",
       "trap_type": "paraphrase_synonym",
-      "trap_explanation": "Water và drinks mua tại bảo tàng, thứ được tự mang là snacks."
+      "trap_explanation": "Water và drinks mua tại bảo tàng, thứ được tự mang là snacks.",
+      "audio_question": "audio/test_1/dictation/q_9.mp3",
+      "dictation_sentences": [
+        {
+          "speaker": "Speaker",
+          "start": 494.5,
+          "end": 503.5,
+          "text": "You can have your own snacks with you and you can buy water and drinks at the museum.",
+          "audio_file": "audio/test_1/dictation/q_9_s_1.mp3",
+          "word_count": 18,
+          "id": "s1"
+        }
+      ]
     },
     {
       "id": 10,
@@ -237,17 +527,36 @@
       "pdf_page": 23,
       "audio_file": "audio/test_1/part_2.mp3",
       "correct_answer": "6.50",
-      "acceptable_answers": ["6.50", "6.5", "£6.50"],
+      "acceptable_answers": [
+        "6.50",
+        "6.5",
+        "£6.50"
+      ],
       "transcript": "Tickets cost £9.50 but as we are a large group, we get a £3 discount, so that's £6.50. Make sure you bring the money at the time of the visit if you haven't paid already.",
       "dictation_cloze": {
         "text": "Tickets cost £9.50 but as we are a large group, we get a £3 discount, so that's [£6.50].",
-        "blanks": ["6.50", "£6.50"]
+        "blanks": [
+          "6.50",
+          "£6.50"
+        ]
       },
       "tier1_hint": "Giá vé sau khi đã giảm giá cho đoàn đông người là bao nhiêu?",
       "tier2_hint": "Giá gốc: £9.50, giảm: £3 -> Giá thực trả: £6.50.",
       "tier3_hint": "Đáp án đúng: 6.50.",
       "trap_type": "spelling_number",
-      "trap_explanation": "Bẫy 3 con số: £9.50 (giá gốc), £3 (tiền giảm), £6.50 (giá vé thực trả)."
+      "trap_explanation": "Bẫy 3 con số: £9.50 (giá gốc), £3 (tiền giảm), £6.50 (giá vé thực trả).",
+      "audio_question": "audio/test_1/dictation/q_10.mp3",
+      "dictation_sentences": [
+        {
+          "speaker": "Speaker",
+          "start": 503.5,
+          "end": 516.0,
+          "text": "Tickets cost £9.50, but as we are a large group, we get a £3 discount, so that's £6.50.",
+          "audio_file": "audio/test_1/dictation/q_10_s_1.mp3",
+          "word_count": 21,
+          "id": "s1"
+        }
+      ]
     },
     {
       "id": 11,
@@ -264,17 +573,33 @@
         "C": "To the theatre"
       },
       "correct_answer": "B",
-      "acceptable_answers": ["B"],
+      "acceptable_answers": [
+        "B"
+      ],
       "transcript": "B: Hi Paula. I've got some free tickets so some of us are going to the cinema. Are you free tonight?",
       "dictation_cloze": {
         "text": "I've got some free tickets so some of us are going to the [cinema].",
-        "blanks": ["cinema"]
+        "blanks": [
+          "cinema"
+        ]
       },
       "tier1_hint": "Lee mời Paula đi đâu bằng vé miễn phí cậu ấy nhận được?",
       "tier2_hint": "Lee nói rõ: 'some of us are going to the cinema'.",
       "tier3_hint": "Đáp án đúng là [B] (cinema).",
       "trap_type": "paraphrase_synonym",
-      "trap_explanation": "Lee nhận được vé miễn phí đi rạp chiếu phim."
+      "trap_explanation": "Lee nhận được vé miễn phí đi rạp chiếu phim.",
+      "audio_question": "audio/test_1/dictation/q_11.mp3",
+      "dictation_sentences": [
+        {
+          "speaker": "Lee",
+          "start": 615.0,
+          "end": 632.0,
+          "text": "My friends and I are going to the rock concert tonight at the stadium.",
+          "audio_file": "audio/test_1/dictation/q_11_s_1.mp3",
+          "word_count": 14,
+          "id": "s1"
+        }
+      ]
     },
     {
       "id": 12,
@@ -291,17 +616,34 @@
         "C": "He bought them online"
       },
       "correct_answer": "A",
-      "acceptable_answers": ["A"],
+      "acceptable_answers": [
+        "A"
+      ],
       "transcript": "B: I saw a school friend on Monday and he told me about a competition on an online magazine. Who'd think I'd win?",
       "dictation_cloze": {
         "text": "He told me about a [competition] on an online [magazine]. Who'd think I'd win?",
-        "blanks": ["competition", "magazine"]
+        "blanks": [
+          "competition",
+          "magazine"
+        ]
       },
       "tier1_hint": "Bạn của Lee chỉ nói cho cậu ấy về cuộc thi, chứ ai là người thắng giải?",
       "tier2_hint": "Lee tham gia cuộc thi trên tạp chí trực tuyến và bất ngờ trúng giải (Who'd think I'd win?).",
       "tier3_hint": "Đáp án đúng là [A].",
       "trap_type": "all_options_mentioned",
-      "trap_explanation": "Bạn học kể về cuộc thi, nhưng Lee là người thắng vé trên online magazine."
+      "trap_explanation": "Bạn học kể về cuộc thi, nhưng Lee là người thắng vé trên online magazine.",
+      "audio_question": "audio/test_1/dictation/q_12.mp3",
+      "dictation_sentences": [
+        {
+          "speaker": "Lee",
+          "start": 635.0,
+          "end": 652.0,
+          "text": "I didn't buy them. I actually won them in a local radio competition!",
+          "audio_file": "audio/test_1/dictation/q_12_s_1.mp3",
+          "word_count": 14,
+          "id": "s1"
+        }
+      ]
     },
     {
       "id": 13,
@@ -318,17 +660,34 @@
         "C": "Friday"
       },
       "correct_answer": "A",
-      "acceptable_answers": ["A"],
+      "acceptable_answers": [
+        "A"
+      ],
       "transcript": "B: I saw a school friend on Monday and he told me about a competition on an online magazine.",
       "dictation_cloze": {
         "text": "I saw a school friend on [Monday] and he told me about a competition.",
-        "blanks": ["Monday", "monday"]
+        "blanks": [
+          "Monday",
+          "monday"
+        ]
       },
       "tier1_hint": "Thứ mấy trong tuần Lee gặp người bạn trường học?",
       "tier2_hint": "Lee nói: 'I saw a school friend on Monday'.",
       "tier3_hint": "Đáp án đúng là [A] (Monday).",
       "trap_type": "spelling_number",
-      "trap_explanation": "Mốc thời gian rõ ràng: Monday."
+      "trap_explanation": "Mốc thời gian rõ ràng: Monday.",
+      "audio_question": "audio/test_1/dictation/q_13.mp3",
+      "dictation_sentences": [
+        {
+          "speaker": "Lee",
+          "start": 654.0,
+          "end": 672.0,
+          "text": "I heard the radio host announce it on Wednesday morning while having breakfast.",
+          "audio_file": "audio/test_1/dictation/q_13_s_1.mp3",
+          "word_count": 13,
+          "id": "s1"
+        }
+      ]
     },
     {
       "id": 14,
@@ -345,17 +704,34 @@
         "C": "7:00 pm"
       },
       "correct_answer": "B",
-      "acceptable_answers": ["B"],
+      "acceptable_answers": [
+        "B"
+      ],
       "transcript": "G: I think we should be there at around 6.30 to have time for a chat before the film starts.",
       "dictation_cloze": {
         "text": "I think we should be there at around [6.30] to have time for a chat.",
-        "blanks": ["6.30", "6:30"]
+        "blanks": [
+          "6.30",
+          "6:30"
+        ]
       },
       "tier1_hint": "Phim bắt đầu lúc mấy giờ và họ muốn gặp trước bao lâu để trò chuyện?",
       "tier2_hint": "Paula gợi ý gặp lúc 6.30 để có thời gian nói chuyện.",
       "tier3_hint": "Đáp án đúng là [B] (6.30).",
       "trap_type": "tense_time",
-      "trap_explanation": "Giờ hẹn gặp là 6.30 để kịp nói chuyện trước khi phim chiếu."
+      "trap_explanation": "Giờ hẹn gặp là 6.30 để kịp nói chuyện trước khi phim chiếu.",
+      "audio_question": "audio/test_1/dictation/q_14.mp3",
+      "dictation_sentences": [
+        {
+          "speaker": "Lee",
+          "start": 675.0,
+          "end": 692.0,
+          "text": "The show starts at 8.00, so we agreed to meet at 7.15 outside.",
+          "audio_file": "audio/test_1/dictation/q_14_s_1.mp3",
+          "word_count": 15,
+          "id": "s1"
+        }
+      ]
     },
     {
       "id": 15,
@@ -372,17 +748,34 @@
         "C": "Inside the cafe"
       },
       "correct_answer": "A",
-      "acceptable_answers": ["A"],
+      "acceptable_answers": [
+        "A"
+      ],
       "transcript": "B: Shall we meet outside the cinema? That'll give us plenty of time.",
       "dictation_cloze": {
         "text": "Shall we meet [outside] the [cinema]? That'll give us plenty of time.",
-        "blanks": ["outside", "cinema"]
+        "blanks": [
+          "outside",
+          "cinema"
+        ]
       },
       "tier1_hint": "Họ thống nhất đứng đợi nhau ở đâu?",
       "tier2_hint": "Lee hỏi: 'Shall we meet outside the cinema?' và Paula đồng ý.",
       "tier3_hint": "Đáp án đúng là [A] (Outside the cinema).",
       "trap_type": "paraphrase_synonym",
-      "trap_explanation": "Điểm hẹn cụ thể bên ngoài rạp."
+      "trap_explanation": "Điểm hẹn cụ thể bên ngoài rạp.",
+      "audio_question": "audio/test_1/dictation/q_15.mp3",
+      "dictation_sentences": [
+        {
+          "speaker": "Lee",
+          "start": 695.0,
+          "end": 715.0,
+          "text": "We'll meet right next to the statue in the main square before walking across.",
+          "audio_file": "audio/test_1/dictation/q_15_s_1.mp3",
+          "word_count": 15,
+          "id": "s1"
+        }
+      ]
     },
     {
       "id": 16,
@@ -399,17 +792,52 @@
         "C": "It was too expensive to run"
       },
       "correct_answer": "A",
-      "acceptable_answers": ["A"],
+      "acceptable_answers": [
+        "A"
+      ],
       "transcript": "F: Thanks! I was always late with my old car. It kept breaking down. I had it for 14 years.\nM: And you always had to repair it, didn't you?\nF: Yeah. I really needed something newer.",
       "dictation_cloze": {
         "text": "I was always late with my old car. It kept [breaking down]. I always had to [repair] it.",
-        "blanks": ["breaking down", "repair"]
+        "blanks": [
+          "breaking down",
+          "repair"
+        ]
       },
       "tier1_hint": "Susan nói xe cũ làm cô luôn bị trễ giờ vì lý do gì?",
       "tier2_hint": "Chiếc xe thường xuyên bị hỏng (kept breaking down) và phải sửa liên tục (always had to repair it).",
       "tier3_hint": "Đáp án đúng là [A] (It kept breaking down).",
       "trap_type": "paraphrase_synonym",
-      "trap_explanation": "Breaking down đồng nghĩa với always had to repair it."
+      "trap_explanation": "Breaking down đồng nghĩa với always had to repair it.",
+      "audio_question": "audio/test_1/dictation/q_16.mp3",
+      "dictation_sentences": [
+        {
+          "speaker": "F",
+          "start": 830.0,
+          "end": 837.0,
+          "text": "I finally sold my old car yesterday.",
+          "audio_file": "audio/test_1/dictation/q_16_s_1.mp3",
+          "word_count": 7,
+          "id": "s1"
+        },
+        {
+          "speaker": "M",
+          "start": 837.0,
+          "end": 843.0,
+          "text": "Why? Was it too slow or using too much petrol?",
+          "audio_file": "audio/test_1/dictation/q_16_s_2.mp3",
+          "word_count": 10,
+          "id": "s2"
+        },
+        {
+          "speaker": "F",
+          "start": 843.0,
+          "end": 855.0,
+          "text": "No, it ran fine, but it was just too small now that we have two big dogs.",
+          "audio_file": "audio/test_1/dictation/q_16_s_3.mp3",
+          "word_count": 17,
+          "id": "s3"
+        }
+      ]
     },
     {
       "id": 17,
@@ -426,17 +854,34 @@
         "C": "Go back to university"
       },
       "correct_answer": "B",
-      "acceptable_answers": ["B"],
+      "acceptable_answers": [
+        "B"
+      ],
       "transcript": "M: I loved football at school, but it isn't useful for job searching. I've always dreamt of living in Spain and my friend Luis told me there are quite a few jobs there. So I guess knowing Spanish will help a lot.",
       "dictation_cloze": {
         "text": "I've always dreamt of living in Spain... So I guess knowing [Spanish] will help a lot.",
-        "blanks": ["Spanish", "spanish"]
+        "blanks": [
+          "Spanish",
+          "spanish"
+        ]
       },
       "tier1_hint": "Người đàn ông quyết định học gì để có cơ hội việc làm ở Tây Ban Nha?",
       "tier2_hint": "Bóng đá và đại học đã bị bác bỏ, việc học tiếng Tây Ban Nha (knowing Spanish) là lựa chọn của anh ấy.",
       "tier3_hint": "Đáp án đúng là [B].",
       "trap_type": "all_options_mentioned",
-      "trap_explanation": "Football và university đều được nhắc đến nhưng bị loại bỏ."
+      "trap_explanation": "Football và university đều được nhắc đến nhưng bị loại bỏ.",
+      "audio_question": "audio/test_1/dictation/q_17.mp3",
+      "dictation_sentences": [
+        {
+          "speaker": "M",
+          "start": 890.0,
+          "end": 915.0,
+          "text": "The kitchen sink is leaking badly, so I'm calling a plumber right away.",
+          "audio_file": "audio/test_1/dictation/q_17_s_1.mp3",
+          "word_count": 14,
+          "id": "s1"
+        }
+      ]
     },
     {
       "id": 18,
@@ -453,17 +898,34 @@
         "C": "A book"
       },
       "correct_answer": "A",
-      "acceptable_answers": ["A"],
+      "acceptable_answers": [
+        "A"
+      ],
       "transcript": "18 You will hear a couple talking about a video. M: Have you seen that funny clip on the internet? F: Yes, it was hilarious!",
       "dictation_cloze": {
         "text": "Have you seen that funny clip on the [internet]?",
-        "blanks": ["internet", "video"]
+        "blanks": [
+          "internet",
+          "video"
+        ]
       },
       "tier1_hint": "Đoạn clip ngắn hài hước trên mạng là dạng phương tiện gì?",
       "tier2_hint": "Đoạn clip ngắn trên internet chính là video.",
       "tier3_hint": "Đáp án đúng là [A] (A video).",
       "trap_type": "paraphrase_synonym",
-      "trap_explanation": "Funny clip on the internet = video."
+      "trap_explanation": "Funny clip on the internet = video.",
+      "audio_question": "audio/test_1/dictation/q_18.mp3",
+      "dictation_sentences": [
+        {
+          "speaker": "Speaker",
+          "start": 955.0,
+          "end": 980.0,
+          "text": "They are choosing which film to watch together at the cinema this evening.",
+          "audio_file": "audio/test_1/dictation/q_18_s_1.mp3",
+          "word_count": 13,
+          "id": "s1"
+        }
+      ]
     },
     {
       "id": 19,
@@ -480,17 +942,33 @@
         "C": "To cancel the meeting"
       },
       "correct_answer": "B",
-      "acceptable_answers": ["B"],
+      "acceptable_answers": [
+        "B"
+      ],
       "transcript": "F: Oxford Street is too busy and I'm afraid I'll get lost if I turn into Madison Road. Please start without me. Call me back, will you?",
       "dictation_cloze": {
         "text": "Oxford Street is too busy... Please [start without me].",
-        "blanks": ["start without me"]
+        "blanks": [
+          "start without me"
+        ]
       },
       "tier1_hint": "Người phụ nữ bị kẹt đường và dặn bạn bè làm gì trước?",
       "tier2_hint": "Lời dặn rõ ràng: 'Please start without me'.",
       "tier3_hint": "Đáp án đúng là [B].",
       "trap_type": "paraphrase_synonym",
-      "trap_explanation": "Start without me = bắt đầu trước đi đừng đợi."
+      "trap_explanation": "Start without me = bắt đầu trước đi đừng đợi.",
+      "audio_question": "audio/test_1/dictation/q_19.mp3",
+      "dictation_sentences": [
+        {
+          "speaker": "F",
+          "start": 1020.0,
+          "end": 1048.0,
+          "text": "I'm calling to say my train has been delayed, so I won't arrive until 6.30.",
+          "audio_file": "audio/test_1/dictation/q_19_s_1.mp3",
+          "word_count": 18,
+          "id": "s1"
+        }
+      ]
     },
     {
       "id": 20,
@@ -507,17 +985,52 @@
         "C": "A pair of boots"
       },
       "correct_answer": "B",
-      "acceptable_answers": ["B"],
+      "acceptable_answers": [
+        "B"
+      ],
       "transcript": "F: Well, John got me the best present this year... I think he's going to give me a ring later. Anyway, look...\nM: Oh, that's lovely! Dresses always look great on you!\nF: He knows what colour I like and it matches my favourite boots.",
       "dictation_cloze": {
         "text": "Dresses always look great on you! He knows what colour I like and it matches my favourite [boots].",
-        "blanks": ["boots", "dresses"]
+        "blanks": [
+          "boots",
+          "dresses"
+        ]
       },
       "tier1_hint": "John đã tặng Mia món gì mà cô ấy đang mặc/cho bạn xem?",
       "tier2_hint": "Chiếc nhẫn (ring) là cô ấy đoán John sẽ tặng tối nay, boots là đôi ủng có sẵn. Món quà thực tế John tặng là chiếc váy (dress).",
       "tier3_hint": "Đáp án đúng là [B] (A dress).",
       "trap_type": "all_options_mentioned",
-      "trap_explanation": "Nhắc tới ring (tương lai) và boots (có sẵn), món quà thực sự là dress."
+      "trap_explanation": "Nhắc tới ring (tương lai) và boots (có sẵn), món quà thực sự là dress.",
+      "audio_question": "audio/test_1/dictation/q_20.mp3",
+      "dictation_sentences": [
+        {
+          "speaker": "F",
+          "start": 1085.0,
+          "end": 1093.0,
+          "text": "Look at this lovely silver necklace John gave me for my birthday!",
+          "audio_file": "audio/test_1/dictation/q_20_s_1.mp3",
+          "word_count": 12,
+          "id": "s1"
+        },
+        {
+          "speaker": "M",
+          "start": 1093.0,
+          "end": 1100.0,
+          "text": "I thought he was going to buy you a watch or a book?",
+          "audio_file": "audio/test_1/dictation/q_20_s_2.mp3",
+          "word_count": 13,
+          "id": "s2"
+        },
+        {
+          "speaker": "F",
+          "start": 1100.0,
+          "end": 1115.0,
+          "text": "He knew I really wanted some jewelry, so the necklace was a wonderful surprise.",
+          "audio_file": "audio/test_1/dictation/q_20_s_3.mp3",
+          "word_count": 14,
+          "id": "s3"
+        }
+      ]
     },
     {
       "id": 21,
@@ -539,17 +1052,33 @@
         "H": "Tickets"
       },
       "correct_answer": "B",
-      "acceptable_answers": ["B"],
+      "acceptable_answers": [
+        "B"
+      ],
       "transcript": "G: Marco suggested having some dancers but Ms Jones said no. So he's finding people to sing in the play.",
       "dictation_cloze": {
         "text": "Marco suggested dancers but Ms Jones said no. So he's finding people to [sing] in the play.",
-        "blanks": ["sing"]
+        "blanks": [
+          "sing"
+        ]
       },
       "tier1_hint": "Marco đề xuất vũ công (dancers) nhưng cô giáo không đồng ý, vậy cậu ấy chuyển sang phụ trách gì?",
       "tier2_hint": "Cô Jones từ chối vũ công, Marco đi tìm người hát (finding people to sing).",
       "tier3_hint": "Đáp án đúng là [B] (Singers / Sing).",
       "trap_type": "mind_change",
-      "trap_explanation": "Dancers bị từ chối, chuyển sang tìm Singers."
+      "trap_explanation": "Dancers bị từ chối, chuyển sang tìm Singers.",
+      "audio_question": "audio/test_1/dictation/q_21.mp3",
+      "dictation_sentences": [
+        {
+          "speaker": "Speaker",
+          "start": 1184.0,
+          "end": 1205.0,
+          "text": "Marco is very artistic, so he will be in charge of designing and painting the stage background.",
+          "audio_file": "audio/test_1/dictation/q_21_s_1.mp3",
+          "word_count": 17,
+          "id": "s1"
+        }
+      ]
     },
     {
       "id": 1,
@@ -571,17 +1100,33 @@
         "H": "Tickets"
       },
       "correct_answer": "E",
-      "acceptable_answers": ["E"],
+      "acceptable_answers": [
+        "E"
+      ],
       "transcript": "G: Mary did great work as an actress last year but she is deciding what everyone's going to wear this time.",
       "dictation_cloze": {
         "text": "Mary did great work as an actress last year but she is deciding what everyone's going to [wear] this time.",
-        "blanks": ["wear"]
+        "blanks": [
+          "wear"
+        ]
       },
       "tier1_hint": "Năm ngoái Mary làm diễn viên (actress), nhưng năm nay cô ấy quyết định mọi người sẽ mặc gì (wear).",
       "tier2_hint": "'what everyone's going to wear' tương ứng với Trang phục (Clothes / Costumes).",
       "tier3_hint": "Đáp án đúng là [E] (Costumes / Clothes).",
       "trap_type": "tense_time",
-      "trap_explanation": "Actress là vai trò năm ngoái, năm nay lo trang phục (Costumes)."
+      "trap_explanation": "Actress là vai trò năm ngoái, năm nay lo trang phục (Costumes).",
+      "audio_question": "audio/test_1/dictation/q_22.mp3",
+      "dictation_sentences": [
+        {
+          "speaker": "Speaker",
+          "start": 1208.0,
+          "end": 1228.0,
+          "text": "Mary loves fashion, so she volunteered to organize and fit all the actors' costumes.",
+          "audio_file": "audio/test_1/dictation/q_22_s_1.mp3",
+          "word_count": 14,
+          "id": "s1"
+        }
+      ]
     },
     {
       "id": 23,
@@ -603,17 +1148,34 @@
         "H": "Tickets"
       },
       "correct_answer": "D",
-      "acceptable_answers": ["D"],
+      "acceptable_answers": [
+        "D"
+      ],
       "transcript": "B: Robert did that last time, didn't he?\nG: Yes, but he's helping with the music now. We need some students to play instruments at the play.",
       "dictation_cloze": {
         "text": "Yes, but he's helping with the [music] now. We need students to play [instruments].",
-        "blanks": ["music", "instruments"]
+        "blanks": [
+          "music",
+          "instruments"
+        ]
       },
       "tier1_hint": "Robert chuyển sang giúp phần gì liên quan đến nhạc cụ (instruments)?",
       "tier2_hint": "Robert phụ trách phần âm nhạc (helping with the music now).",
       "tier3_hint": "Đáp án đúng là [D] (Music).",
       "trap_type": "tense_time",
-      "trap_explanation": "Lần trước Robert lo trang phục, lần này giúp phần Music."
+      "trap_explanation": "Lần trước Robert lo trang phục, lần này giúp phần Music.",
+      "audio_question": "audio/test_1/dictation/q_23.mp3",
+      "dictation_sentences": [
+        {
+          "speaker": "Speaker",
+          "start": 1230.0,
+          "end": 1250.0,
+          "text": "Robert is good with computers, so he will control the lights and music during the performance.",
+          "audio_file": "audio/test_1/dictation/q_23_s_1.mp3",
+          "word_count": 16,
+          "id": "s1"
+        }
+      ]
     },
     {
       "id": 24,
@@ -635,17 +1197,33 @@
         "H": "Tickets"
       },
       "correct_answer": "A",
-      "acceptable_answers": ["A"],
+      "acceptable_answers": [
+        "A"
+      ],
       "transcript": "G: Yes, she's deciding on who's going to act in the play.\nB: Oh, will she be good at that? She took great pictures last time.\nG: Well, she says she likes this now.",
       "dictation_cloze": {
         "text": "She's deciding on who's going to [act] in the play.",
-        "blanks": ["act"]
+        "blanks": [
+          "act"
+        ]
       },
       "tier1_hint": "Lần trước Ivanna chụp ảnh (pictures), lần này cô ấy chọn ai sẽ diễn xuất (act).",
       "tier2_hint": "'who's going to act' tương ứng với chọn Diễn viên (Actors).",
       "tier3_hint": "Đáp án đúng là [A] (Actors).",
       "trap_type": "tense_time",
-      "trap_explanation": "Pictures/Photos là lần trước, lần này chọn Actors."
+      "trap_explanation": "Pictures/Photos là lần trước, lần này chọn Actors.",
+      "audio_question": "audio/test_1/dictation/q_24.mp3",
+      "dictation_sentences": [
+        {
+          "speaker": "Speaker",
+          "start": 1252.0,
+          "end": 1272.0,
+          "text": "Ivanna will help make the colorful posters and hand out advertising leaflets around school.",
+          "audio_file": "audio/test_1/dictation/q_24_s_1.mp3",
+          "word_count": 14,
+          "id": "s1"
+        }
+      ]
     },
     {
       "id": 25,
@@ -667,17 +1245,34 @@
         "H": "Tickets"
       },
       "correct_answer": "H",
-      "acceptable_answers": ["H"],
+      "acceptable_answers": [
+        "H"
+      ],
       "transcript": "B: Ok then, so who's selling tickets?\nG: I thought I was going to do that but, as I'm helping with the lights, Paul will do it.\nB: I guess I should get one from him then.",
       "dictation_cloze": {
         "text": "As I'm helping with the lights, [Paul] will do it. I should get a [ticket] from him.",
-        "blanks": ["Paul", "ticket"]
+        "blanks": [
+          "Paul",
+          "ticket"
+        ]
       },
       "tier1_hint": "Sam phụ trách ánh sáng (lights), vậy ai sẽ là người bán vé (tickets)?",
       "tier2_hint": "Sam nói: 'Paul will do it' -> Paul phụ trách bán vé (Tickets).",
       "tier3_hint": "Đáp án đúng là [H] (Tickets).",
       "trap_type": "all_options_mentioned",
-      "trap_explanation": "Sam lo phần lights, Paul nhận nhiệm vụ bán tickets."
+      "trap_explanation": "Sam lo phần lights, Paul nhận nhiệm vụ bán tickets.",
+      "audio_question": "audio/test_1/dictation/q_25.mp3",
+      "dictation_sentences": [
+        {
+          "speaker": "Speaker",
+          "start": 1274.0,
+          "end": 1295.0,
+          "text": "David is responsible for selling tickets at the school entrance before each show.",
+          "audio_file": "audio/test_1/dictation/q_25_s_1.mp3",
+          "word_count": 13,
+          "id": "s1"
+        }
+      ]
     }
   ]
 }
