@@ -1,0 +1,575 @@
+{
+  "test_id": 3,
+  "title": "Practice Test 3",
+  "book_pages": [
+    46,
+    47,
+    48,
+    49
+  ],
+  "audio_folder": "audio/test_3",
+  "audio_full": "audio/test_3/full.mp3",
+  "questions": [
+    {
+      "id": 1,
+      "test_id": 3,
+      "part": 1,
+      "q_number": 1,
+      "type": "multiple_choice",
+      "prompt": "Test 3 · Part 1 · Câu 1",
+      "pdf_page": 46,
+      "audio_file": "audio/test_3/full.mp3",
+      "options": {
+        "A": "A",
+        "B": "B",
+        "C": "C"
+      },
+      "correct_answer": "A",
+      "acceptable_answers": [
+        "A"
+      ],
+      "tier1_hint": "Xem kỹ câu hỏi 1 trên đề thi PDF trang 46.",
+      "tier2_hint": "Chú ý các thông tin gây nhiễu trong đoạn băng của Part 1.",
+      "tier3_hint": "Đáp án đúng là [A]. Xem lại trên trang 46."
+    },
+    {
+      "id": 2,
+      "test_id": 3,
+      "part": 1,
+      "q_number": 2,
+      "type": "multiple_choice",
+      "prompt": "Test 3 · Part 1 · Câu 2",
+      "pdf_page": 46,
+      "audio_file": "audio/test_3/full.mp3",
+      "options": {
+        "A": "A",
+        "B": "B",
+        "C": "C"
+      },
+      "correct_answer": "B",
+      "acceptable_answers": [
+        "B"
+      ],
+      "tier1_hint": "Xem kỹ câu hỏi 2 trên đề thi PDF trang 46.",
+      "tier2_hint": "Chú ý các thông tin gây nhiễu trong đoạn băng của Part 1.",
+      "tier3_hint": "Đáp án đúng là [B]. Xem lại trên trang 46."
+    },
+    {
+      "id": 3,
+      "test_id": 3,
+      "part": 1,
+      "q_number": 3,
+      "type": "multiple_choice",
+      "prompt": "Test 3 · Part 1 · Câu 3",
+      "pdf_page": 46,
+      "audio_file": "audio/test_3/full.mp3",
+      "options": {
+        "A": "A",
+        "B": "B",
+        "C": "C"
+      },
+      "correct_answer": "A",
+      "acceptable_answers": [
+        "A"
+      ],
+      "tier1_hint": "Xem kỹ câu hỏi 3 trên đề thi PDF trang 46.",
+      "tier2_hint": "Chú ý các thông tin gây nhiễu trong đoạn băng của Part 1.",
+      "tier3_hint": "Đáp án đúng là [A]. Xem lại trên trang 46."
+    },
+    {
+      "id": 4,
+      "test_id": 3,
+      "part": 1,
+      "q_number": 4,
+      "type": "multiple_choice",
+      "prompt": "Test 3 · Part 1 · Câu 4",
+      "pdf_page": 46,
+      "audio_file": "audio/test_3/full.mp3",
+      "options": {
+        "A": "A",
+        "B": "B",
+        "C": "C"
+      },
+      "correct_answer": "C",
+      "acceptable_answers": [
+        "C"
+      ],
+      "tier1_hint": "Xem kỹ câu hỏi 4 trên đề thi PDF trang 46.",
+      "tier2_hint": "Chú ý các thông tin gây nhiễu trong đoạn băng của Part 1.",
+      "tier3_hint": "Đáp án đúng là [C]. Xem lại trên trang 46."
+    },
+    {
+      "id": 5,
+      "test_id": 3,
+      "part": 1,
+      "q_number": 5,
+      "type": "multiple_choice",
+      "prompt": "Test 3 · Part 1 · Câu 5",
+      "pdf_page": 46,
+      "audio_file": "audio/test_3/full.mp3",
+      "options": {
+        "A": "A",
+        "B": "B",
+        "C": "C"
+      },
+      "correct_answer": "B",
+      "acceptable_answers": [
+        "B"
+      ],
+      "tier1_hint": "Xem kỹ câu hỏi 5 trên đề thi PDF trang 46.",
+      "tier2_hint": "Chú ý các thông tin gây nhiễu trong đoạn băng của Part 1.",
+      "tier3_hint": "Đáp án đúng là [B]. Xem lại trên trang 46."
+    },
+    {
+      "id": 6,
+      "test_id": 3,
+      "part": 2,
+      "q_number": 6,
+      "type": "gap_fill",
+      "prompt": "Test 3 · Part 2 · Câu 6",
+      "pdf_page": 47,
+      "audio_file": "audio/test_3/full.mp3",
+      "options": {},
+      "correct_answer": "15th",
+      "acceptable_answers": [
+        "15th",
+        "15th"
+      ],
+      "tier1_hint": "Xem kỹ câu hỏi 6 trên đề thi PDF trang 47.",
+      "tier2_hint": "Chú ý các thông tin gây nhiễu trong đoạn băng của Part 2.",
+      "tier3_hint": "Đáp án đúng là [15th]. Xem lại trên trang 47."
+    },
+    {
+      "id": 7,
+      "test_id": 3,
+      "part": 2,
+      "q_number": 7,
+      "type": "gap_fill",
+      "prompt": "Test 3 · Part 2 · Câu 7",
+      "pdf_page": 47,
+      "audio_file": "audio/test_3/full.mp3",
+      "options": {},
+      "correct_answer": "video",
+      "acceptable_answers": [
+        "video",
+        "video"
+      ],
+      "tier1_hint": "Xem kỹ câu hỏi 7 trên đề thi PDF trang 47.",
+      "tier2_hint": "Chú ý các thông tin gây nhiễu trong đoạn băng của Part 2.",
+      "tier3_hint": "Đáp án đúng là [video]. Xem lại trên trang 47."
+    },
+    {
+      "id": 8,
+      "test_id": 3,
+      "part": 2,
+      "q_number": 8,
+      "type": "gap_fill",
+      "prompt": "Test 3 · Part 2 · Câu 8",
+      "pdf_page": 47,
+      "audio_file": "audio/test_3/full.mp3",
+      "options": {},
+      "correct_answer": "singpros",
+      "acceptable_answers": [
+        "singpros",
+        "singpros"
+      ],
+      "tier1_hint": "Xem kỹ câu hỏi 8 trên đề thi PDF trang 47.",
+      "tier2_hint": "Chú ý các thông tin gây nhiễu trong đoạn băng của Part 2.",
+      "tier3_hint": "Đáp án đúng là [singpros]. Xem lại trên trang 47."
+    },
+    {
+      "id": 9,
+      "test_id": 3,
+      "part": 2,
+      "q_number": 9,
+      "type": "gap_fill",
+      "prompt": "Test 3 · Part 2 · Câu 9",
+      "pdf_page": 47,
+      "audio_file": "audio/test_3/full.mp3",
+      "options": {},
+      "correct_answer": "café",
+      "acceptable_answers": [
+        "café",
+        "café",
+        "cafe"
+      ],
+      "tier1_hint": "Xem kỹ câu hỏi 9 trên đề thi PDF trang 47.",
+      "tier2_hint": "Chú ý các thông tin gây nhiễu trong đoạn băng của Part 2.",
+      "tier3_hint": "Đáp án đúng là [café]. Xem lại trên trang 47."
+    },
+    {
+      "id": 10,
+      "test_id": 3,
+      "part": 2,
+      "q_number": 10,
+      "type": "gap_fill",
+      "prompt": "Test 3 · Part 2 · Câu 10",
+      "pdf_page": 47,
+      "audio_file": "audio/test_3/full.mp3",
+      "options": {},
+      "correct_answer": "180",
+      "acceptable_answers": [
+        "180",
+        "180"
+      ],
+      "tier1_hint": "Xem kỹ câu hỏi 10 trên đề thi PDF trang 47.",
+      "tier2_hint": "Chú ý các thông tin gây nhiễu trong đoạn băng của Part 2.",
+      "tier3_hint": "Đáp án đúng là [180]. Xem lại trên trang 47."
+    },
+    {
+      "id": 11,
+      "test_id": 3,
+      "part": 3,
+      "q_number": 11,
+      "type": "multiple_choice",
+      "prompt": "Test 3 · Part 3 · Câu 11",
+      "pdf_page": 48,
+      "audio_file": "audio/test_3/full.mp3",
+      "options": {
+        "A": "A",
+        "B": "B",
+        "C": "C"
+      },
+      "correct_answer": "C",
+      "acceptable_answers": [
+        "C"
+      ],
+      "tier1_hint": "Xem kỹ câu hỏi 11 trên đề thi PDF trang 48.",
+      "tier2_hint": "Chú ý các thông tin gây nhiễu trong đoạn băng của Part 3.",
+      "tier3_hint": "Đáp án đúng là [C]. Xem lại trên trang 48."
+    },
+    {
+      "id": 12,
+      "test_id": 3,
+      "part": 3,
+      "q_number": 12,
+      "type": "multiple_choice",
+      "prompt": "Test 3 · Part 3 · Câu 12",
+      "pdf_page": 48,
+      "audio_file": "audio/test_3/full.mp3",
+      "options": {
+        "A": "A",
+        "B": "B",
+        "C": "C"
+      },
+      "correct_answer": "C",
+      "acceptable_answers": [
+        "C"
+      ],
+      "tier1_hint": "Xem kỹ câu hỏi 12 trên đề thi PDF trang 48.",
+      "tier2_hint": "Chú ý các thông tin gây nhiễu trong đoạn băng của Part 3.",
+      "tier3_hint": "Đáp án đúng là [C]. Xem lại trên trang 48."
+    },
+    {
+      "id": 13,
+      "test_id": 3,
+      "part": 3,
+      "q_number": 13,
+      "type": "multiple_choice",
+      "prompt": "Test 3 · Part 3 · Câu 13",
+      "pdf_page": 48,
+      "audio_file": "audio/test_3/full.mp3",
+      "options": {
+        "A": "A",
+        "B": "B",
+        "C": "C"
+      },
+      "correct_answer": "B",
+      "acceptable_answers": [
+        "B"
+      ],
+      "tier1_hint": "Xem kỹ câu hỏi 13 trên đề thi PDF trang 48.",
+      "tier2_hint": "Chú ý các thông tin gây nhiễu trong đoạn băng của Part 3.",
+      "tier3_hint": "Đáp án đúng là [B]. Xem lại trên trang 48."
+    },
+    {
+      "id": 14,
+      "test_id": 3,
+      "part": 3,
+      "q_number": 14,
+      "type": "multiple_choice",
+      "prompt": "Test 3 · Part 3 · Câu 14",
+      "pdf_page": 48,
+      "audio_file": "audio/test_3/full.mp3",
+      "options": {
+        "A": "A",
+        "B": "B",
+        "C": "C"
+      },
+      "correct_answer": "B",
+      "acceptable_answers": [
+        "B"
+      ],
+      "tier1_hint": "Xem kỹ câu hỏi 14 trên đề thi PDF trang 48.",
+      "tier2_hint": "Chú ý các thông tin gây nhiễu trong đoạn băng của Part 3.",
+      "tier3_hint": "Đáp án đúng là [B]. Xem lại trên trang 48."
+    },
+    {
+      "id": 15,
+      "test_id": 3,
+      "part": 3,
+      "q_number": 15,
+      "type": "multiple_choice",
+      "prompt": "Test 3 · Part 3 · Câu 15",
+      "pdf_page": 48,
+      "audio_file": "audio/test_3/full.mp3",
+      "options": {
+        "A": "A",
+        "B": "B",
+        "C": "C"
+      },
+      "correct_answer": "A",
+      "acceptable_answers": [
+        "A"
+      ],
+      "tier1_hint": "Xem kỹ câu hỏi 15 trên đề thi PDF trang 48.",
+      "tier2_hint": "Chú ý các thông tin gây nhiễu trong đoạn băng của Part 3.",
+      "tier3_hint": "Đáp án đúng là [A]. Xem lại trên trang 48."
+    },
+    {
+      "id": 16,
+      "test_id": 3,
+      "part": 4,
+      "q_number": 16,
+      "type": "multiple_choice",
+      "prompt": "Test 3 · Part 4 · Câu 16",
+      "pdf_page": 49,
+      "audio_file": "audio/test_3/full.mp3",
+      "options": {
+        "A": "A",
+        "B": "B",
+        "C": "C"
+      },
+      "correct_answer": "A",
+      "acceptable_answers": [
+        "A"
+      ],
+      "tier1_hint": "Xem kỹ câu hỏi 16 trên đề thi PDF trang 49.",
+      "tier2_hint": "Chú ý các thông tin gây nhiễu trong đoạn băng của Part 4.",
+      "tier3_hint": "Đáp án đúng là [A]. Xem lại trên trang 49."
+    },
+    {
+      "id": 17,
+      "test_id": 3,
+      "part": 4,
+      "q_number": 17,
+      "type": "multiple_choice",
+      "prompt": "Test 3 · Part 4 · Câu 17",
+      "pdf_page": 49,
+      "audio_file": "audio/test_3/full.mp3",
+      "options": {
+        "A": "A",
+        "B": "B",
+        "C": "C"
+      },
+      "correct_answer": "B",
+      "acceptable_answers": [
+        "B"
+      ],
+      "tier1_hint": "Xem kỹ câu hỏi 17 trên đề thi PDF trang 49.",
+      "tier2_hint": "Chú ý các thông tin gây nhiễu trong đoạn băng của Part 4.",
+      "tier3_hint": "Đáp án đúng là [B]. Xem lại trên trang 49."
+    },
+    {
+      "id": 18,
+      "test_id": 3,
+      "part": 4,
+      "q_number": 18,
+      "type": "multiple_choice",
+      "prompt": "Test 3 · Part 4 · Câu 18",
+      "pdf_page": 49,
+      "audio_file": "audio/test_3/full.mp3",
+      "options": {
+        "A": "A",
+        "B": "B",
+        "C": "C"
+      },
+      "correct_answer": "C",
+      "acceptable_answers": [
+        "C"
+      ],
+      "tier1_hint": "Xem kỹ câu hỏi 18 trên đề thi PDF trang 49.",
+      "tier2_hint": "Chú ý các thông tin gây nhiễu trong đoạn băng của Part 4.",
+      "tier3_hint": "Đáp án đúng là [C]. Xem lại trên trang 49."
+    },
+    {
+      "id": 19,
+      "test_id": 3,
+      "part": 4,
+      "q_number": 19,
+      "type": "multiple_choice",
+      "prompt": "Test 3 · Part 4 · Câu 19",
+      "pdf_page": 49,
+      "audio_file": "audio/test_3/full.mp3",
+      "options": {
+        "A": "A",
+        "B": "B",
+        "C": "C"
+      },
+      "correct_answer": "B",
+      "acceptable_answers": [
+        "B"
+      ],
+      "tier1_hint": "Xem kỹ câu hỏi 19 trên đề thi PDF trang 49.",
+      "tier2_hint": "Chú ý các thông tin gây nhiễu trong đoạn băng của Part 4.",
+      "tier3_hint": "Đáp án đúng là [B]. Xem lại trên trang 49."
+    },
+    {
+      "id": 20,
+      "test_id": 3,
+      "part": 4,
+      "q_number": 20,
+      "type": "multiple_choice",
+      "prompt": "Test 3 · Part 4 · Câu 20",
+      "pdf_page": 49,
+      "audio_file": "audio/test_3/full.mp3",
+      "options": {
+        "A": "A",
+        "B": "B",
+        "C": "C"
+      },
+      "correct_answer": "C",
+      "acceptable_answers": [
+        "C"
+      ],
+      "tier1_hint": "Xem kỹ câu hỏi 20 trên đề thi PDF trang 49.",
+      "tier2_hint": "Chú ý các thông tin gây nhiễu trong đoạn băng của Part 4.",
+      "tier3_hint": "Đáp án đúng là [C]. Xem lại trên trang 49."
+    },
+    {
+      "id": 21,
+      "test_id": 3,
+      "part": 5,
+      "q_number": 21,
+      "type": "matching",
+      "prompt": "Test 3 · Part 5 · Câu 21",
+      "pdf_page": 49,
+      "audio_file": "audio/test_3/full.mp3",
+      "options": {
+        "A": "A",
+        "B": "B",
+        "C": "C",
+        "D": "D",
+        "E": "E",
+        "F": "F",
+        "G": "G",
+        "H": "H"
+      },
+      "correct_answer": "C",
+      "acceptable_answers": [
+        "C"
+      ],
+      "tier1_hint": "Xem kỹ câu hỏi 21 trên đề thi PDF trang 49.",
+      "tier2_hint": "Chú ý các thông tin gây nhiễu trong đoạn băng của Part 5.",
+      "tier3_hint": "Đáp án đúng là [C]. Xem lại trên trang 49."
+    },
+    {
+      "id": 22,
+      "test_id": 3,
+      "part": 5,
+      "q_number": 22,
+      "type": "matching",
+      "prompt": "Test 3 · Part 5 · Câu 22",
+      "pdf_page": 49,
+      "audio_file": "audio/test_3/full.mp3",
+      "options": {
+        "A": "A",
+        "B": "B",
+        "C": "C",
+        "D": "D",
+        "E": "E",
+        "F": "F",
+        "G": "G",
+        "H": "H"
+      },
+      "correct_answer": "E",
+      "acceptable_answers": [
+        "E"
+      ],
+      "tier1_hint": "Xem kỹ câu hỏi 22 trên đề thi PDF trang 49.",
+      "tier2_hint": "Chú ý các thông tin gây nhiễu trong đoạn băng của Part 5.",
+      "tier3_hint": "Đáp án đúng là [E]. Xem lại trên trang 49."
+    },
+    {
+      "id": 23,
+      "test_id": 3,
+      "part": 5,
+      "q_number": 23,
+      "type": "matching",
+      "prompt": "Test 3 · Part 5 · Câu 23",
+      "pdf_page": 49,
+      "audio_file": "audio/test_3/full.mp3",
+      "options": {
+        "A": "A",
+        "B": "B",
+        "C": "C",
+        "D": "D",
+        "E": "E",
+        "F": "F",
+        "G": "G",
+        "H": "H"
+      },
+      "correct_answer": "B",
+      "acceptable_answers": [
+        "B"
+      ],
+      "tier1_hint": "Xem kỹ câu hỏi 23 trên đề thi PDF trang 49.",
+      "tier2_hint": "Chú ý các thông tin gây nhiễu trong đoạn băng của Part 5.",
+      "tier3_hint": "Đáp án đúng là [B]. Xem lại trên trang 49."
+    },
+    {
+      "id": 24,
+      "test_id": 3,
+      "part": 5,
+      "q_number": 24,
+      "type": "matching",
+      "prompt": "Test 3 · Part 5 · Câu 24",
+      "pdf_page": 49,
+      "audio_file": "audio/test_3/full.mp3",
+      "options": {
+        "A": "A",
+        "B": "B",
+        "C": "C",
+        "D": "D",
+        "E": "E",
+        "F": "F",
+        "G": "G",
+        "H": "H"
+      },
+      "correct_answer": "H",
+      "acceptable_answers": [
+        "H"
+      ],
+      "tier1_hint": "Xem kỹ câu hỏi 24 trên đề thi PDF trang 49.",
+      "tier2_hint": "Chú ý các thông tin gây nhiễu trong đoạn băng của Part 5.",
+      "tier3_hint": "Đáp án đúng là [H]. Xem lại trên trang 49."
+    },
+    {
+      "id": 25,
+      "test_id": 3,
+      "part": 5,
+      "q_number": 25,
+      "type": "matching",
+      "prompt": "Test 3 · Part 5 · Câu 25",
+      "pdf_page": 49,
+      "audio_file": "audio/test_3/full.mp3",
+      "options": {
+        "A": "A",
+        "B": "B",
+        "C": "C",
+        "D": "D",
+        "E": "E",
+        "F": "F",
+        "G": "G",
+        "H": "H"
+      },
+      "correct_answer": "A",
+      "acceptable_answers": [
+        "A"
+      ],
+      "tier1_hint": "Xem kỹ câu hỏi 25 trên đề thi PDF trang 49.",
+      "tier2_hint": "Chú ý các thông tin gây nhiễu trong đoạn băng của Part 5.",
+      "tier3_hint": "Đáp án đúng là [A]. Xem lại trên trang 49."
+    }
+  ]
+}

@@ -1462,3 +1462,84 @@ body.zen-mode #mode-switcher-bar {
 .btn-ping-test:hover {
   background: #c7d2fe;
 }
+
+/* ==========================================================================
+   Exam Mode PDF Navigation Dock & Part Quick Jump (Lego Style)
+   ========================================================================== */
+.lego-pdf-nav-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  padding: 0.35rem 0.2rem;
+  margin-top: 0.25rem;
+  margin-bottom: 0.35rem;
+  border-top: 1px dashed #e2e8f0;
+}
+
+.lego-pdf-part-btn {
+  background: #f8fafc;
+  border: 2px solid #cbd5e1;
+  border-bottom: 3px solid #94a3b8;
+  border-radius: var(--radius-md);
+  padding: 0.25rem 0.5rem;
+  font-size: 0.76rem;
+  font-weight: 800;
+  color: #334155;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.12s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+}
+
+.lego-pdf-part-btn:hover {
+  background: #e2e8f0;
+  transform: translateY(-1px);
+}
+
+.lego-pdf-part-btn.active {
+  background: #eff6ff;
+  border-color: var(--lego-blue);
+  border-bottom: 4px solid var(--lego-blue-shadow);
+  color: var(--lego-blue);
+  box-shadow: 0 2px 4px rgba(2, 132, 199, 0.2);
+}
+
+.lego-btn-pill-pdf {
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  border-bottom: 2px solid #60a5fa;
+  border-radius: var(--radius-full);
+  padding: 0.25rem 0.6rem;
+  font-size: 0.78rem;
+  font-weight: 800;
+  color: #1d4ed8;
+  cursor: pointer;
+  transition: all 0.12s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.lego-btn-pill-pdf:hover {
+  background: #dbeafe;
+  transform: translateY(-1px);
+}
+
+.exam-part-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 1rem;
+  margin-bottom: 0.65rem;
+  padding: 0.45rem 0.85rem;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-left: 4px solid var(--lego-blue);
+  border-radius: 8px;
+  font-weight: 800;
+  font-size: 0.92rem;
+  color: var(--text-primary);
+}

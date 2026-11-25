@@ -16,6 +16,20 @@ window.App = {
   examSecondsRemaining: 30 * 60, // 30 mins
   _profileModalPendingAction: null,
   
+  // Bảng phân bổ trang PDF chính thức cho cả 8 đề thi (Succeed in A2 Key)
+  TEST_PAGES_MAP: {
+    1: { p1: 22, p2: 23, p3: 24, p4: 25, p5: 25, start: 22, end: 25 },
+    2: { p1: 34, p2: 35, p3: 36, p4: 37, p5: 37, start: 34, end: 37 },
+    3: { p1: 46, p2: 47, p3: 48, p4: 49, p5: 49, start: 46, end: 49 },
+    4: { p1: 58, p2: 59, p3: 60, p4: 61, p5: 61, start: 58, end: 61 },
+    5: { p1: 70, p2: 71, p3: 72, p4: 73, p5: 73, start: 70, end: 73 },
+    6: { p1: 82, p2: 83, p3: 84, p4: 85, p5: 85, start: 82, end: 85 },
+    7: { p1: 94, p2: 95, p3: 96, p4: 97, p5: 97, start: 94, end: 97 },
+    8: { p1: 106, p2: 107, p3: 108, p4: 109, p5: 109, start: 106, end: 109 }
+  },
+  currentExamPdfPage: 22,
+  currentExamPdfTestId: 1,
+  
   async init() {
     window.KetAudioPlayer.init();
     if (window.I18N) window.I18N.setLang(window.I18N.currentLang);
@@ -44,6 +58,10 @@ window.App = {
     this.sentenceAttempts = {};
     this.lastHintConsumed = {};
     this.socraticHintsRevealed = {};
+
+    this.currentExamPdfTestId = testId;
+    const cfg = this.TEST_PAGES_MAP[testId] || { p1: 22, p2: 23, p3: 24, p4: 25, p5: 25, start: 22, end: 25 };
+    this.currentExamPdfPage = cfg.start;
 
     try {
       const res = await fetch(`data/test_${testId}.json`);
@@ -319,25 +337,30 @@ window.App = {
     if (!pane) return;
 
     if (this.currentMode === 'exam') {
+      const testId = this.currentTestId || 1;
+      const cfg = this.TEST_PAGES_MAP[testId] || { p1: 22, p2: 23, p3: 24, p4: 25, p5: 25, start: 22, end: 25 };
       const existingFrame = document.getElementById('exam-pdf-frame');
-      if (existingFrame) {
-        // Cập nhật số trang gợi ý mà không reload iframe để giữ nguyên vị trí cuộn & phóng to của học sinh
-        const pageBadge = document.getElementById('exam-pdf-page-indicator');
-        if (pageBadge && q.pdf_page) {
-          pageBadge.textContent = `📖 Trang gợi ý: ${q.pdf_page}`;
-        }
+      const frameTestId = existingFrame ? parseInt(existingFrame.getAttribute('data-test-id') || '0', 10) : null;
+
+      if (existingFrame && frameTestId === testId) {
+        this.updateExamPdfNavUI(q ? q.part : null);
         return;
+      }
+
+      this.currentExamPdfTestId = testId;
+      if (!this.currentExamPdfPage || this.currentExamPdfPage < cfg.start || this.currentExamPdfPage > cfg.end) {
+        this.currentExamPdfPage = (q && q.pdf_page) ? q.pdf_page : cfg.start;
       }
 
       pane.innerHTML = `
         <div class="lego-card lego-pdf-card">
           <div class="lego-pdf-header-row">
             <div style="display:flex; align-items:center; gap:0.5rem; flex-wrap:wrap;">
-              <span class="part-badge" id="exam-pdf-page-indicator">📖 Trang gợi ý: ${q.pdf_page || 'Đề thi'}</span>
+              <span class="part-badge" id="exam-pdf-page-indicator">📖 Test ${testId} · Trang ${this.currentExamPdfPage}</span>
               <span class="badge-session">Cambridge A2 Key</span>
             </div>
             <div style="display:flex; gap:0.4rem; align-items:center;">
-              <a href="https://drive.google.com/file/d/1OVNzYe_ZYOm9xVlfBB9nISHOuLF4_joT/view?usp=drive_open" target="_blank" rel="noopener" class="lego-btn-secondary" style="text-decoration:none; font-size:0.8rem; padding:0.3rem 0.65rem;" title="Mở file PDF trong tab mới">
+              <a id="exam-pdf-ext-link" href="https://drive.google.com/file/d/1OVNzYe_ZYOm9xVlfBB9nISHOuLF4_joT/view?usp=drive_open#page=${this.currentExamPdfPage}" target="_blank" rel="noopener" class="lego-btn-secondary" style="text-decoration:none; font-size:0.8rem; padding:0.3rem 0.65rem;" title="Mở file PDF trong tab mới">
                 Mở tab mới ↗️
               </a>
               <button class="lego-btn-secondary" onclick="App.reloadExamPdf()" style="font-size:0.8rem; padding:0.3rem 0.65rem;" title="Tải lại PDF">
@@ -346,20 +369,47 @@ window.App = {
             </div>
           </div>
 
+          <!-- LEGO PDF Navigation Dock for Practice Test ${testId} -->
+          <div class="lego-pdf-nav-row">
+            <button id="btn-pdf-prev" class="lego-pdf-part-btn" onclick="App.prevExamPdfPage()" ${this.currentExamPdfPage <= cfg.start ? 'disabled' : ''} title="Trang trước">
+              ◀️ Trước
+            </button>
+            <button class="lego-pdf-part-btn ${this.currentExamPdfPage === cfg.p1 ? 'active' : ''}" data-page="${cfg.p1}" data-part="1" onclick="App.setExamPdfPage(${cfg.p1}, 1)">
+              Part 1 (p.${cfg.p1})
+            </button>
+            <button class="lego-pdf-part-btn ${this.currentExamPdfPage === cfg.p2 ? 'active' : ''}" data-page="${cfg.p2}" data-part="2" onclick="App.setExamPdfPage(${cfg.p2}, 2)">
+              Part 2 (p.${cfg.p2})
+            </button>
+            <button class="lego-pdf-part-btn ${this.currentExamPdfPage === cfg.p3 ? 'active' : ''}" data-page="${cfg.p3}" data-part="3" onclick="App.setExamPdfPage(${cfg.p3}, 3)">
+              Part 3 (p.${cfg.p3})
+            </button>
+            <button class="lego-pdf-part-btn ${this.currentExamPdfPage === cfg.p4 ? 'active' : ''}" data-page="${cfg.p4}" data-part="4" onclick="App.setExamPdfPage(${cfg.p4}, 4)">
+              Part 4 (p.${cfg.p4})
+            </button>
+            <button class="lego-pdf-part-btn ${this.currentExamPdfPage === cfg.p5 ? 'active' : ''}" data-page="${cfg.p5}" data-part="5" onclick="App.setExamPdfPage(${cfg.p5}, 5)">
+              Part 5 (p.${cfg.p5})
+            </button>
+            <button id="btn-pdf-next" class="lego-pdf-part-btn" onclick="App.nextExamPdfPage()" ${this.currentExamPdfPage >= cfg.end ? 'disabled' : ''} title="Trang sau">
+              Sau ▶️
+            </button>
+          </div>
+
           <!-- Google Drive PDF Viewer Embed (SUCCEED in A2 Key 2020) -->
           <div class="lego-pdf-viewer-wrap">
             <iframe 
               id="exam-pdf-frame" 
-              src="https://drive.google.com/file/d/1OVNzYe_ZYOm9xVlfBB9nISHOuLF4_joT/preview" 
+              data-test-id="${testId}"
+              src="https://drive.google.com/file/d/1OVNzYe_ZYOm9xVlfBB9nISHOuLF4_joT/preview#page=${this.currentExamPdfPage}" 
               width="100%" 
               height="100%" 
               allow="autoplay"
               loading="lazy"
-              title="Đề thi SUCCEED in A2 Key New 2020 Format"
+              title="Đề thi SUCCEED in A2 Key New 2020 Format - Test ${testId}"
             ></iframe>
           </div>
         </div>
       `;
+      this.updateExamPdfNavUI(q ? q.part : 1);
       return;
     } else if (this.currentMode === 'beginner') {
       // BEGINNER: ZERO TRANSCRIPT! CHỈ HIỆN ĐIỀU KHIỂN ÂM THANH CÂU THOẠI LẺ
@@ -1033,31 +1083,63 @@ window.App = {
   },
 
   /* ==========================================================================
-     Mức 3: Exam Mode Workspace (Phiếu Trả Lời 25 Câu)
+     Mức 3: Exam Mode Workspace (Phiếu Trả Lời 25 Câu Theo Từng Part)
      ========================================================================== */
   renderExamWorkspace(q) {
     const pane = document.getElementById('pane-right');
     if (!pane) return;
 
-    const gridHtml = this.testData.questions.map((item, idx) => {
-      const ans = this.userAnswers[item.id] || '';
-      return `
-        <div class="exam-question-card">
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.4rem;">
-            <strong style="color:var(--lego-blue);">Q${item.q_number} (Part ${item.part})</strong>
-            <span style="font-size:0.8rem; font-weight:800; color:#64748b;">${item.type === 'multiple_choice' ? 'Trắc nghiệm' : 'Điền từ'}</span>
-          </div>
-          ${item.type === 'multiple_choice' ? `
-            <div style="display:flex; gap:0.4rem;">
-              ${['A', 'B', 'C'].map(opt => `
-                <button class="audio-btn ${ans === opt ? 'selected' : ''}" style="width:34px; height:34px; font-size:0.85rem; ${ans === opt ? 'background:var(--lego-blue); color:#fff; border-color:var(--lego-blue-shadow);' : ''}" onclick="App.recordExamAnswer(${item.id}, '${opt}')">
-                  ${opt}
-                </button>
-              `).join('')}
+    const testId = this.currentTestId || 1;
+    const cfg = this.TEST_PAGES_MAP[testId] || { p1: 22, p2: 23, p3: 24, p4: 25, p5: 25, start: 22, end: 25 };
+
+    const partsDef = [
+      { part: 1, title: 'Part 1: Nghe 5 đoạn ngắn & chọn tranh/đáp án (Q1 - Q5)', page: cfg.p1, questions: [] },
+      { part: 2, title: 'Part 2: Nghe và điền thông tin/tin nhắn (Q6 - Q10)', page: cfg.p2, questions: [] },
+      { part: 3, title: 'Part 3: Nghe hội thoại dài & chọn A, B, C (Q11 - Q15)', page: cfg.p3, questions: [] },
+      { part: 4, title: 'Part 4: Nghe 5 tình huống độc lập & chọn đáp án (Q16 - Q20)', page: cfg.p4, questions: [] },
+      { part: 5, title: 'Part 5: Nghe và nối thông tin phù hợp (Q21 - Q25)', page: cfg.p5, questions: [] }
+    ];
+
+    (this.testData.questions || []).forEach(item => {
+      const pIdx = (item.part >= 1 && item.part <= 5) ? item.part - 1 : 0;
+      partsDef[pIdx].questions.push(item);
+    });
+
+    const sectionsHtml = partsDef.map(pDef => {
+      const qCards = pDef.questions.map(item => {
+        const ans = this.userAnswers[item.id] || '';
+        return `
+          <div class="exam-question-card">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.4rem;">
+              <strong style="color:var(--lego-blue);">Q${item.q_number}</strong>
+              <span style="font-size:0.78rem; font-weight:800; color:#64748b;">${item.type === 'multiple_choice' ? 'Trắc nghiệm' : 'Điền từ'}</span>
             </div>
-          ` : `
-            <input type="text" class="dictation-input-field" style="padding:0.4rem 0.6rem; font-size:0.9rem;" value="${ans}" placeholder="Đáp án..." onchange="App.recordExamAnswer(${item.id}, this.value)" />
-          `}
+            ${item.type === 'multiple_choice' ? `
+              <div style="display:flex; gap:0.4rem;">
+                ${['A', 'B', 'C'].map(opt => `
+                  <button class="audio-btn ${ans === opt ? 'selected' : ''}" style="width:34px; height:34px; font-size:0.85rem; ${ans === opt ? 'background:var(--lego-blue); color:#fff; border-color:var(--lego-blue-shadow);' : ''}" onclick="App.recordExamAnswer(${item.id}, '${opt}')">
+                    ${opt}
+                  </button>
+                `).join('')}
+              </div>
+            ` : `
+              <input type="text" class="dictation-input-field" style="padding:0.4rem 0.6rem; font-size:0.9rem;" value="${ans}" placeholder="Đáp án..." onchange="App.recordExamAnswer(${item.id}, this.value)" />
+            `}
+          </div>
+        `;
+      }).join('');
+
+      return `
+        <div class="exam-part-header-row">
+          <div style="display:flex; align-items:center; gap:0.4rem;">
+            <span>${pDef.title}</span>
+          </div>
+          <button class="lego-btn-pill-pdf" onclick="App.setExamPdfPage(${pDef.page}, ${pDef.part})" title="Mở trang đề thi Part ${pDef.part}">
+            📄 Xem đề trang ${pDef.page} ↗
+          </button>
+        </div>
+        <div class="exam-grid-container" style="margin-bottom:0.75rem;">
+          ${qCards}
         </div>
       `;
     }).join('');
@@ -1091,12 +1173,15 @@ window.App = {
       </div>
 
       <div class="lego-card">
-        <h3 style="color:var(--lego-blue); font-size:1.15rem; font-weight:800; margin-bottom:1rem;">
-          Phiếu Làm Bài 25 Câu (Answer Sheet)
-        </h3>
-        <div class="exam-grid-container">
-          ${gridHtml}
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; flex-wrap:wrap; gap:0.5rem;">
+          <h3 style="color:var(--lego-blue); font-size:1.15rem; font-weight:800; margin:0;">
+            Phiếu Làm Bài 25 Câu (Answer Sheet) · Test ${this.currentTestId}
+          </h3>
+          <span style="font-size:0.85rem; color:#64748b; font-weight:700;">
+            Trang đề Listening: ${cfg.start} - ${cfg.end}
+          </span>
         </div>
+        ${sectionsHtml}
         <div style="margin-top:1.5rem; text-align:right;">
           <button class="lego-btn-green" style="font-size:1.05rem; padding:0.75rem 1.75rem;" onclick="App.submitExamTest()">
             Nộp Bài Thi (Finish) 🚀
@@ -1106,10 +1191,95 @@ window.App = {
     `;
   },
 
+  setExamPdfPage(pageNum, partNum) {
+    const testId = this.currentTestId || 1;
+    const cfg = this.TEST_PAGES_MAP[testId] || { p1: 22, p2: 23, p3: 24, p4: 25, p5: 25, start: 22, end: 25 };
+    if (pageNum < cfg.start) pageNum = cfg.start;
+    if (pageNum > cfg.end) pageNum = cfg.end;
+
+    this.currentExamPdfPage = pageNum;
+
+    const frame = document.getElementById('exam-pdf-frame');
+    if (frame) {
+      const targetSrc = `https://drive.google.com/file/d/1OVNzYe_ZYOm9xVlfBB9nISHOuLF4_joT/preview#page=${pageNum}`;
+      if (!frame.src.includes(`#page=${pageNum}`)) {
+        frame.src = targetSrc;
+      }
+    }
+
+    this.updateExamPdfNavUI(partNum);
+  },
+
+  prevExamPdfPage() {
+    this.setExamPdfPage(this.currentExamPdfPage - 1);
+  },
+
+  nextExamPdfPage() {
+    this.setExamPdfPage(this.currentExamPdfPage + 1);
+  },
+
+  updateExamPdfNavUI(specifiedPart) {
+    const testId = this.currentTestId || 1;
+    const cfg = this.TEST_PAGES_MAP[testId] || { p1: 22, p2: 23, p3: 24, p4: 25, p5: 25, start: 22, end: 25 };
+
+    let part = specifiedPart;
+    if (!part) {
+      if (this.currentExamPdfPage === cfg.p1) part = 1;
+      else if (this.currentExamPdfPage === cfg.p2) part = 2;
+      else if (this.currentExamPdfPage === cfg.p3) part = 3;
+      else if (this.currentExamPdfPage === cfg.p4 || this.currentExamPdfPage === cfg.p5) {
+        part = (cfg.p4 === cfg.p5) ? 4 : (this.currentExamPdfPage === cfg.p4 ? 4 : 5);
+      } else {
+        part = 1;
+      }
+    }
+
+    const badge = document.getElementById('exam-pdf-page-indicator');
+    if (badge) {
+      const partDisplay = (typeof part === 'number') ? `Part ${part}` : part;
+      badge.textContent = `📖 Test ${testId} · Trang ${this.currentExamPdfPage} (${partDisplay})`;
+    }
+
+    const extLink = document.getElementById('exam-pdf-ext-link');
+    if (extLink) {
+      extLink.href = `https://drive.google.com/file/d/1OVNzYe_ZYOm9xVlfBB9nISHOuLF4_joT/view?usp=drive_open#page=${this.currentExamPdfPage}`;
+    }
+
+    document.querySelectorAll('.lego-pdf-part-btn[data-page]').forEach(btn => {
+      const p = parseInt(btn.getAttribute('data-page'), 10);
+      const btnPart = parseInt(btn.getAttribute('data-part') || '0', 10);
+      let isMatch = false;
+      if (specifiedPart) {
+        isMatch = (btnPart === specifiedPart);
+      } else {
+        if (p === this.currentExamPdfPage) {
+          if (cfg.p4 === cfg.p5 && p === cfg.p4) {
+            isMatch = (btnPart === (part === 5 ? 5 : 4));
+          } else {
+            isMatch = true;
+          }
+        }
+      }
+
+      if (isMatch) {
+        btn.classList.add('active');
+      } else {
+        btn.classList.remove('active');
+      }
+    });
+
+    const prevBtn = document.getElementById('btn-pdf-prev');
+    if (prevBtn) prevBtn.disabled = this.currentExamPdfPage <= cfg.start;
+
+    const nextBtn = document.getElementById('btn-pdf-next');
+    if (nextBtn) nextBtn.disabled = this.currentExamPdfPage >= cfg.end;
+  },
+
   reloadExamPdf() {
     const frame = document.getElementById('exam-pdf-frame');
     if (frame) {
-      frame.src = "https://drive.google.com/file/d/1OVNzYe_ZYOm9xVlfBB9nISHOuLF4_joT/preview?t=" + Date.now();
+      const page = this.currentExamPdfPage || 22;
+      frame.src = `https://drive.google.com/file/d/1OVNzYe_ZYOm9xVlfBB9nISHOuLF4_joT/preview?t=${Date.now()}#page=${page}`;
     }
   },
 
