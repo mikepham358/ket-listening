@@ -365,6 +365,45 @@ window.App = {
     this.renderWorkspace();
   },
 
+  switchMode(mode) {
+    this.setMode(mode);
+  },
+
+  formatTranscriptHtml(transcript) {
+    if (!transcript) {
+      return '<div style="color:#64748b; font-style:italic; font-size:0.85rem; padding:0.5rem;">Đang chuẩn bị transcript trích đoạn...</div>';
+    }
+    const lines = transcript.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+    return lines.map(line => {
+      const colonIdx = line.indexOf(':');
+      if (colonIdx > 0 && colonIdx < 15) {
+        const rawSpeaker = line.slice(0, colonIdx).trim();
+        const text = line.slice(colonIdx + 1).trim();
+        const spLower = rawSpeaker.toLowerCase();
+        let badgeClass = 'narrator';
+        let label = `🗣️ ${rawSpeaker}`;
+        if (rawSpeaker === 'F' || spLower.includes('woman') || spLower.includes('girl')) {
+          badgeClass = 'female';
+          label = '👩 Nữ (F)';
+        } else if (rawSpeaker === 'M' || spLower.includes('man') || spLower.includes('boy')) {
+          badgeClass = 'male';
+          label = '👨 Nam (M)';
+        }
+        return `
+          <div class="transcript-line">
+            <span class="speaker-badge ${badgeClass}">${label}</span>
+            <span class="transcript-text">${text}</span>
+          </div>
+        `;
+      }
+      return `
+        <div class="transcript-line">
+          <span class="transcript-text" style="width:100%;">${line}</span>
+        </div>
+      `;
+    }).join('');
+  },
+
   renderWorkspace() {
     if (!this.testData || !this.testData.questions) return;
     
@@ -377,19 +416,12 @@ window.App = {
     if (this.currentMode === 'exam') {
       const fullAudio = this.testData?.audio_full || `audio/test_${this.currentTestId}/full.mp3`;
       window.KetAudioPlayer.loadTrack(fullAudio, 0, null, true);
-    } else if (this.currentMode === 'beginner' && q.dictation_sentences && q.dictation_sentences[this.currentSentenceIndex]) {
-      const s = q.dictation_sentences[this.currentSentenceIndex];
-      window.KetAudioPlayer.loadTrack(s.audio_file);
-    } else if (this.currentMode === 'intermediate') {
-      if (q.audio_question) {
-        window.KetAudioPlayer.loadTrack(q.audio_question);
-      } else if (q.audio_file) {
-        window.KetAudioPlayer.loadTrack(q.audio_file);
+    } else {
+      // Mức 1 (Tư duy) & Mức 2 (Paraphrasing): Tải audio cắt độc lập cho từng câu hỏi
+      const qAudio = q.audio_question || q.audio_file;
+      if (qAudio) {
+        window.KetAudioPlayer.loadTrack(qAudio);
       }
-    } else if (q.audio_question) {
-      window.KetAudioPlayer.loadTrack(q.audio_question);
-    } else if (q.audio_file) {
-      window.KetAudioPlayer.loadTrack(q.audio_file);
     }
 
     this.renderLeftPane(q);
@@ -462,8 +494,7 @@ window.App = {
       return;
     } else if (this.currentMode === 'beginner') {
       // MỨC 1: TƯ DUY & NHẬN DIỆN BẪY (CRITICAL THINKING)
-      const qKey = `${q.test_id || 1}_${q.id}`;
-      const isScriptOpen = this.transcriptRevealedM1[qKey] || false;
+      const formattedTranscript = this.formatTranscriptHtml(q.transcript);
 
       pane.innerHTML = `
         <div class="lego-card">
@@ -477,19 +508,21 @@ window.App = {
           <h4 style="color:var(--lego-blue); font-size:1.05rem; margin-bottom:0.35rem;">
             🎯 Bối Cảnh Câu Hỏi:
           </h4>
-          <p style="font-size: 0.98rem; color: var(--text-primary); font-weight:700; margin-bottom: 1rem; line-height:1.45;">
+          <p style="font-size: 0.98rem; color: var(--text-primary); font-weight:700; margin-bottom: 0.85rem; line-height:1.45;">
             ${q.prompt}
           </p>
 
-          <!-- Audio Box -->
+          <!-- Audio Box (Đoạn cắt độc lập cho từng câu hỏi) -->
           <div class="lego-thinking-audio-box">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.6rem;">
-              <span style="font-size:0.85rem; font-weight:800; color:#15803d;">🎧 Audio Nghe Bối Cảnh</span>
-              <span style="font-size:0.75rem; color:#64748b; font-weight:700;">(Space/R để nghe lại)</span>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
+              <span style="font-size:0.85rem; font-weight:800; color:#15803d;">
+                🎧 Audio Câu Hỏi ${q.q_number} (Đoạn Cắt Độc Lập)
+              </span>
+              <span style="font-size:0.75rem; color:#64748b; font-weight:700;">(Space để nghe/dừng)</span>
             </div>
             <div style="display:flex; gap:0.45rem; flex-wrap:wrap;">
-              <button class="lego-btn-green" onclick="window.KetAudioPlayer.play()" style="font-size:0.85rem; padding:0.45rem 0.85rem;">
-                ▶️ Phát Audio
+              <button class="lego-btn-green" onclick="window.KetAudioPlayer.togglePlay()" style="font-size:0.85rem; padding:0.45rem 0.85rem;">
+                ▶️ Nghe / Tạm Dừng
               </button>
               <button class="lego-btn-secondary" onclick="window.KetAudioPlayer.replay5s()" style="font-size:0.85rem; padding:0.45rem 0.85rem;">
                 ⏮️ Tua lại 5s
@@ -503,25 +536,30 @@ window.App = {
             </div>
           </div>
 
-          <!-- Clues & Transcript Guidance -->
+          <!-- Transcript Phân Tích (Audioscript hiển thị trực tiếp cho học sinh phân tích) -->
+          <div class="lego-transcript-box">
+            <div class="lego-transcript-header">
+              <span style="font-size:0.88rem; font-weight:800; color:#1e40af; display:flex; align-items:center; gap:0.35rem;">
+                <span>📜</span> Transcript Phân Tích (Audioscript):
+              </span>
+              <span style="font-size:0.72rem; color:#0369a1; font-weight:800; background:#e0f2fe; padding:0.15rem 0.5rem; border-radius:999px; border:1px solid #bae6fd;">
+                Đọc & bóc tách bẫy
+              </span>
+            </div>
+            <div class="lego-transcript-lines">
+              ${formattedTranscript}
+            </div>
+          </div>
+
+          <!-- Clues & Trap Guidance -->
           <div class="lego-thinking-clues-box">
             <div style="margin-bottom:0.6rem;">
               <div style="font-weight:800; font-size:0.84rem; color:#b45309; margin-bottom:0.2rem;">💡 Gợi Ý Bối Cảnh & Từ Khóa:</div>
               <div style="font-size:0.85rem; color:#78350f; line-height:1.4;">${q.tier1_hint || 'Lắng nghe các mốc thông tin và phản ứng của người nói.'}</div>
             </div>
-            <div style="margin-bottom:0.6rem;">
+            <div>
               <div style="font-weight:800; font-size:0.84rem; color:#c2410c; margin-bottom:0.2rem;">⚠️ Cảnh Báo Bẫy Đề Thi:</div>
               <div style="font-size:0.85rem; color:#7c2d12; line-height:1.4;">${q.tier2_hint || 'Chú ý các từ chuyển ý (Actually, But, However) hoặc các phương án bị từ chối.'}</div>
-            </div>
-            <div style="border-top:1px dashed #cbd5e1; padding-top:0.5rem; margin-top:0.5rem;">
-              <button class="lego-btn-secondary" onclick="App.toggleTranscriptM1('${qKey}')" style="width:100%; font-size:0.82rem; padding:0.35rem 0.6rem;">
-                ${isScriptOpen ? '🙈 Ẩn Audioscript' : '📜 Mở Xem Audioscript Trích Đoạn'}
-              </button>
-              ${isScriptOpen ? `
-                <div style="margin-top:0.5rem; background:#ffffff; border:1.5px solid #93c5fd; border-radius:8px; padding:0.75rem; font-size:0.85rem; line-height:1.5; color:#1e293b; white-space:pre-line;">
-                  ${q.transcript || 'Chưa có transcript trích đoạn'}
-                </div>
-              ` : ''}
             </div>
           </div>
         </div>
@@ -1743,11 +1781,7 @@ window.App = {
 
     if (e.code === 'Space' || e.code === 'KeyR') {
       e.preventDefault();
-      if (this.currentMode === 'beginner') {
-        this.replayCurrentSentence();
-      } else {
-        window.KetAudioPlayer.togglePlay();
-      }
+      window.KetAudioPlayer.togglePlay();
     } else if (e.code === 'KeyZ') {
       document.body.classList.toggle('zen-mode');
     } else if (e.code === 'ArrowLeft') {
