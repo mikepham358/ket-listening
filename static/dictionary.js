@@ -565,7 +565,6 @@ window.KetDictionary = {
     }
 
     // Process Google Translate for Vietnamese meanings, Oxford synonyms, definitions, examples
-    let viMeanings = [];
     const googleSynonyms = [];
     if (gTranslateRes.status === 'fulfilled' && gTranslateRes.value) {
       const gVal = gTranslateRes.value;
