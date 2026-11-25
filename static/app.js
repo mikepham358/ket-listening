@@ -406,6 +406,7 @@ window.App = {
   },
 
   currentQuestionStep: 1, // 1: Làm bài thi, 2: Bẫy & Transcript, 3: Paraphrasing & Phân tích
+  showAllQuestionsGrid: false,
   expandedOptionBreakdowns: {},
   thinkingAnswers: {},
   paraphraseAnswers: {},
@@ -413,6 +414,31 @@ window.App = {
   setQuestionStep(step) {
     this.currentQuestionStep = parseInt(step, 10) || 1;
     this.renderWorkspace();
+  },
+
+  toggleAllQuestionsGrid() {
+    this.showAllQuestionsGrid = !this.showAllQuestionsGrid;
+    this.renderWorkspace();
+  },
+
+  jumpToQuestionIndex(idx) {
+    if (!this.testData || !this.testData.questions) return;
+    idx = parseInt(idx, 10);
+    if (!isNaN(idx) && idx >= 0 && idx < this.testData.questions.length) {
+      this.currentQuestionIndex = idx;
+      this.currentSentenceIndex = 0;
+      this.currentQuestionStep = 1;
+      this.renderWorkspace();
+    }
+  },
+
+  jumpToPart(partNum) {
+    if (!this.testData || !this.testData.questions) return;
+    partNum = parseInt(partNum, 10);
+    const idx = this.testData.questions.findIndex(q => q.part === partNum);
+    if (idx !== -1) {
+      this.jumpToQuestionIndex(idx);
+    }
   },
 
   selectExamOption(qId, key) {
@@ -970,26 +996,160 @@ window.App = {
       `;
     }
 
+    // --- BUILD SMART PART & QUESTION NAVIGATOR ---
+    const partTitles = {
+      1: "Part 1 (Q1 - 5) · Tranh & Trắc nghiệm",
+      2: "Part 2 (Q6 - 10) · Điền từ / Tin nhắn",
+      3: "Part 3 (Q11 - 15) · Hội thoại 3 lựa chọn",
+      4: "Part 4 (Q16 - 20) · 5 đoạn ngắn độc lập",
+      5: "Part 5 (Q21 - 25) · Nối thông tin"
+    };
+
+    const partsDef = [
+      { part: 1, range: 'Q1-5', title: 'Part 1 (1-5)' },
+      { part: 2, range: 'Q6-10', title: 'Part 2 (6-10)' },
+      { part: 3, range: 'Q11-15', title: 'Part 3 (11-15)' },
+      { part: 4, range: 'Q16-20', title: 'Part 4 (16-20)' },
+      { part: 5, range: 'Q21-25', title: 'Part 5 (21-25)' }
+    ];
+
+    let qSelectOptionsHtml = '';
+    for (let pNum = 1; pNum <= 5; pNum++) {
+      const pQuestions = (this.testData.questions || []).filter(item => item.part === pNum);
+      if (pQuestions.length > 0) {
+        qSelectOptionsHtml += `<optgroup label="${partTitles[pNum] || 'Part ' + pNum}">`;
+        pQuestions.forEach(item => {
+          const qIdx = this.testData.questions.findIndex(x => x.id === item.id);
+          const isSelected = (qIdx === this.currentQuestionIndex);
+          const ans = this.userAnswers[item.id];
+          const statusText = ans ? `✅ (${ans})` : '⚪';
+          qSelectOptionsHtml += `
+            <option value="${qIdx}" ${isSelected ? 'selected' : ''}>
+              Câu ${item.q_number} ${statusText} · Trang ${item.pdf_page || 22}
+            </option>
+          `;
+        });
+        qSelectOptionsHtml += `</optgroup>`;
+      }
+    }
+
+    const partPillsHtml = partsDef.map(p => `
+      <button class="smart-part-btn ${q.part === p.part ? 'active' : ''}" onclick="App.jumpToPart(${p.part})" title="${partTitles[p.part]}">
+        ${p.title}
+      </button>
+    `).join('');
+
+    const currentPartQuestions = (this.testData.questions || []).filter(item => item.part === q.part);
+    const qPillsHtml = currentPartQuestions.map(item => {
+      const isCur = (item.id === q.id);
+      const itemAns = this.userAnswers[item.id];
+      const qIdx = this.testData.questions.findIndex(x => x.id === item.id);
+      return `
+        <button class="smart-q-btn ${isCur ? 'active' : ''} ${itemAns ? 'answered' : ''}" 
+                onclick="App.jumpToQuestionIndex(${qIdx})" 
+                title="Câu ${item.q_number} ${itemAns ? '(Đã làm: ' + itemAns + ')' : '(Chưa làm)'}">
+          <span>Q${item.q_number}</span>
+          ${itemAns ? '<span style="font-size:0.65rem; color:#16a34a;">✓</span>' : ''}
+        </button>
+      `;
+    }).join('');
+
+    let allQuestionsGridHtml = '';
+    if (this.showAllQuestionsGrid) {
+      allQuestionsGridHtml = `
+        <div class="smart-all-q-grid-panel">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.45rem;">
+            <strong style="font-size:0.85rem; color:#1e293b;">🗺️ Bản Đồ 25 Câu Hỏi (Chọn nhanh câu bất kỳ):</strong>
+            <button class="lego-chip" style="font-size:0.75rem; padding:0.15rem 0.45rem;" onclick="App.toggleAllQuestionsGrid()">Đóng ✕</button>
+          </div>
+          <div class="smart-all-q-rows">
+            ${partsDef.map(p => {
+              const pQs = (this.testData.questions || []).filter(item => item.part === p.part);
+              return `
+                <div class="smart-grid-part-row">
+                  <span class="smart-grid-part-label">${p.title}:</span>
+                  <div class="smart-grid-part-btns">
+                    ${pQs.map(item => {
+                      const isCur = (item.id === q.id);
+                      const itemAns = this.userAnswers[item.id];
+                      const qIdx = this.testData.questions.findIndex(x => x.id === item.id);
+                      return `
+                        <button class="smart-q-btn ${isCur ? 'active' : ''} ${itemAns ? 'answered' : ''}" 
+                                onclick="App.jumpToQuestionIndex(${qIdx})" 
+                                title="Câu ${item.q_number} ${itemAns ? '(Đã làm: ' + itemAns + ')' : '(Chưa làm)'}">
+                          <span>Q${item.q_number}</span>
+                          ${itemAns ? '<span style="font-size:0.65rem; color:#16a34a;">✓</span>' : ''}
+                        </button>
+                      `;
+                    }).join('')}
+                  </div>
+                </div>
+              `;
+            }).join('')}
+          </div>
+        </div>
+      `;
+    }
+
     // --- RENDER FULL RIGHT PANE ---
     pane.innerHTML = `
-      <!-- Header Card with Question info & Stepper -->
+      <!-- Header Card with Smart Question & Part Navigation & Stepper -->
       <div class="flow-header-card">
-        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem;">
-          <div style="display:flex; align-items:center; gap:0.5rem; flex-wrap:wrap;">
-            <span class="part-badge">Part ${q.part} (Câu ${q.q_number} / ${this.testData.questions.length})</span>
-            <span style="font-size:0.8rem; font-weight:800; color:#475569; background:#f1f5f9; padding:0.2rem 0.55rem; border-radius:6px; border:1px solid #cbd5e1;">
-              📄 PDF Trang ${q.pdf_page || 22}
+        <!-- Row 1: Smart Selectors & Actions -->
+        <div class="smart-nav-row">
+          <div class="smart-nav-selectors">
+            <!-- Part Select -->
+            <div class="smart-nav-picker">
+              <label class="smart-nav-label">📂 Phần:</label>
+              <select class="smart-select-pill" onchange="App.jumpToPart(parseInt(this.value, 10))">
+                <option value="1" ${q.part === 1 ? 'selected' : ''}>Part 1 (Q1-5)</option>
+                <option value="2" ${q.part === 2 ? 'selected' : ''}>Part 2 (Q6-10)</option>
+                <option value="3" ${q.part === 3 ? 'selected' : ''}>Part 3 (Q11-15)</option>
+                <option value="4" ${q.part === 4 ? 'selected' : ''}>Part 4 (Q16-20)</option>
+                <option value="5" ${q.part === 5 ? 'selected' : ''}>Part 5 (Q21-25)</option>
+              </select>
+            </div>
+
+            <!-- Question Select -->
+            <div class="smart-nav-picker">
+              <label class="smart-nav-label">🎯 Câu:</label>
+              <select class="smart-select-pill" onchange="App.jumpToQuestionIndex(parseInt(this.value, 10))">
+                ${qSelectOptionsHtml}
+              </select>
+            </div>
+
+            <!-- PDF Page Badge -->
+            <span class="smart-pdf-badge" title="Đang mở trang ${q.pdf_page || 22} trên PDF viewer bên trái">
+              📄 Trang ${q.pdf_page || 22}
             </span>
           </div>
-          <div style="display:flex; gap:0.4rem; align-items:center;">
-            <button class="lego-btn-secondary" onclick="App.prevQuestion()" style="font-size:0.82rem; padding:0.35rem 0.65rem;" ${this.currentQuestionIndex === 0 ? 'disabled' : ''}>
-              ⬅️ Câu trước
+
+          <!-- Controls: Prev / Next / Toggle 25 Questions -->
+          <div style="display:flex; gap:0.35rem; align-items:center;">
+            <button class="lego-chip ${this.showAllQuestionsGrid ? 'active' : ''}" onclick="App.toggleAllQuestionsGrid()" title="Mở danh sách 25 câu hỏi" style="font-size:0.78rem; padding:0.3rem 0.6rem;">
+              🗺️ 25 Câu
             </button>
-            <button class="lego-btn-secondary" onclick="App.nextQuestion()" style="font-size:0.82rem; padding:0.35rem 0.65rem;" ${this.currentQuestionIndex === this.testData.questions.length - 1 ? 'disabled' : ''}>
-              Câu tiếp ➡️
+            <button class="lego-btn-secondary" onclick="App.prevQuestion()" style="font-size:0.82rem; padding:0.3rem 0.65rem;" ${this.currentQuestionIndex === 0 ? 'disabled' : ''}>
+              ⬅️ Trước
+            </button>
+            <button class="lego-btn-secondary" onclick="App.nextQuestion()" style="font-size:0.82rem; padding:0.3rem 0.65rem;" ${this.currentQuestionIndex === this.testData.questions.length - 1 ? 'disabled' : ''}>
+              Sau ➡️
             </button>
           </div>
         </div>
+
+        <!-- Row 2: Part Pills & Current Part Question Pills Quick-Strip -->
+        <div class="smart-quick-strip">
+          <div class="smart-parts-pills">
+            ${partPillsHtml}
+          </div>
+          <div class="smart-questions-pills">
+            ${qPillsHtml}
+          </div>
+        </div>
+
+        <!-- Expandable All 25 Questions Grid Panel (if opened) -->
+        ${allQuestionsGridHtml}
 
         <!-- Stepper Navigation Pills -->
         <div class="flow-stepper-row">

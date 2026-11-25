@@ -1388,6 +1388,203 @@ body {
   margin-bottom: 0.85rem;
 }
 
+/* Smart Part & Question Navigator in Right Pane */
+.smart-nav-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+.smart-nav-selectors {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.smart-nav-picker {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: #f8fafc;
+  border: 1.5px solid #cbd5e1;
+  border-radius: 8px;
+  padding: 0.2rem 0.45rem;
+}
+
+.smart-nav-label {
+  font-size: 0.76rem;
+  font-weight: 800;
+  color: #475569;
+  white-space: nowrap;
+}
+
+.smart-select-pill {
+  font-family: inherit;
+  font-size: 0.82rem;
+  font-weight: 800;
+  color: var(--lego-blue);
+  background: #ffffff;
+  border: 1.5px solid #cbd5e1;
+  border-radius: 6px;
+  padding: 0.22rem 0.5rem;
+  cursor: pointer;
+  outline: none;
+  transition: all 0.15s ease;
+}
+
+.smart-select-pill:hover, .smart-select-pill:focus {
+  border-color: var(--lego-blue);
+  box-shadow: 0 0 0 2px rgba(0, 109, 204, 0.15);
+}
+
+.smart-pdf-badge {
+  font-size: 0.78rem;
+  font-weight: 800;
+  color: #475569;
+  background: #f1f5f9;
+  padding: 0.28rem 0.55rem;
+  border-radius: 6px;
+  border: 1px solid #cbd5e1;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  white-space: nowrap;
+}
+
+/* Quick Part & Question Pills Strip */
+.smart-quick-strip {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.65rem;
+  padding-top: 0.65rem;
+  border-top: 1px dashed #e2e8f0;
+}
+
+.smart-parts-pills {
+  display: flex;
+  gap: 0.3rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.smart-part-btn {
+  font-size: 0.76rem;
+  font-weight: 800;
+  padding: 0.22rem 0.55rem;
+  border-radius: 6px;
+  border: 1.5px solid #cbd5e1;
+  background: #ffffff;
+  color: #475569;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.smart-part-btn:hover {
+  background: #f1f5f9;
+  border-color: #94a3b8;
+  color: #1e293b;
+}
+
+.smart-part-btn.active {
+  background: var(--lego-blue);
+  color: #ffffff;
+  border-color: var(--lego-blue-shadow);
+  box-shadow: 0 2px 4px rgba(0, 109, 204, 0.25);
+}
+
+.smart-questions-pills {
+  display: flex;
+  gap: 0.3rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.smart-q-btn {
+  min-width: 32px;
+  height: 28px;
+  font-size: 0.78rem;
+  font-weight: 900;
+  padding: 0 0.4rem;
+  border-radius: 6px;
+  border: 1.5px solid #cbd5e1;
+  background: #ffffff;
+  color: #334155;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.15rem;
+  transition: all 0.15s ease;
+}
+
+.smart-q-btn:hover {
+  background: #f8fafc;
+  border-color: var(--lego-blue);
+  color: var(--lego-blue);
+}
+
+.smart-q-btn.active {
+  background: var(--lego-blue);
+  color: #ffffff;
+  border-color: var(--lego-blue-shadow);
+  box-shadow: 0 2px 4px rgba(0, 109, 204, 0.25);
+}
+
+.smart-q-btn.answered {
+  border-color: #86efac;
+  background: #f0fdf4;
+  color: #166534;
+}
+
+.smart-q-btn.active.answered {
+  background: var(--lego-blue);
+  color: #ffffff;
+  border-color: var(--lego-blue-shadow);
+}
+
+/* All 25 Questions Expandable Grid */
+.smart-all-q-grid-panel {
+  margin-top: 0.65rem;
+  background: #f8fafc;
+  border: 1.5px solid #cbd5e1;
+  border-radius: 8px;
+  padding: 0.65rem 0.8rem;
+  animation: fadeIn 0.2s ease;
+}
+
+.smart-all-q-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.smart-grid-part-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.smart-grid-part-label {
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: #475569;
+  min-width: 85px;
+}
+
+.smart-grid-part-btns {
+  display: flex;
+  gap: 0.25rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
 .flow-stepper-row {
   display: flex;
   gap: 0.5rem;
