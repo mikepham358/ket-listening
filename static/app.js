@@ -51,6 +51,7 @@ window.App = {
     this.currentTestId = testId;
     this.currentQuestionIndex = 0;
     this.currentSentenceIndex = 0;
+    this.currentQuestionStep = 1;
     this.attempts = {};
     this.userAnswers = {};
     this.sentenceAnswers = {};
@@ -404,6 +405,50 @@ window.App = {
     }).join('');
   },
 
+  currentQuestionStep: 1, // 1: Làm bài thi, 2: Bẫy & Transcript, 3: Paraphrasing & Phân tích
+  expandedOptionBreakdowns: {},
+  thinkingAnswers: {},
+  paraphraseAnswers: {},
+
+  setQuestionStep(step) {
+    this.currentQuestionStep = parseInt(step, 10) || 1;
+    this.renderWorkspace();
+  },
+
+  selectExamOption(qId, key) {
+    if (window.KetTracker && !window.KetTracker.hasProfile()) {
+      return this.requireStudentProfile(() => this.selectExamOption(qId, key));
+    }
+    this.userAnswers[qId] = key;
+    const q = this.testData.questions[this.currentQuestionIndex];
+    const isCorrect = (q && q.correct_answer) ? (key.toUpperCase() === q.correct_answer.toUpperCase()) : false;
+
+    if (window.KetTracker) {
+      window.KetTracker.track('EXAM_STEP1_ANSWER', {
+        question_id: qId,
+        chosen: key,
+        correct_answer: q ? q.correct_answer : '',
+        is_correct: isCorrect
+      }, {
+        question_number: `Câu ${q ? q.q_number : qId} (Part ${q ? q.part : 1})`,
+        result: isCorrect ? `ĐÚNG (${key})` : `CHỌN (${key})`
+      });
+      if (isCorrect) window.KetTracker.incrementSessionCounter();
+    }
+    this.renderWorkspace();
+  },
+
+  submitClozeOption(qId) {
+    const inputEl = document.getElementById(`cloze-input-${qId}`);
+    if (!inputEl) return;
+    const val = inputEl.value.trim();
+    if (!val) {
+      inputEl.focus();
+      return;
+    }
+    this.selectExamOption(qId, val);
+  },
+
   renderWorkspace() {
     if (!this.testData || !this.testData.questions) return;
     
@@ -412,270 +457,155 @@ window.App = {
 
     if (window.KetTracker) window.KetTracker.startQuestionTimer();
 
-    // Auto load audio
-    if (this.currentMode === 'exam') {
-      const fullAudio = this.testData?.audio_full || `audio/test_${this.currentTestId}/full.mp3`;
-      window.KetAudioPlayer.loadTrack(fullAudio, 0, null, true);
-    } else {
-      // Mức 1 (Tư duy) & Mức 2 (Paraphrasing): Tải audio cắt độc lập cho từng câu hỏi
-      const qAudio = q.audio_question || q.audio_file;
-      if (qAudio) {
-        window.KetAudioPlayer.loadTrack(qAudio);
-      }
+    // Auto load audio cho câu hỏi hiện tại
+    const qAudio = q.audio_question || q.audio_file;
+    if (qAudio) {
+      window.KetAudioPlayer.loadTrack(qAudio);
     }
 
+    // Phần tay trái: Luôn luôn hiển thị PDF Viewer
     this.renderLeftPane(q);
 
-    if (this.currentMode === 'beginner') {
-      this.renderBeginnerWorkspace(q);
-    } else if (this.currentMode === 'intermediate') {
-      this.renderIntermediateWorkspace(q);
-    } else if (this.currentMode === 'exam') {
-      this.renderExamWorkspace(q);
-    }
+    // Phần tay phải: Flow luyện tập nghe 3 bước
+    this.renderUnifiedWorkspace(q);
   },
 
   /* ==========================================================================
-     Left Pane: Audio Controls & Context (ZERO TRANSCRIPT AT BEGINNER)
+     Left Pane: LUÔN LUÔN HIỂN THỊ PDF VIEWER (SUCCEED IN A2 KEY)
      ========================================================================== */
   renderLeftPane(q) {
     const pane = document.getElementById('pane-left');
     if (!pane) return;
 
-    if (this.currentMode === 'exam') {
-      const testId = this.currentTestId || 1;
-      const cfg = this.TEST_PAGES_MAP[testId] || { p1: 22, p2: 23, p3: 24, p4: 25, p5: 25, start: 22, end: 25 };
-      const existingFrame = document.getElementById('exam-pdf-frame');
-      const frameTestId = existingFrame ? parseInt(existingFrame.getAttribute('data-test-id') || '0', 10) : null;
+    const testId = this.currentTestId || 1;
+    const cfg = this.TEST_PAGES_MAP[testId] || { p1: 22, p2: 23, p3: 24, p4: 25, p5: 25, start: 22, end: 25 };
+    const targetPage = (q && q.pdf_page) ? q.pdf_page : cfg.start;
+    this.currentExamPdfPage = targetPage;
+    this.currentExamPdfTestId = testId;
 
-      if (existingFrame && frameTestId === testId) {
-        this.updateExamPdfNavUI(q ? q.part : null);
-        return;
+    const existingFrame = document.getElementById('exam-pdf-frame');
+    const frameTestId = existingFrame ? parseInt(existingFrame.getAttribute('data-test-id') || '0', 10) : null;
+    const framePage = existingFrame ? parseInt(existingFrame.getAttribute('data-page') || '0', 10) : null;
+
+    if (existingFrame && frameTestId === testId) {
+      const pageIndicator = document.getElementById('exam-pdf-page-indicator');
+      if (pageIndicator) {
+        pageIndicator.textContent = `📖 Test ${testId} · Trang ${targetPage} (Part ${q ? q.part : 1})`;
       }
-
-      this.currentExamPdfTestId = testId;
-      if (!this.currentExamPdfPage || this.currentExamPdfPage < cfg.start || this.currentExamPdfPage > cfg.end) {
-        this.currentExamPdfPage = (q && q.pdf_page) ? q.pdf_page : cfg.start;
+      const extLink = document.getElementById('exam-pdf-ext-link');
+      if (extLink) {
+        extLink.href = `https://drive.google.com/file/d/1OVNzYe_ZYOm9xVlfBB9nISHOuLF4_joT/view?usp=drive_open#page=${targetPage}`;
       }
-
-      pane.innerHTML = `
-        <div class="lego-card lego-pdf-card">
-          <div class="lego-pdf-header-row">
-            <div style="display:flex; align-items:center; gap:0.5rem; flex-wrap:wrap;">
-              <span class="part-badge" id="exam-pdf-page-indicator">📖 Test ${testId} · Trang ${this.currentExamPdfPage}</span>
-              <span class="badge-session">Cambridge A2 Key</span>
-            </div>
-            <div style="display:flex; gap:0.4rem; align-items:center;">
-              <a id="exam-pdf-ext-link" href="https://drive.google.com/file/d/1OVNzYe_ZYOm9xVlfBB9nISHOuLF4_joT/view?usp=drive_open#page=${this.currentExamPdfPage}" target="_blank" rel="noopener" class="lego-btn-secondary" style="text-decoration:none; font-size:0.8rem; padding:0.3rem 0.65rem;" title="Mở file PDF trong tab mới">
-                Mở tab mới ↗️
-              </a>
-              <button class="lego-btn-secondary" onclick="App.reloadExamPdf()" style="font-size:0.8rem; padding:0.3rem 0.65rem;" title="Tải lại PDF">
-                🔄 Tải lại
-              </button>
-            </div>
-          </div>
-
-          <!-- Google Drive PDF Viewer Embed (SUCCEED in A2 Key 2020) -->
-          <div class="lego-pdf-viewer-wrap">
-            <iframe 
-              id="exam-pdf-frame" 
-              data-test-id="${testId}"
-              src="https://drive.google.com/file/d/1OVNzYe_ZYOm9xVlfBB9nISHOuLF4_joT/preview#page=${this.currentExamPdfPage}" 
-              width="100%" 
-              height="100%" 
-              allow="autoplay"
-              loading="lazy"
-              title="Đề thi SUCCEED in A2 Key New 2020 Format - Test ${testId}"
-            ></iframe>
-          </div>
-        </div>
-      `;
-      this.updateExamPdfNavUI(q ? q.part : 1);
+      if (framePage !== targetPage) {
+        existingFrame.setAttribute('data-page', targetPage);
+        existingFrame.src = `https://drive.google.com/file/d/1OVNzYe_ZYOm9xVlfBB9nISHOuLF4_joT/preview#page=${targetPage}`;
+      }
       return;
-    } else if (this.currentMode === 'beginner') {
-      // MỨC 1: TƯ DUY & NHẬN DIỆN BẪY (CRITICAL THINKING)
-      const formattedTranscript = this.formatTranscriptHtml(q.transcript);
-
-      pane.innerHTML = `
-        <div class="lego-card">
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 0.85rem;">
-            <span class="part-badge">Part ${q.part} (Câu ${q.q_number})</span>
-            <span class="stopwatch-badge" style="background:#dcfce7; color:#15803d; border-color:#86efac;">
-              🌱 Mức 1: Tư Duy & Nhận Diện Bẫy
-            </span>
-          </div>
-
-          <h4 style="color:var(--lego-blue); font-size:1.05rem; margin-bottom:0.35rem;">
-            🎯 Bối Cảnh Câu Hỏi:
-          </h4>
-          <p style="font-size: 0.98rem; color: var(--text-primary); font-weight:700; margin-bottom: 0.85rem; line-height:1.45;">
-            ${q.prompt}
-          </p>
-
-          <!-- Audio Box (Đoạn cắt độc lập cho từng câu hỏi) -->
-          <div class="lego-thinking-audio-box">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
-              <span style="font-size:0.85rem; font-weight:800; color:#15803d;">
-                🎧 Audio Câu Hỏi ${q.q_number} (Đoạn Cắt Độc Lập)
-              </span>
-              <span style="font-size:0.75rem; color:#64748b; font-weight:700;">(Space để nghe/dừng)</span>
-            </div>
-            <div style="display:flex; gap:0.45rem; flex-wrap:wrap;">
-              <button class="lego-btn-green" onclick="window.KetAudioPlayer.togglePlay()" style="font-size:0.85rem; padding:0.45rem 0.85rem;">
-                ▶️ Nghe / Tạm Dừng
-              </button>
-              <button class="lego-btn-secondary" onclick="window.KetAudioPlayer.replay5s()" style="font-size:0.85rem; padding:0.45rem 0.85rem;">
-                ⏮️ Tua lại 5s
-              </button>
-              <button class="lego-btn-orange" onclick="window.KetAudioPlayer.setSpeed(0.85)" style="font-size:0.85rem; padding:0.45rem 0.85rem;">
-                🐢 0.85x Chậm
-              </button>
-              <button class="lego-btn-secondary" onclick="window.KetAudioPlayer.setSpeed(1.0)" style="font-size:0.85rem; padding:0.45rem 0.85rem;">
-                ⚡ 1.0x Thường
-              </button>
-            </div>
-          </div>
-
-          <!-- Transcript Phân Tích (Audioscript hiển thị trực tiếp cho học sinh phân tích) -->
-          <div class="lego-transcript-box">
-            <div class="lego-transcript-header">
-              <span style="font-size:0.88rem; font-weight:800; color:#1e40af; display:flex; align-items:center; gap:0.35rem;">
-                <span>📜</span> Transcript Phân Tích (Audioscript):
-              </span>
-              <span style="font-size:0.72rem; color:#0369a1; font-weight:800; background:#e0f2fe; padding:0.15rem 0.5rem; border-radius:999px; border:1px solid #bae6fd;">
-                Đọc & bóc tách bẫy
-              </span>
-            </div>
-            <div class="lego-transcript-lines">
-              ${formattedTranscript}
-            </div>
-          </div>
-
-          <!-- Clues & Trap Guidance -->
-          <div class="lego-thinking-clues-box">
-            <div style="margin-bottom:0.6rem;">
-              <div style="font-weight:800; font-size:0.84rem; color:#b45309; margin-bottom:0.2rem;">💡 Gợi Ý Bối Cảnh & Từ Khóa:</div>
-              <div style="font-size:0.85rem; color:#78350f; line-height:1.4;">${q.tier1_hint || 'Lắng nghe các mốc thông tin và phản ứng của người nói.'}</div>
-            </div>
-            <div>
-              <div style="font-weight:800; font-size:0.84rem; color:#c2410c; margin-bottom:0.2rem;">⚠️ Cảnh Báo Bẫy Đề Thi:</div>
-              <div style="font-size:0.85rem; color:#7c2d12; line-height:1.4;">${q.tier2_hint || 'Chú ý các từ chuyển ý (Actually, But, However) hoặc các phương án bị từ chối.'}</div>
-            </div>
-          </div>
-        </div>
-      `;
-    } else {
-      // MỨC 2: PARAPHRASING & KHO TỪ VỰNG (PARAPHRASING & VOCAB BANK)
-      const thinkingData = window.ThinkingEngine ? window.ThinkingEngine.getThinkingData(q) : null;
-      const vocabList = thinkingData?.tier2_paraphrase?.vocab_bank || [];
-
-      const vocabCardsHtml = vocabList.map(v => {
-        const relBadge = v.relation === 'synonym' 
-          ? '<span class="lego-rel-badge syn">🟢 Đồng nghĩa</span>' 
-          : (v.relation === 'antonym' ? '<span class="lego-rel-badge ant">🔴 Trái nghĩa</span>' : '<span class="lego-rel-badge col">⭐ Cụm từ</span>');
-        const safePhrase = (v.phrase || '').replace(/'/g, "\\'");
-        return `
-          <div class="lego-vocab-chip-card">
-            <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:0.25rem;">
-              <span style="font-weight:800; font-size:0.9rem; color:var(--lego-blue);">${v.phrase}</span>
-              ${relBadge}
-            </div>
-            <div style="font-size:0.8rem; color:#334155; margin-bottom:0.35rem;">
-              👉 <strong>${v.meaning}</strong>
-            </div>
-            <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px dashed #e2e8f0; padding-top:0.3rem;">
-              <span style="font-size:0.74rem; color:#64748b; font-style:italic;">Khớp: ${v.target}</span>
-              <button class="lego-chip" onclick="KetDictionary.openModal('${safePhrase}')" style="font-size:0.72rem; padding:0.1rem 0.45rem;" title="Mở Dictionary tra IPA & ghi chép nghĩa">
-                📚 Tra từ
-              </button>
-            </div>
-          </div>
-        `;
-      }).join('');
-
-      pane.innerHTML = `
-        <div class="lego-card">
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 0.85rem;">
-            <span class="part-badge">Part ${q.part} (Câu ${q.q_number})</span>
-            <span class="stopwatch-badge" style="background:#fef3c7; color:#92400e; border-color:#fde68a;">
-              ⚡ Mức 2: Paraphrasing & Từ Vựng
-            </span>
-          </div>
-
-          <!-- Audio Box -->
-          <div class="lego-thinking-audio-box" style="margin-bottom:0.85rem;">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
-              <span style="font-size:0.85rem; font-weight:800; color:#15803d;">🎧 Audio Bắt Paraphrasing</span>
-            </div>
-            <div style="display:flex; gap:0.45rem; flex-wrap:wrap;">
-              <button class="lego-btn-green" onclick="window.KetAudioPlayer.play()" style="font-size:0.85rem; padding:0.4rem 0.8rem;">
-                ▶️ Nghe
-              </button>
-              <button class="lego-btn-secondary" onclick="window.KetAudioPlayer.replay5s()" style="font-size:0.85rem; padding:0.4rem 0.8rem;">
-                ⏮️ Tua lại 5s
-              </button>
-              <button class="lego-btn-orange" onclick="window.KetAudioPlayer.setSpeed(0.85)" style="font-size:0.85rem; padding:0.4rem 0.8rem;">
-                🐢 0.85x Chậm
-              </button>
-            </div>
-          </div>
-
-          <!-- Vocab Bank -->
-          <div style="margin-bottom:0.5rem;">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
-              <h4 style="color:#0f766e; font-size:0.92rem; font-weight:900; margin:0;">
-                📚 Kho Từ Vựng & Paraphrase:
-              </h4>
-              <span style="font-size:0.73rem; color:#64748b; font-weight:700;">Bấm 'Tra từ' để mở Dictionary</span>
-            </div>
-            <div class="lego-vocab-bank-list">
-              ${vocabCardsHtml}
-            </div>
-          </div>
-        </div>
-      `;
     }
-  },
 
-  renderTranscriptCard(q) {
-    const revealed = this.socraticHintsRevealed[q.id] >= 3;
-    if (!revealed) {
-      return `
-        <div style="background: #f8fafc; border: 2px dashed #cbd5e1; border-radius: var(--radius-md); padding: 1.25rem; text-align: center; color: var(--text-muted); font-size: 0.9rem; font-weight:600;">
-          🔒 Audioscript sẽ được mở khóa sau khi bạn hoàn thành 3 lần thử hoặc trả lời đúng.
+    pane.innerHTML = `
+      <div class="lego-card lego-pdf-card" style="height:100%; display:flex; flex-direction:column; padding:0.6rem;">
+        <div class="lego-pdf-header-row" style="margin-bottom:0.5rem;">
+          <div style="display:flex; align-items:center; gap:0.5rem; flex-wrap:wrap;">
+            <span class="part-badge" id="exam-pdf-page-indicator">📖 Test ${testId} · Trang ${targetPage} (Part ${q ? q.part : 1})</span>
+            <span class="badge-session">Cambridge A2 Key PDF</span>
+          </div>
+          <div style="display:flex; gap:0.4rem; align-items:center;">
+            <a id="exam-pdf-ext-link" href="https://drive.google.com/file/d/1OVNzYe_ZYOm9xVlfBB9nISHOuLF4_joT/view?usp=drive_open#page=${targetPage}" target="_blank" rel="noopener" class="lego-btn-secondary" style="text-decoration:none; font-size:0.8rem; padding:0.3rem 0.65rem;" title="Mở file PDF trong tab mới">
+              Mở tab mới ↗️
+            </a>
+            <button class="lego-btn-secondary" onclick="App.reloadExamPdf()" style="font-size:0.8rem; padding:0.3rem 0.65rem;" title="Tải lại PDF">
+              🔄 Tải lại
+            </button>
+          </div>
         </div>
-      `;
-    }
-    return `
-      <div style="background: #eff6ff; border: 2px solid #bfdbfe; border-radius: var(--radius-md); padding: 1.25rem; font-size: 0.95rem;">
-        <h4 style="color: var(--lego-blue); margin-bottom: 0.5rem; font-weight:800;">📜 Audioscript Trích Đoạn:</h4>
-        <p style="white-space: pre-line; color: var(--text-secondary); line-height: 1.6; font-weight:600;">${q.transcript}</p>
+
+        <!-- Google Drive PDF Viewer Embed -->
+        <div class="lego-pdf-viewer-wrap" style="flex:1; min-height:480px;">
+          <iframe 
+            id="exam-pdf-frame" 
+            data-test-id="${testId}"
+            data-page="${targetPage}"
+            src="https://drive.google.com/file/d/1OVNzYe_ZYOm9xVlfBB9nISHOuLF4_joT/preview#page=${targetPage}" 
+            width="100%" 
+            height="100%" 
+            allow="autoplay"
+            loading="lazy"
+            title="Đề thi SUCCEED in A2 Key New 2020 Format - Test ${testId}"
+          ></iframe>
+        </div>
       </div>
     `;
   },
 
   /* ==========================================================================
-     Mức 1: Tư Duy & Nhận Diện Bẫy (Critical Thinking & Traps)
+     Right Pane: FLOW LUYỆN TẬP NGHE TOÀN DIỆN (3 BƯỚC)
      ========================================================================== */
-  renderBeginnerWorkspace(q) {
+  renderUnifiedWorkspace(q) {
     const pane = document.getElementById('pane-right');
     if (!pane) return;
 
     const qKey = `${q.test_id || 1}_${q.id}`;
     const tData = window.ThinkingEngine ? window.ThinkingEngine.getThinkingData(q) : null;
     const tAnswers = this.thinkingAnswers[qKey] || { trap_choice: null, comp_choice: null, trap_solved: false, comp_solved: false };
+    const pAnswers = this.paraphraseAnswers[qKey] || { syn_choice: null, ant_choice: null, final_choice: null, syn_solved: false, ant_solved: false, final_solved: false };
+    const expanded = this.expandedOptionBreakdowns[qKey] || {};
+
+    const chosenAnswer = this.userAnswers[q.id];
+    const step2Completed = tAnswers.trap_solved && tAnswers.comp_solved;
+    const step3Completed = pAnswers.syn_solved && pAnswers.ant_solved;
+
+    // --- BƯỚC 1: OPTIONS HTML ---
+    const rawOptions = q.options || { "A": "Phương án A", "B": "Phương án B", "C": "Phương án C" };
+    const isFillIn = (q.part === 2 || q.part === 5);
+    let step1InputHtml = '';
+    if (isFillIn) {
+      step1InputHtml = `
+        <div style="margin-top:1rem; background:#f8fafc; border:1.5px solid #cbd5e1; border-radius:8px; padding:1rem;">
+          <label style="display:block; font-weight:800; font-size:0.92rem; color:#1e293b; margin-bottom:0.4rem;">
+            ✍️ Nhập từ hoặc số cần điền cho Câu ${q.q_number}:
+          </label>
+          <div style="display:flex; gap:0.5rem; align-items:center; flex-wrap:wrap;">
+            <input 
+              type="text" 
+              id="cloze-input-${q.id}" 
+              class="lego-input" 
+              placeholder="Nhập câu trả lời..." 
+              value="${chosenAnswer || ''}"
+              style="font-size:1.05rem; padding:0.6rem 0.85rem; max-width:320px; border:2px solid #cbd5e1; border-radius:8px;"
+              onkeydown="if(event.key === 'Enter') App.submitClozeOption('${q.id}')"
+            />
+            <button class="lego-btn-blue" onclick="App.submitClozeOption('${q.id}')">
+              Ghi Nhận ✍️
+            </button>
+          </div>
+        </div>
+      `;
+    } else {
+      step1InputHtml = `
+        <div class="exam-options-grid">
+          ${Object.entries(rawOptions).map(([key, label]) => {
+            const isSelected = chosenAnswer && (chosenAnswer.toUpperCase() === key.toUpperCase());
+            return `
+              <button class="lego-exam-opt-btn ${isSelected ? 'selected' : ''}" onclick="App.selectExamOption('${q.id}', '${key}')">
+                <span class="exam-opt-circle">${key}</span>
+                <span class="exam-opt-label">${label}</span>
+                ${isSelected ? '<span style="margin-left:auto; font-size:1.1rem;">✅</span>' : ''}
+              </button>
+            `;
+          }).join('')}
+        </div>
+      `;
+    }
+
+    // --- BƯỚC 2: TRAP & COMPREHENSION HTML ---
     const trapQ = tData?.tier1_thinking?.trap_question;
     const compQ = tData?.tier1_thinking?.comprehension_question;
 
-    const bothSolved = tAnswers.trap_solved && tAnswers.comp_solved;
-
-    // Trap Options HTML
     const trapOptionsHtml = trapQ?.options.map(opt => {
       const isSelected = tAnswers.trap_choice === opt.id;
       let stateClass = '';
-      if (isSelected) {
-        stateClass = opt.is_correct ? 'correct' : 'incorrect';
-      }
+      if (isSelected) stateClass = opt.is_correct ? 'correct' : 'incorrect';
       return `
         <button class="lego-thinking-opt-btn ${stateClass}" onclick="App.selectTrapAnswer('${qKey}', '${opt.id}')">
           <span class="opt-badge">${opt.id}</span>
@@ -685,13 +615,10 @@ window.App = {
       `;
     }).join('') || '';
 
-    // Comprehension Options HTML
     const compOptionsHtml = compQ?.options.map(opt => {
       const isSelected = tAnswers.comp_choice === opt.id;
       let stateClass = '';
-      if (isSelected) {
-        stateClass = opt.is_correct ? 'correct' : 'incorrect';
-      }
+      if (isSelected) stateClass = opt.is_correct ? 'correct' : 'incorrect';
       return `
         <button class="lego-thinking-opt-btn ${stateClass}" onclick="App.selectCompAnswer('${qKey}', '${opt.id}')">
           <span class="opt-badge">${opt.id}</span>
@@ -701,89 +628,430 @@ window.App = {
       `;
     }).join('') || '';
 
+    // --- BƯỚC 3: PARAPHRASING & DECONSTRUCTION HTML ---
+    const vocabList = tData?.tier2_paraphrase?.vocab_bank || [];
+    const vocabCardsHtml = vocabList.map(v => {
+      const relBadge = v.relation === 'synonym' 
+        ? '<span class="lego-rel-badge syn">🟢 Đồng nghĩa</span>' 
+        : (v.relation === 'antonym' ? '<span class="lego-rel-badge ant">🔴 Trái nghĩa</span>' : '<span class="lego-rel-badge col">⭐ Cụm từ</span>');
+      const safePhrase = (v.phrase || '').replace(/'/g, "\\'");
+      return `
+        <div class="lego-vocab-chip-card">
+          <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:0.25rem;">
+            <span style="font-weight:800; font-size:0.9rem; color:var(--lego-blue);">${v.phrase}</span>
+            ${relBadge}
+          </div>
+          <div style="font-size:0.8rem; color:#334155; margin-bottom:0.35rem;">
+            👉 <strong>${v.meaning}</strong>
+          </div>
+          <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px dashed #e2e8f0; padding-top:0.3rem;">
+            <span style="font-size:0.74rem; color:#64748b; font-style:italic;">Khớp: ${v.target}</span>
+            <button class="lego-chip" onclick="KetDictionary.openModal('${safePhrase}')" style="font-size:0.72rem; padding:0.1rem 0.45rem;" title="Mở Dictionary tra IPA & ghi chép nghĩa">
+              📚 Tra từ
+            </button>
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    const synQ = tData?.tier2_paraphrase?.synonym_quiz;
+    const antQ = tData?.tier2_paraphrase?.antonym_quiz;
+    const optBreakdown = tData?.tier2_paraphrase?.options_breakdown || {};
+
+    const synOptsHtml = synQ?.options.map(opt => {
+      const isSelected = pAnswers.syn_choice === opt.id;
+      let stateClass = '';
+      if (isSelected) stateClass = opt.is_correct ? 'correct' : 'incorrect';
+      return `
+        <button class="lego-thinking-opt-btn ${stateClass}" onclick="App.selectSynonymQuiz('${qKey}', '${opt.id}')">
+          <span class="opt-badge">${opt.id}</span>
+          <span class="opt-text">${opt.text}</span>
+          ${isSelected && opt.is_correct ? '<span class="status-icon">✅</span>' : (isSelected ? '<span class="status-icon">❌</span>' : '')}
+        </button>
+      `;
+    }).join('') || '';
+
+    const antOptsHtml = antQ?.options.map(opt => {
+      const isSelected = pAnswers.ant_choice === opt.id;
+      let stateClass = '';
+      if (isSelected) stateClass = opt.is_correct ? 'correct' : 'incorrect';
+      return `
+        <button class="lego-thinking-opt-btn ${stateClass}" onclick="App.selectAntonymQuiz('${qKey}', '${opt.id}')">
+          <span class="opt-badge">${opt.id}</span>
+          <span class="opt-text">${opt.text}</span>
+          ${isSelected && opt.is_correct ? '<span class="status-icon">✅</span>' : (isSelected ? '<span class="status-icon">❌</span>' : '')}
+        </button>
+      `;
+    }).join('') || '';
+
+    const optionCardsHtml = Object.entries(rawOptions).map(([key, label]) => {
+      const info = optBreakdown[key] || { status: 'Phân tích', why: 'Đang cập nhật', evidence: '' };
+      const isCorrectOpt = (key === q.correct_answer);
+      const isOpen = expanded[key] !== false;
+      return `
+        <div class="lego-deconstruct-card ${isCorrectOpt ? 'is-correct' : 'is-distractor'}">
+          <div class="deconstruct-header" onclick="App.toggleOptionBreakdown('${qKey}', '${key}')">
+            <div style="display:flex; align-items:center; gap:0.5rem;">
+              <span class="opt-key-circle ${isCorrectOpt ? 'correct' : 'distractor'}">${key}</span>
+              <span style="font-weight:800; font-size:0.92rem; color:#1e293b;">${label}</span>
+            </div>
+            <div style="display:flex; align-items:center; gap:0.4rem;">
+              <span class="deconstruct-badge ${isCorrectOpt ? 'correct' : 'distractor'}">${info.status}</span>
+              <span style="font-size:0.8rem; color:#94a3b8;">${isOpen ? '▲' : '▼'}</span>
+            </div>
+          </div>
+          ${isOpen ? `
+            <div class="deconstruct-body">
+              <div class="deconstruct-why">
+                <strong>💡 Tại sao ${isCorrectOpt ? 'ĐÚNG' : 'SAI'}:</strong> ${info.why}
+              </div>
+              ${info.evidence ? `
+                <div class="deconstruct-evidence">
+                  <strong>📜 Dẫn chứng audio:</strong> “${info.evidence}”
+                </div>
+              ` : ''}
+            </div>
+          ` : ''}
+        </div>
+      `;
+    }).join('');
+
+    // --- STEP CONTENT SWITCHER ---
+    let stepContentHtml = '';
+
+    if (this.currentQuestionStep === 1) {
+      stepContentHtml = `
+        <div class="lego-card" style="border-top: 4px solid var(--lego-blue);">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.75rem;">
+            <h3 style="font-size:1.15rem; font-weight:900; color:var(--lego-blue); margin:0;">
+              🎓 Bước 1: Làm Bài Thi & Chọn Đáp Án
+            </h3>
+            <span class="badge-session">Exam Simulation</span>
+          </div>
+
+          <div style="font-size:1.02rem; font-weight:700; color:var(--text-primary); line-height:1.45; margin-bottom:0.85rem; background:#f8fafc; padding:0.75rem 0.9rem; border-radius:8px; border:1px solid #e2e8f0;">
+            🎯 ${q.prompt}
+          </div>
+
+          <div style="font-size:0.88rem; color:#475569; margin-bottom:0.6rem; display:flex; align-items:center; gap:0.4rem;">
+            <span>👉</span> Quan sát <strong>trang PDF ở bên trái</strong>, lắng nghe audio và chọn đáp án:
+          </div>
+
+          ${step1InputHtml}
+
+          ${chosenAnswer ? `
+            <div style="background:#eff6ff; border:1.5px solid #93c5fd; border-radius:8px; padding:0.85rem; margin-top:1rem; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem;">
+              <div>
+                <span style="font-weight:800; color:#1d4ed8; font-size:0.95rem;">
+                  ✅ Bạn đã chọn: <strong>${chosenAnswer}</strong>
+                </span>
+                <div style="font-size:0.82rem; color:#475569; margin-top:0.2rem;">
+                  Hãy chuyển sang Bước 2 để đọc transcript và khám phá các bẫy đề thi Cambridge!
+                </div>
+              </div>
+              <button class="lego-btn-orange" onclick="App.setQuestionStep(2)" style="font-size:0.9rem; padding:0.55rem 1rem;">
+                Tiếp Tục: Bước 2 (Bẫy & Transcript) ➡️
+              </button>
+            </div>
+          ` : `
+            <div style="display:flex; justify-content:flex-end; margin-top:1rem;">
+              <button class="lego-btn-secondary" onclick="App.setQuestionStep(2)" style="font-size:0.85rem;">
+                Chuyển Sang Bước 2 (Bẫy & Transcript) ➡️
+              </button>
+            </div>
+          `}
+        </div>
+      `;
+    } else if (this.currentQuestionStep === 2) {
+      stepContentHtml = `
+        <div class="lego-card" style="border-top: 4px solid #16a34a;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.75rem;">
+            <h3 style="font-size:1.15rem; font-weight:900; color:#15803d; margin:0;">
+              🌱 Bước 2: Bóc Tách Bẫy & Phân Tích Transcript
+            </h3>
+            <span class="stopwatch-badge" style="background:#dcfce7; color:#15803d; border-color:#86efac;">
+              Critical Thinking
+            </span>
+          </div>
+
+          <!-- Transcript Box (Hiển thị trực tiếp cho học sinh phân tích) -->
+          <div class="lego-transcript-box">
+            <div class="lego-transcript-header">
+              <span style="font-size:0.88rem; font-weight:800; color:#1e40af; display:flex; align-items:center; gap:0.35rem;">
+                <span>📜</span> Transcript Phân Tích (Audioscript):
+              </span>
+              <span style="font-size:0.72rem; color:#0369a1; font-weight:800; background:#e0f2fe; padding:0.15rem 0.5rem; border-radius:999px; border:1px solid #bae6fd;">
+                Đọc & đối chiếu lời thoại
+              </span>
+            </div>
+            <div class="lego-transcript-lines">
+              ${this.formatTranscriptHtml(q.transcript)}
+            </div>
+          </div>
+
+          <!-- Clues Box -->
+          <div class="lego-thinking-clues-box" style="margin-bottom:1rem;">
+            <div style="margin-bottom:0.5rem;">
+              <div style="font-weight:800; font-size:0.84rem; color:#b45309; margin-bottom:0.2rem;">💡 Gợi Ý Bối Cảnh:</div>
+              <div style="font-size:0.85rem; color:#78350f; line-height:1.4;">${q.tier1_hint || 'Lắng nghe các mốc thông tin và phản ứng của người nói.'}</div>
+            </div>
+            <div>
+              <div style="font-weight:800; font-size:0.84rem; color:#c2410c; margin-bottom:0.2rem;">⚠️ Cảnh Báo Bẫy Đề Thi:</div>
+              <div style="font-size:0.85rem; color:#7c2d12; line-height:1.4;">${q.tier2_hint || 'Chú ý các từ chuyển ý hoặc các phương án bị từ chối.'}</div>
+            </div>
+          </div>
+
+          <!-- Trap Question -->
+          <div class="lego-thinking-card ${tAnswers.trap_solved ? 'card-solved' : ''}">
+            <div class="thinking-card-header">
+              <span class="thinking-step-pill">❓ Câu hỏi tư duy 1</span>
+              <span class="thinking-title">Nhận Diện Bẫy Đề Thi</span>
+              ${tAnswers.trap_solved ? '<span class="badge-solved">✅ Đã Vượt Qua</span>' : '<span class="badge-pending">🎯 Cần Hoàn Thành</span>'}
+            </div>
+            <p class="thinking-prompt">${trapQ?.prompt || 'Người nói đã sử dụng bẫy đề thi nào?'}</p>
+            <div class="thinking-options-grid">
+              ${trapOptionsHtml}
+            </div>
+            ${tAnswers.trap_choice ? `
+              <div class="thinking-explanation-box ${tAnswers.trap_solved ? 'expl-correct' : 'expl-wrong'}">
+                ${tAnswers.trap_solved ? `
+                  <div style="font-weight:800; color:#15803d; margin-bottom:0.25rem;">🎉 Hoàn toàn chính xác!</div>
+                  <div>${trapQ?.explanation}</div>
+                ` : `
+                  <div style="font-weight:800; color:#b91c1c; margin-bottom:0.25rem;">💡 Chưa chính xác rồi!</div>
+                  <div>Hãy nhìn kỹ transcript ở trên: Chú ý xem người nói có thay đổi ý định hoặc nhắc các mốc thời gian nhiễu không nhé!</div>
+                `}
+              </div>
+            ` : ''}
+          </div>
+
+          <!-- Comprehension Question -->
+          <div class="lego-thinking-card ${tAnswers.comp_solved ? 'card-solved' : ''}" style="margin-top:1rem;">
+            <div class="thinking-card-header">
+              <span class="thinking-step-pill" style="background:#e0f2fe; color:#0369a1; border-color:#bae6fd;">❓ Câu hỏi tư duy 2</span>
+              <span class="thinking-title">Hiểu Sâu Transcript</span>
+              ${tAnswers.comp_solved ? '<span class="badge-solved">✅ Đã Vượt Qua</span>' : '<span class="badge-pending">🎯 Cần Hoàn Thành</span>'}
+            </div>
+            <p class="thinking-prompt">${compQ?.prompt || 'Hiểu sâu chi tiết then chốt trong transcript:'}</p>
+            <div class="thinking-options-grid">
+              ${compOptionsHtml}
+            </div>
+            ${tAnswers.comp_choice ? `
+              <div class="thinking-explanation-box ${tAnswers.comp_solved ? 'expl-correct' : 'expl-wrong'}">
+                ${tAnswers.comp_solved ? `
+                  <div style="font-weight:800; color:#15803d; margin-bottom:0.25rem;">🎉 Lập luận rất chuẩn!</div>
+                  <div>${compQ?.explanation}</div>
+                ` : `
+                  <div style="font-weight:800; color:#b91c1c; margin-bottom:0.25rem;">💡 Hãy thử lại nhé!</div>
+                  <div>Hãy đọc lại từng dòng thoại trong hộp Transcript phía trên để tìm căn cứ chính xác.</div>
+                `}
+              </div>
+            ` : ''}
+          </div>
+
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-top:1.25rem; border-top:1px dashed #cbd5e1; padding-top:1rem;">
+            <button class="lego-btn-secondary" onclick="App.setQuestionStep(1)">
+              ⬅️ Quay Lại Bước 1
+            </button>
+            <button class="lego-btn-orange" onclick="App.setQuestionStep(3)">
+              Tiếp Tục: Bước 3 (Paraphrasing) ➡️
+            </button>
+          </div>
+        </div>
+      `;
+    } else {
+      // BƯỚC 3: PARAPHRASING & GIẢI MÃ
+      stepContentHtml = `
+        <div class="lego-card" style="border-top: 4px solid #ea580c;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.75rem;">
+            <h3 style="font-size:1.15rem; font-weight:900; color:#c2410c; margin:0;">
+              ⚡ Bước 3: Paraphrasing & Phân Tích Phương Án
+            </h3>
+            <span class="stopwatch-badge" style="background:#ffedd5; color:#c2410c; border-color:#fed7aa;">
+              Vocab & Deconstruction
+            </span>
+          </div>
+
+          <!-- Vocab Bank -->
+          <div style="margin-bottom:1rem;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
+              <h4 style="color:#0f766e; font-size:0.95rem; font-weight:900; margin:0;">
+                📚 Kho Từ Vựng & Cụm Paraphrase Cốt Lõi:
+              </h4>
+              <span style="font-size:0.74rem; color:#64748b; font-weight:700;">Nhấn 'Tra từ' để tra từ điển & ghi chú</span>
+            </div>
+            <div class="lego-vocab-bank-list" style="max-height:200px;">
+              ${vocabCardsHtml}
+            </div>
+          </div>
+
+          <!-- Synonym Challenge -->
+          <div class="lego-thinking-card" style="margin-bottom:1rem;">
+            <div class="thinking-card-header">
+              <span class="thinking-step-pill" style="background:#dcfce7; color:#15803d; border-color:#86efac;">🟢 Thử Thách 1</span>
+              <span class="thinking-title">Từ Đồng Nghĩa (Synonym Paraphrase)</span>
+              ${pAnswers.syn_solved ? '<span class="badge-solved">✅ Hoàn Thành</span>' : '<span class="badge-pending">🎯 Cần Làm</span>'}
+            </div>
+            <p class="thinking-prompt">${synQ?.prompt || 'Tìm từ đồng nghĩa trong bài nghe:'}</p>
+            <div class="thinking-options-grid">
+              ${synOptsHtml}
+            </div>
+            ${pAnswers.syn_choice ? `
+              <div class="thinking-explanation-box ${pAnswers.syn_solved ? 'expl-correct' : 'expl-wrong'}">
+                ${pAnswers.syn_solved ? `
+                  <div style="font-weight:800; color:#15803d; margin-bottom:0.25rem;">🎉 Chuẩn xác!</div>
+                  <div>${synQ?.explanation}</div>
+                ` : `
+                  <div style="font-weight:800; color:#b91c1c; margin-bottom:0.25rem;">💡 Chưa khớp rồi!</div>
+                  <div>Hãy xem lại các từ ở Kho Từ Vựng phía trên để chọn cụm đồng nghĩa phù hợp nhất.</div>
+                `}
+              </div>
+            ` : ''}
+          </div>
+
+          <!-- Antonym Challenge -->
+          <div class="lego-thinking-card" style="margin-bottom:1rem;">
+            <div class="thinking-card-header">
+              <span class="thinking-step-pill" style="background:#fee2e2; color:#b91c1c; border-color:#fca5a5;">🔴 Thử Thách 2</span>
+              <span class="thinking-title">Từ Trái Nghĩa (Antonym Contrast)</span>
+              ${pAnswers.ant_solved ? '<span class="badge-solved">✅ Hoàn Thành</span>' : '<span class="badge-pending">🎯 Cần Làm</span>'}
+            </div>
+            <p class="thinking-prompt">${antQ?.prompt || 'Nhận diện từ trái nghĩa / tương phản:'}</p>
+            <div class="thinking-options-grid">
+              ${antOptsHtml}
+            </div>
+            ${pAnswers.ant_choice ? `
+              <div class="thinking-explanation-box ${pAnswers.ant_solved ? 'expl-correct' : 'expl-wrong'}">
+                ${pAnswers.ant_solved ? `
+                  <div style="font-weight:800; color:#15803d; margin-bottom:0.25rem;">🎉 Rất tốt!</div>
+                  <div>${antQ?.explanation}</div>
+                ` : `
+                  <div style="font-weight:800; color:#b91c1c; margin-bottom:0.25rem;">💡 Thử lại nhé!</div>
+                  <div>Tìm từ mang ý nghĩa đối lập với hành động trong câu hỏi.</div>
+                `}
+              </div>
+            ` : ''}
+          </div>
+
+          <!-- Option Deconstruction Cards -->
+          <div style="margin-bottom:1.25rem;">
+            <div style="margin-bottom:0.6rem;">
+              <h4 style="color:#1e40af; font-size:1.02rem; font-weight:900; margin:0 0 0.2rem 0;">
+                🔍 Giải Mã · Tại Sao Từng Lựa Chọn Lại Đúng / Sai?
+              </h4>
+              <p style="font-size:0.83rem; color:#64748b; margin:0;">
+                Bóc tách chi tiết từng phương án kèm dẫn chứng transcript trích xuất từ audio:
+              </p>
+            </div>
+            <div class="lego-deconstruct-list">
+              ${optionCardsHtml}
+            </div>
+          </div>
+
+          <!-- Completion Box -->
+          <div class="thinking-summary-success" style="margin-top:1.5rem;">
+            <div style="font-size:1.8rem; margin-bottom:0.3rem;">🏆</div>
+            <h4 style="font-size:1.1rem; font-weight:800; color:#15803d; margin-bottom:0.3rem;">
+              Xuất sắc! Bạn đã hoàn thành toàn diện 3 bước của Câu ${q.q_number}!
+            </h4>
+            <p style="font-size:0.88rem; color:#166534; margin-bottom:0.85rem;">
+              Bạn đã chọn đáp án, bóc tách bẫy transcript và nắm trọn từ vựng paraphrasing.
+            </p>
+            <div style="display:flex; justify-content:center; gap:0.6rem; flex-wrap:wrap;">
+              <button class="lego-btn-secondary" onclick="App.setQuestionStep(1)">
+                🔄 Xem Lại Bước 1
+              </button>
+              <button class="lego-btn-orange" onclick="App.nextQuestion()">
+                Chuyển Sang Câu ${q.q_number + 1 <= this.testData.questions.length ? q.q_number + 1 : 1} ⏭️
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    // --- RENDER FULL RIGHT PANE ---
     pane.innerHTML = `
-      <div class="question-header">
-        <span class="part-badge" style="background:#dcfce7; color:#15803d; border-color:#86efac;">
-          🧠 Mức 1: Tư Duy & Nhận Diện Bẫy
-        </span>
-        <span class="stopwatch-badge">
-          Câu ${this.currentQuestionIndex + 1} / ${this.testData.questions.length}
-        </span>
-      </div>
-
-      <!-- Trap Detection Question -->
-      <div class="lego-thinking-card ${tAnswers.trap_solved ? 'card-solved' : ''}">
-        <div class="thinking-card-header">
-          <span class="thinking-step-pill">❓ Câu hỏi tư duy 1</span>
-          <span class="thinking-title">Nhận Diện Bẫy Đề Thi</span>
-          ${tAnswers.trap_solved ? '<span class="badge-solved">✅ Đã Vượt Qua</span>' : '<span class="badge-pending">🎯 Cần Hoàn Thành</span>'}
-        </div>
-        <p class="thinking-prompt">${trapQ?.prompt || 'Người nói đã sử dụng bẫy đề thi nào?'}</p>
-        <div class="thinking-options-grid">
-          ${trapOptionsHtml}
-        </div>
-        ${tAnswers.trap_choice ? `
-          <div class="thinking-explanation-box ${tAnswers.trap_solved ? 'expl-correct' : 'expl-wrong'}">
-            ${tAnswers.trap_solved ? `
-              <div style="font-weight:800; color:#15803d; margin-bottom:0.25rem;">🎉 Hoàn toàn chính xác!</div>
-              <div>${trapQ?.explanation}</div>
-            ` : `
-              <div style="font-weight:800; color:#b91c1c; margin-bottom:0.25rem;">💡 Chưa chính xác rồi!</div>
-              <div>Hãy nghe lại kỹ hơn: Chú ý xem người nói có đổi ý, bị vướng mốc thời gian quá khứ hay nhắc nhiều số liệu không nhé!</div>
-            `}
+      <!-- Header Card with Question info & Stepper -->
+      <div class="flow-header-card">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem;">
+          <div style="display:flex; align-items:center; gap:0.5rem; flex-wrap:wrap;">
+            <span class="part-badge">Part ${q.part} (Câu ${q.q_number} / ${this.testData.questions.length})</span>
+            <span style="font-size:0.8rem; font-weight:800; color:#475569; background:#f1f5f9; padding:0.2rem 0.55rem; border-radius:6px; border:1px solid #cbd5e1;">
+              📄 PDF Trang ${q.pdf_page || 22}
+            </span>
           </div>
-        ` : ''}
-      </div>
-
-      <!-- Deep Transcript Comprehension Question -->
-      <div class="lego-thinking-card ${tAnswers.comp_solved ? 'card-solved' : ''}" style="margin-top:1rem;">
-        <div class="thinking-card-header">
-          <span class="thinking-step-pill" style="background:#e0f2fe; color:#0369a1; border-color:#bae6fd;">❓ Câu hỏi tư duy 2</span>
-          <span class="thinking-title">Hiểu Sâu Transcript</span>
-          ${tAnswers.comp_solved ? '<span class="badge-solved">✅ Đã Vượt Qua</span>' : '<span class="badge-pending">🎯 Cần Hoàn Thành</span>'}
-        </div>
-        <p class="thinking-prompt">${compQ?.prompt || 'Hiểu sâu chi tiết then chốt trong transcript:'}</p>
-        <div class="thinking-options-grid">
-          ${compOptionsHtml}
-        </div>
-        ${tAnswers.comp_choice ? `
-          <div class="thinking-explanation-box ${tAnswers.comp_solved ? 'expl-correct' : 'expl-wrong'}">
-            ${tAnswers.comp_solved ? `
-              <div style="font-weight:800; color:#15803d; margin-bottom:0.25rem;">🎉 Lập luận rất chuẩn!</div>
-              <div>${compQ?.explanation}</div>
-            ` : `
-              <div style="font-weight:800; color:#b91c1c; margin-bottom:0.25rem;">💡 Hãy thử lại nhé!</div>
-              <div>Bạn có thể bấm 'Mở Xem Audioscript Trích Đoạn' ở cột bên trái để kiểm tra lại câu thoại của người nói.</div>
-            `}
-          </div>
-        ` : ''}
-      </div>
-
-      ${bothSolved ? `
-        <div class="thinking-summary-success">
-          <div style="font-size:1.8rem; margin-bottom:0.3rem;">🏆</div>
-          <h4 style="font-size:1.1rem; font-weight:800; color:#15803d; margin-bottom:0.3rem;">
-            Tuyệt vời! Bạn đã hoàn thành 2 câu hỏi tư duy của Câu ${this.currentQuestionIndex + 1}!
-          </h4>
-          <p style="font-size:0.88rem; color:#166534; margin-bottom:0.85rem;">
-            Bạn đã thấu hiểu transcript và nắm trọn bẫy đề thi. Hãy sẵn sàng cho bài tập Paraphrasing ở Mức 2 nhé!
-          </p>
-          <div style="display:flex; justify-content:center; gap:0.5rem; flex-wrap:wrap;">
-            <button class="lego-btn-orange" onclick="App.switchMode('intermediate')">
-              ⚡ Chuyển Sang Mức 2 (Paraphrasing) ➡️
+          <div style="display:flex; gap:0.4rem; align-items:center;">
+            <button class="lego-btn-secondary" onclick="App.prevQuestion()" style="font-size:0.82rem; padding:0.35rem 0.65rem;" ${this.currentQuestionIndex === 0 ? 'disabled' : ''}>
+              ⬅️ Câu trước
             </button>
-            <button class="lego-btn-secondary" onclick="App.nextQuestion()">
-              Câu Tiếp Theo ⏭️
+            <button class="lego-btn-secondary" onclick="App.nextQuestion()" style="font-size:0.82rem; padding:0.35rem 0.65rem;" ${this.currentQuestionIndex === this.testData.questions.length - 1 ? 'disabled' : ''}>
+              Câu tiếp ➡️
             </button>
           </div>
         </div>
-      ` : `
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:1.25rem;">
-          <button class="lego-btn-secondary" onclick="App.prevQuestion()">⬅️ Câu trước</button>
-          <button class="lego-btn-secondary" onclick="App.nextQuestion()">Câu tiếp ➡️</button>
+
+        <!-- Stepper Navigation Pills -->
+        <div class="flow-stepper-row">
+          <button class="flow-step-pill ${this.currentQuestionStep === 1 ? 'active' : ''} ${chosenAnswer ? 'completed' : ''}" onclick="App.setQuestionStep(1)">
+            <span>1️⃣ 🎓</span> Bước 1: Làm Bài Thi
+          </button>
+          <button class="flow-step-pill ${this.currentQuestionStep === 2 ? 'active' : ''} ${step2Completed ? 'completed' : ''}" onclick="App.setQuestionStep(2)">
+            <span>2️⃣ 🌱</span> Bước 2: Bẫy & Transcript
+          </button>
+          <button class="flow-step-pill ${this.currentQuestionStep === 3 ? 'active' : ''} ${step3Completed ? 'completed' : ''}" onclick="App.setQuestionStep(3)">
+            <span>3️⃣ ⚡</span> Bước 3: Paraphrasing
+          </button>
         </div>
-      `}
+      </div>
+
+      <!-- Question Audio Player Box -->
+      <div class="lego-thinking-audio-box">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.55rem; flex-wrap:wrap; gap:0.4rem;">
+          <div style="display:flex; align-items:center; gap:0.4rem;">
+            <span style="font-size:0.88rem; font-weight:900; color:#15803d;">
+              🎧 Audio Câu Hỏi ${q.q_number} (Đoạn Cắt Độc Lập)
+            </span>
+            <span style="font-size:0.75rem; color:#64748b; font-weight:700;">(Space để Nghe/Dừng)</span>
+          </div>
+          <span style="font-size:0.75rem; font-weight:700; color:#0369a1; background:#e0f2fe; padding:0.15rem 0.5rem; border-radius:999px;">
+            Nhìn đề thi PDF bên trái
+          </span>
+        </div>
+        <div style="display:flex; gap:0.45rem; flex-wrap:wrap; align-items:center;">
+          <button class="lego-btn-green" onclick="window.KetAudioPlayer.togglePlay()" style="font-size:0.85rem; padding:0.42rem 0.85rem;">
+            ▶️ / ⏸️ Nghe Câu Hỏi
+          </button>
+          <button class="lego-btn-secondary" onclick="window.KetAudioPlayer.replay5s()" style="font-size:0.85rem; padding:0.42rem 0.85rem;">
+            ⏮️ Tua lại 5s
+          </button>
+          <button class="lego-btn-orange" onclick="window.KetAudioPlayer.setSpeed(0.85)" style="font-size:0.85rem; padding:0.42rem 0.85rem;">
+            🐢 0.85x Chậm
+          </button>
+          <button class="lego-btn-secondary" onclick="window.KetAudioPlayer.setSpeed(1.0)" style="font-size:0.85rem; padding:0.42rem 0.85rem;">
+            ⚡ 1.0x Thường
+          </button>
+          <button class="lego-chip" onclick="KetDictionary.openModal()" style="font-size:0.75rem; padding:0.2rem 0.55rem; margin-left:auto;">
+            📚 Dictionary
+          </button>
+        </div>
+      </div>
+
+      <!-- Active Step Content -->
+      ${stepContentHtml}
     `;
+  },
+
+  renderBeginnerWorkspace(q) {
+    this.renderUnifiedWorkspace(q);
+  },
+
+  renderIntermediateWorkspace(q) {
+    this.renderUnifiedWorkspace(q);
+  },
+
+  renderExamWorkspace(q) {
+    this.renderUnifiedWorkspace(q);
   },
 
   switchSentence(idx) {
@@ -1038,191 +1306,6 @@ window.App = {
     alert(`🔒 Quyền trợ giúp đang bị khóa!\n\nBạn cần tự nghe và thử gõ thêm ${remaining} lần nữa (đã thử: ${attempts}/3 lần) để kích hoạt 1 lần trợ giúp tiếp theo nhé!\n\nSau khi dùng 1 lần, nút sẽ lại khóa để bạn tiếp tục tự luyện tai nghe! 💪`);
   },
 
-  /* ==========================================================================
-     Mức 2: Paraphrasing & Phân Tích Lựa Chọn (Option Deconstruction)
-     ========================================================================== */
-  renderIntermediateWorkspace(q) {
-    const pane = document.getElementById('pane-right');
-    if (!pane) return;
-
-    const qKey = `${q.test_id || 1}_${q.id}`;
-    const tData = window.ThinkingEngine ? window.ThinkingEngine.getThinkingData(q) : null;
-    const pAnswers = this.paraphraseAnswers[qKey] || { syn_choice: null, ant_choice: null, final_choice: null, syn_solved: false, ant_solved: false, final_solved: false };
-    const expanded = this.expandedOptionBreakdowns[qKey] || {};
-
-    const synQ = tData?.tier2_paraphrase?.synonym_quiz;
-    const antQ = tData?.tier2_paraphrase?.antonym_quiz;
-    const optBreakdown = tData?.tier2_paraphrase?.options_breakdown || {};
-
-    // Synonym Quiz Options HTML
-    const synOptsHtml = synQ?.options.map(opt => {
-      const isSelected = pAnswers.syn_choice === opt.id;
-      let stateClass = '';
-      if (isSelected) stateClass = opt.is_correct ? 'correct' : 'incorrect';
-      return `
-        <button class="lego-thinking-opt-btn ${stateClass}" onclick="App.selectSynonymQuiz('${qKey}', '${opt.id}')">
-          <span class="opt-badge">${opt.id}</span>
-          <span class="opt-text">${opt.text}</span>
-          ${isSelected && opt.is_correct ? '<span class="status-icon">✅</span>' : (isSelected ? '<span class="status-icon">❌</span>' : '')}
-        </button>
-      `;
-    }).join('') || '';
-
-    // Antonym Quiz Options HTML
-    const antOptsHtml = antQ?.options.map(opt => {
-      const isSelected = pAnswers.ant_choice === opt.id;
-      let stateClass = '';
-      if (isSelected) stateClass = opt.is_correct ? 'correct' : 'incorrect';
-      return `
-        <button class="lego-thinking-opt-btn ${stateClass}" onclick="App.selectAntonymQuiz('${qKey}', '${opt.id}')">
-          <span class="opt-badge">${opt.id}</span>
-          <span class="opt-text">${opt.text}</span>
-          ${isSelected && opt.is_correct ? '<span class="status-icon">✅</span>' : (isSelected ? '<span class="status-icon">❌</span>' : '')}
-        </button>
-      `;
-    }).join('') || '';
-
-    // Option Deconstruction Cards HTML (A, B, C)
-    const rawOptions = q.options || { "A": "Phương án A", "B": "Phương án B", "C": "Phương án C" };
-    const optionCardsHtml = Object.entries(rawOptions).map(([key, label]) => {
-      const info = optBreakdown[key] || { status: 'Phân tích', why: 'Đang cập nhật', evidence: '' };
-      const isCorrectOpt = (key === q.correct_answer);
-      const isOpen = expanded[key] !== false; // default open
-      return `
-        <div class="lego-deconstruct-card ${isCorrectOpt ? 'is-correct' : 'is-distractor'}">
-          <div class="deconstruct-header" onclick="App.toggleOptionBreakdown('${qKey}', '${key}')">
-            <div style="display:flex; align-items:center; gap:0.5rem;">
-              <span class="opt-key-circle ${isCorrectOpt ? 'correct' : 'distractor'}">${key}</span>
-              <span style="font-weight:800; font-size:0.92rem; color:#1e293b;">${label}</span>
-            </div>
-            <div style="display:flex; align-items:center; gap:0.4rem;">
-              <span class="deconstruct-badge ${isCorrectOpt ? 'correct' : 'distractor'}">${info.status}</span>
-              <span style="font-size:0.8rem; color:#94a3b8;">${isOpen ? '▲' : '▼'}</span>
-            </div>
-          </div>
-          ${isOpen ? `
-            <div class="deconstruct-body">
-              <div class="deconstruct-why">
-                <strong>💡 Tại sao ${isCorrectOpt ? 'ĐÚNG' : 'SAI'}:</strong> ${info.why}
-              </div>
-              ${info.evidence ? `
-                <div class="deconstruct-evidence">
-                  <strong>📜 Dẫn chứng audio:</strong> “${info.evidence}”
-                </div>
-              ` : ''}
-            </div>
-          ` : ''}
-        </div>
-      `;
-    }).join('');
-
-    // Final answer verification buttons
-    const finalBtnsHtml = Object.keys(rawOptions).map(key => {
-      const isSelected = pAnswers.final_choice === key;
-      const isCorrect = (key === q.correct_answer);
-      let btnClass = isSelected ? (isCorrect ? 'lego-btn-green' : 'lego-btn-red') : 'lego-btn-secondary';
-      return `
-        <button class="${btnClass}" onclick="App.selectParaphraseFinalAnswer('${qKey}', '${key}')" style="min-width:70px; font-weight:800; font-size:1rem; padding:0.5rem 1rem;">
-          ${key} ${isSelected ? (isCorrect ? '✅' : '❌') : ''}
-        </button>
-      `;
-    }).join(' ');
-
-    pane.innerHTML = `
-      <div class="question-header">
-        <span class="part-badge" style="background:#fef3c7; color:#92400e; border-color:#fde68a;">
-          ⚡ Mức 2: Paraphrasing & Phân Tích Lựa Chọn
-        </span>
-        <span class="stopwatch-badge">
-          Câu ${this.currentQuestionIndex + 1} / ${this.testData.questions.length}
-        </span>
-      </div>
-
-      <!-- Part 2A: Paraphrase Challenges -->
-      <div class="lego-thinking-card" style="margin-bottom:1rem;">
-        <div class="thinking-card-header">
-          <span class="thinking-step-pill" style="background:#dcfce7; color:#15803d; border-color:#86efac;">🟢 Thử Thách 1</span>
-          <span class="thinking-title">Từ Đồng Nghĩa (Synonym Paraphrase)</span>
-          ${pAnswers.syn_solved ? '<span class="badge-solved">✅ Hoàn Thành</span>' : '<span class="badge-pending">🎯 Cần Làm</span>'}
-        </div>
-        <p class="thinking-prompt">${synQ?.prompt || 'Tìm từ đồng nghĩa trong bài nghe:'}</p>
-        <div class="thinking-options-grid">
-          ${synOptsHtml}
-        </div>
-        ${pAnswers.syn_choice ? `
-          <div class="thinking-explanation-box ${pAnswers.syn_solved ? 'expl-correct' : 'expl-wrong'}">
-            ${pAnswers.syn_solved ? `
-              <div style="font-weight:800; color:#15803d; margin-bottom:0.25rem;">🎉 Chuẩn xác!</div>
-              <div>${synQ?.explanation}</div>
-            ` : `
-              <div style="font-weight:800; color:#b91c1c;">Chưa chính xác! Thử lại hoặc xem danh sách từ vựng bên trái nhé.</div>
-            `}
-          </div>
-        ` : ''}
-      </div>
-
-      <div class="lego-thinking-card" style="margin-bottom:1rem;">
-        <div class="thinking-card-header">
-          <span class="thinking-step-pill" style="background:#fee2e2; color:#b91c1c; border-color:#fca5a5;">🔴 Thử Thách 2</span>
-          <span class="thinking-title">Từ Trái Nghĩa (Antonym Contrast)</span>
-          ${pAnswers.ant_solved ? '<span class="badge-solved">✅ Hoàn Thành</span>' : '<span class="badge-pending">🎯 Cần Làm</span>'}
-        </div>
-        <p class="thinking-prompt">${antQ?.prompt || 'Tìm từ trái nghĩa:'}</p>
-        <div class="thinking-options-grid">
-          ${antOptsHtml}
-        </div>
-        ${pAnswers.ant_choice ? `
-          <div class="thinking-explanation-box ${pAnswers.ant_solved ? 'expl-correct' : 'expl-wrong'}">
-            ${pAnswers.ant_solved ? `
-              <div style="font-weight:800; color:#15803d; margin-bottom:0.25rem;">🎉 Rất tốt!</div>
-              <div>${antQ?.explanation}</div>
-            ` : `
-              <div style="font-weight:800; color:#b91c1c;">Chưa chính xác! Hãy chọn từ mang nghĩa đối lập.</div>
-            `}
-          </div>
-        ` : ''}
-      </div>
-
-      <!-- Part 2B: Option Deconstruction -->
-      <div class="lego-thinking-card" style="margin-bottom:1rem;">
-        <div class="thinking-card-header">
-          <span class="thinking-step-pill" style="background:#fef3c7; color:#b45309; border-color:#fde68a;">🔍 Giải Mã</span>
-          <span class="thinking-title">Tại Sao Từng Lựa Chọn Lại Đúng / Sai?</span>
-        </div>
-        <p style="font-size:0.86rem; color:#64748b; margin-bottom:0.75rem;">
-          Đề thi Cambridge luôn có 1 đáp án đúng và 2 phương án bẫy. Hãy đọc kỹ phân tích từng lựa chọn dưới đây:
-        </p>
-        <div style="display:flex; flex-direction:column; gap:0.6rem;">
-          ${optionCardsHtml}
-        </div>
-      </div>
-
-      <!-- Part 2C: Final Answer Confirmation -->
-      <div class="lego-thinking-card" style="background:#f0fdf4; border-color:#86efac;">
-        <h4 style="font-size:0.98rem; font-weight:800; color:#166534; margin-bottom:0.4rem;">
-          🎯 Chốt Đáp Án Dựa Trên Paraphrasing:
-        </h4>
-        <p style="font-size:0.88rem; color:#15803d; margin-bottom:0.75rem;">
-          Dựa trên từ đồng nghĩa và phân tích ở trên, bạn chốt đáp án đúng của câu này là gì?
-        </p>
-        <div style="display:flex; gap:0.5rem; flex-wrap:wrap; margin-bottom:0.75rem;">
-          ${finalBtnsHtml}
-        </div>
-        ${pAnswers.final_solved ? `
-          <div style="background:#ffffff; border:2px solid #22c55e; border-radius:8px; padding:0.75rem; font-size:0.88rem; line-height:1.5; color:#15803d;">
-            <strong>🎉 Chúc mừng! Bạn đã giải mã thành công câu này!</strong><br />
-            Bạn đã nắm vững kỹ thuật Paraphrase và nhận diện trọn vẹn lý do đúng/sai của từng phương án.
-          </div>
-        ` : ''}
-      </div>
-
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-top:1.25rem;">
-        <button class="lego-btn-secondary" onclick="App.prevQuestion()">⬅️ Câu trước</button>
-        <button class="lego-btn-secondary" onclick="App.nextQuestion()">Câu tiếp ➡️</button>
-      </div>
-    `;
-  },
-
   selectTrapAnswer(qKey, choiceId) {
     if (window.KetTracker && !window.KetTracker.hasProfile()) {
       return this.requireStudentProfile(() => this.selectTrapAnswer(qKey, choiceId));
@@ -1243,7 +1326,7 @@ window.App = {
       if (window.KetTracker) window.KetTracker.incrementSessionCounter();
       this.checkThinkingAllSolved(qKey, q);
     }
-    this.renderBeginnerWorkspace(q);
+    this.renderWorkspace();
   },
 
   selectCompAnswer(qKey, choiceId) {
@@ -1266,7 +1349,7 @@ window.App = {
       if (window.KetTracker) window.KetTracker.incrementSessionCounter();
       this.checkThinkingAllSolved(qKey, q);
     }
-    this.renderBeginnerWorkspace(q);
+    this.renderWorkspace();
   },
 
   checkThinkingAllSolved(qKey, q) {
@@ -1305,7 +1388,7 @@ window.App = {
       this.paraphraseAnswers[qKey].syn_solved = true;
       if (window.KetTracker) window.KetTracker.incrementSessionCounter();
     }
-    this.renderIntermediateWorkspace(q);
+    this.renderWorkspace();
   },
 
   selectAntonymQuiz(qKey, choiceId) {
@@ -1327,7 +1410,7 @@ window.App = {
       this.paraphraseAnswers[qKey].ant_solved = true;
       if (window.KetTracker) window.KetTracker.incrementSessionCounter();
     }
-    this.renderIntermediateWorkspace(q);
+    this.renderWorkspace();
   },
 
   toggleOptionBreakdown(qKey, key) {
@@ -1335,8 +1418,7 @@ window.App = {
       this.expandedOptionBreakdowns[qKey] = { A: true, B: true, C: true };
     }
     this.expandedOptionBreakdowns[qKey][key] = !this.expandedOptionBreakdowns[qKey][key];
-    const q = this.testData.questions[this.currentQuestionIndex];
-    this.renderIntermediateWorkspace(q);
+    this.renderWorkspace();
   },
 
   selectParaphraseFinalAnswer(qKey, key) {
@@ -1365,13 +1447,12 @@ window.App = {
         });
       }
     }
-    this.renderIntermediateWorkspace(q);
+    this.renderWorkspace();
   },
 
   toggleTranscriptM1(qKey) {
     this.transcriptRevealedM1[qKey] = !this.transcriptRevealedM1[qKey];
-    const q = this.testData.questions[this.currentQuestionIndex];
-    this.renderLeftPane(q);
+    this.renderWorkspace();
   },
 
   selectOption(qId, key) {
@@ -1379,7 +1460,7 @@ window.App = {
       return this.requireStudentProfile(() => this.selectOption(qId, key));
     }
     this.userAnswers[qId] = key;
-    this.renderIntermediateWorkspace(this.testData.questions[this.currentQuestionIndex]);
+    this.renderWorkspace();
   },
 
   recordTextAnswer(qId, val) {
@@ -1745,6 +1826,7 @@ window.App = {
     if (this.currentQuestionIndex > 0) {
       this.currentQuestionIndex--;
       this.currentSentenceIndex = 0;
+      this.currentQuestionStep = 1;
       this.renderWorkspace();
     }
   },
@@ -1753,6 +1835,7 @@ window.App = {
     if (this.currentQuestionIndex < this.testData.questions.length - 1) {
       this.currentQuestionIndex++;
       this.currentSentenceIndex = 0;
+      this.currentQuestionStep = 1;
       this.renderWorkspace();
     }
   },
@@ -1771,6 +1854,17 @@ window.App = {
     }
 
     if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+
+    if (e.code === 'Digit1') {
+      this.setQuestionStep(1);
+      return;
+    } else if (e.code === 'Digit2') {
+      this.setQuestionStep(2);
+      return;
+    } else if (e.code === 'Digit3') {
+      this.setQuestionStep(3);
+      return;
+    }
 
     if (e.code === 'Space' || e.code === 'KeyR' || e.code === 'ArrowLeft' || e.code === 'ArrowRight') {
       if (window.KetTracker && !window.KetTracker.hasProfile()) {

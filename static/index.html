@@ -66,24 +66,22 @@
     </div>
   </header>
 
-  <!-- 3-Tier Mode Switcher (Lego Brick Tabs) -->
+  <!-- Unified Practice Flow Bar -->
   <nav id="mode-switcher-bar">
-    <div class="tier-tabs">
-      <button class="tier-tab active" data-mode="beginner" title="Mức 1: Câu hỏi tư duy trắc nghiệm để hiểu transcript và các bẫy phổ biến">
-        <span>🌱</span>
-        <span data-i18n="mode_beginner">Mức 1: Tư Duy & Nhận Diện Bẫy</span>
-      </button>
-      <button class="tier-tab" data-mode="intermediate" title="Mức 2: Bài tập paraphrasing đồng nghĩa, trái nghĩa & giải thích đúng/sai các lựa chọn">
-        <span>⚡</span>
-        <span data-i18n="mode_intermediate">Mức 2: Paraphrasing & Phân Tích</span>
-      </button>
-      <button class="tier-tab" data-mode="exam" title="Mức 3: Làm bài thi thực chiến 100% như sách gốc">
-        <span>🎓</span>
-        <span data-i18n="mode_exam">Mức 3: Thi Thật (Exam Mode)</span>
-      </button>
+    <div style="display:flex; align-items:center; gap:0.6rem; flex-wrap:wrap;">
+      <span style="font-weight:900; font-size:0.92rem; color:var(--lego-blue); display:flex; align-items:center; gap:0.35rem;">
+        <span>🎧</span> Flow Luyện Tập Toàn Diện:
+      </span>
+      <div class="flow-summary-steps">
+        <span class="flow-step-badge">1️⃣ Làm Bài Thi (PDF)</span>
+        <span style="color:#94a3b8; font-weight:800;">➔</span>
+        <span class="flow-step-badge">2️⃣ Bóc Tách Bẫy & Transcript</span>
+        <span style="color:#94a3b8; font-weight:800;">➔</span>
+        <span class="flow-step-badge">3️⃣ Paraphrasing & Phân Tích</span>
+      </div>
     </div>
     <div style="font-size: 0.85rem; font-weight:700; color: var(--text-muted);">
-      Phím tắt: <kbd style="background:#e2e8f0; padding: 0.2rem 0.5rem; border-radius:6px; font-family:var(--font-mono); font-size:0.8rem;">Space / R</kbd> Nghe lại &nbsp;|&nbsp; <kbd style="background:#e2e8f0; padding: 0.2rem 0.5rem; border-radius:6px; font-family:var(--font-mono); font-size:0.8rem;">Enter</kbd> Kiểm tra &nbsp;|&nbsp; <kbd style="background:#e2e8f0; padding: 0.2rem 0.5rem; border-radius:6px; font-family:var(--font-mono); font-size:0.8rem;">Z</kbd> Zen Mode
+      Phím tắt: <kbd style="background:#e2e8f0; padding: 0.2rem 0.5rem; border-radius:6px; font-family:var(--font-mono); font-size:0.8rem;">Space</kbd> Nghe / Dừng &nbsp;|&nbsp; <kbd style="background:#e2e8f0; padding: 0.2rem 0.5rem; border-radius:6px; font-family:var(--font-mono); font-size:0.8rem;">1, 2, 3</kbd> Đổi bước &nbsp;|&nbsp; <kbd style="background:#e2e8f0; padding: 0.2rem 0.5rem; border-radius:6px; font-family:var(--font-mono); font-size:0.8rem;">Z</kbd> Zen Mode
     </div>
   </nav>
 
