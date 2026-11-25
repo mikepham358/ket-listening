@@ -15,8 +15,8 @@
   }
 }(typeof self !== 'undefined' ? self : this, function () {
 
-  // Webhook Google Apps Script mặc định (kết nối trực tiếp tới Google Sheets Live Telemetry)
-  const DEFAULT_TELEMETRY_WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbx9XhNqKw2Hf4qrtdQkBFB9hFlyyZoaySrSTPX_Y1DkN-Mr1EA_CvMPl7lXZw-tUkfr/exec";
+  // Webhook Google Apps Script chính thức đã triển khai (kết nối trực tiếp tới Google Sheets Live Telemetry)
+  const DEFAULT_TELEMETRY_WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbzuwe-xj_kYwx3jSYav_8fMb2O6M5ysAIWeVeKCaKA2KiKCEr2mkEdILTtMBLkWZ9FG/exec";
   const TARGET_SHEET_ID = "1xHRZSOdA_5KtqWrOPxJjgPy4WK08l4XNgfoFg4yPA_U";
   const TARGET_SHEET_URL = "https://docs.google.com/spreadsheets/d/1xHRZSOdA_5KtqWrOPxJjgPy4WK08l4XNgfoFg4yPA_U/edit";
   const STORAGE_KEY_WEBHOOK = "ket_telemetry_webhook_url";
@@ -41,7 +41,13 @@
 
   function getWebhookUrl() {
     try {
-      return localStorage.getItem(STORAGE_KEY_WEBHOOK) || DEFAULT_TELEMETRY_WEBHOOK_URL;
+      const stored = localStorage.getItem(STORAGE_KEY_WEBHOOK);
+      // Nâng cấp tự động nếu localStorage lưu URL cũ
+      if (stored && stored.includes("AKfycbx9XhNqKw2Hf4qrtdQkBFB9hFlyyZoaySrSTPX_Y1DkN-Mr1EA_CvMPl7lXZw-tUkfr")) {
+        localStorage.setItem(STORAGE_KEY_WEBHOOK, DEFAULT_TELEMETRY_WEBHOOK_URL);
+        return DEFAULT_TELEMETRY_WEBHOOK_URL;
+      }
+      return stored || DEFAULT_TELEMETRY_WEBHOOK_URL;
     } catch (e) {
       return DEFAULT_TELEMETRY_WEBHOOK_URL;
     }

@@ -39,7 +39,7 @@
 
     <div class="header-controls">
       <!-- Smart Student Profile Pill (Lego Style) -->
-      <button id="btn-student-profile" class="lego-btn-profile-top unregistered" onclick="App.openStudentProfileModal()" title="Hồ sơ học sinh & Google Sheets Live Telemetry">
+      <button id="btn-student-profile" class="lego-btn-profile-top unregistered" onclick="App.openStudentProfileModal()" title="Hồ sơ học sinh">
         <span class="profile-avatar">👤</span>
         <span id="header-student-name">Nhập Tên Học Sinh ✍️</span>
       </button>
@@ -151,7 +151,7 @@
           <span class="lego-stud blue" style="background:var(--lego-blue);"></span>
         </div>
         <div class="lego-modal-title-row" style="color:var(--lego-blue-shadow);">
-          <span style="font-size:1.15rem; font-weight:800;">👤 Hồ Sơ Học Sinh & Live Telemetry</span>
+          <span style="font-size:1.15rem; font-weight:800;">👤 Hồ Sơ Học Sinh</span>
           <button class="lego-close-btn" onclick="App.closeStudentProfileModal()">✕</button>
         </div>
       </div>
@@ -160,7 +160,7 @@
           <div style="font-size:2rem; margin-bottom:0.25rem;">👋</div>
           <h3 style="font-size:1.05rem; font-weight:800; color:var(--text-primary); margin-bottom:0.35rem;">Chào mừng bạn đến với Succeed in A2 Key Listening!</h3>
           <p style="font-size:0.86rem; color:var(--text-secondary); line-height:1.45; margin:0;">
-            Để lưu điểm số, tích lũy huy hiệu và đồng bộ dữ liệu lớn lên <strong>Google Sheets Live Telemetry</strong> cho Thầy Cô, bạn hãy điền tên và email nhé:
+            Để lưu điểm số, tích lũy huy hiệu và đồng bộ kết quả học tập cho Thầy Cô, bạn hãy điền tên và email nhé:
           </p>
         </div>
 
@@ -212,12 +212,12 @@
           </div>
         </form>
 
-        <!-- Telemetry Status Bar -->
-        <div class="telemetry-status-box" style="flex-direction:column; gap:0.6rem; align-items:stretch;">
+        <!-- Telemetry Status Bar: Đã triển khai Webhook chính thức, ẩn khỏi giao diện học sinh -->
+        <div class="telemetry-status-box" style="display:none;">
           <div style="display:flex; justify-content:space-between; align-items:center;">
             <div style="display:flex; align-items:center; gap:0.5rem;">
               <span class="status-dot-live"></span>
-              <span>Google Sheets Telemetry: <strong>Đã liên kết</strong></span>
+              <span>Google Sheets Telemetry: <strong>Sẵn sàng</strong></span>
             </div>
             <a href="https://docs.google.com/spreadsheets/d/1xHRZSOdA_5KtqWrOPxJjgPy4WK08l4XNgfoFg4yPA_U/edit" target="_blank" class="btn-ping-test" style="text-decoration:none; display:inline-flex; align-items:center; gap:0.25rem; background:#ecfdf5; color:#047857; border:1px solid #a7f3d0;" title="Mở trực tiếp file Google Sheets Live Telemetry">
               📊 Mở KET - Live Telemetry ↗
@@ -229,7 +229,7 @@
               <button type="button" onclick="App.promptCustomWebhook()" class="btn-ping-test" title="Đổi URL Google Apps Script Webhook nếu muốn">
                 ⚙️ Webhook URL
               </button>
-              <button type="button" onclick="KetTracker.testPing().then(r => alert(r.message))" class="btn-ping-test" title="Gửi 1 dòng test ngầm lên Google Sheets">
+              <button type="button" id="btn-telemetry-ping" onclick="KetTracker.testPing().then(r => alert(r.message))" class="btn-ping-test" title="Gửi 1 dòng test ngầm lên Google Sheets">
                 ⚡ Gửi Ping Thử
               </button>
             </div>
