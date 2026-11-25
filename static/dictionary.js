@@ -630,7 +630,7 @@ window.KetDictionary = {
 
     const finalSynonyms = Array.from(synSet)
       .filter(w => w.length >= 2 && w.length <= 18 && !w.includes('/') && !w.includes('('))
-      .slice(0, 8);
+      .slice(0, 3);
 
     // Merge & Dedup Antonyms
     const antSet = new Set();
@@ -718,9 +718,10 @@ window.KetDictionary = {
       <span class="lego-tag-meaning">⭐ ${m}</span>
     `).join(' ');
 
-    // Thesaurus Grid
+    // Thesaurus Grid - Giới hạn 3 cụm từ đồng nghĩa gần nghĩa nhất
     let thesaurusHtml = '';
-    const hasSyns = data.synonyms && data.synonyms.length > 0;
+    const topSynonyms = (data.synonyms || []).slice(0, 3);
+    const hasSyns = topSynonyms.length > 0;
     const hasAnts = data.antonyms && data.antonyms.length > 0;
 
     if (hasSyns || hasAnts) {
@@ -730,14 +731,14 @@ window.KetDictionary = {
             📚 Thesaurus Anh - Anh (Kho Từ Đồng Nghĩa & Trái Nghĩa)
           </div>
           <div class="lego-thesaurus-grid">
-            <!-- Synonyms Box -->
+            <!-- Synonyms Box (3 cụm từ gần nghĩa nhất) -->
             <div class="lego-thesaurus-box syn-box">
               <div class="lego-thesaurus-col-header" style="color:#15803d;">
                 <span>🟢 Từ đồng nghĩa (Synonyms)</span>
-                <span class="lego-badge-count">${data.synonyms.length}</span>
+                <span class="lego-badge-count">${topSynonyms.length}</span>
               </div>
               <div class="lego-thesaurus-pills">
-                ${hasSyns ? data.synonyms.map(s => `
+                ${hasSyns ? topSynonyms.map(s => `
                   <button class="lego-thesaurus-pill syn" onclick="KetDictionary.openModal('${s}', 'en-vi')" title="Tra từ '${s}'">
                     🔗 ${s}
                   </button>
