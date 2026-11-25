@@ -536,7 +536,7 @@ window.App = {
               Hãy lắng nghe bằng đôi tai và gõ vào ô bên phải. Hệ thống sẽ so khớp từng từ cho bạn!
             </p>
             <div style="margin-top:0.75rem; font-size:0.8rem; color:#92400e; font-weight:700;">
-              💡 Mẹo: Nhấp đúp vào bất kỳ từ nào để mở <strong>Từ Điển Lego</strong> tra cứu!
+              💡 Mẹo: Nhấp đúp vào bất kỳ từ nào để mở <strong>Dictionary</strong> tra cứu!
             </div>
           </div>
         </div>
