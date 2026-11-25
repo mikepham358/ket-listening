@@ -1,7 +1,7 @@
 // app.js — Succeed in A2 Key Listening (Lego Colorful Theme, Zero-Transcript Dictation & Live Telemetry)
 window.App = {
   currentTestId: 1,
-  currentMode: 'beginner', // Mặc định mở Beginner cho học sinh
+  currentMode: 'flow', // 'flow' (Chế Độ 1: Luyện tập chuyên sâu 3 bước) hoặc 'exam' (Chế Độ 2: Thi thử đề thi thật 25 câu)
   currentQuestionIndex: 0,
   currentSentenceIndex: 0,
   testData: null,
@@ -52,6 +52,7 @@ window.App = {
     this.currentQuestionIndex = 0;
     this.currentSentenceIndex = 0;
     this.currentQuestionStep = 1;
+    this.examSecondsRemaining = 1800;
     this.attempts = {};
     this.userAnswers = {};
     this.sentenceAnswers = {};
@@ -83,7 +84,15 @@ window.App = {
   },
 
   setupListeners() {
-    // Mode Switcher Tabs
+    // 2 Practice Modes Switcher
+    document.querySelectorAll('.mode-tab-btn').forEach(tab => {
+      tab.addEventListener('click', (e) => {
+        const mode = e.currentTarget.getAttribute('data-mode');
+        this.setPracticeMode(mode);
+      });
+    });
+
+    // Legacy Mode Switcher Tabs compatibility
     document.querySelectorAll('.tier-tab').forEach(tab => {
       tab.addEventListener('click', (e) => {
         const mode = e.currentTarget.getAttribute('data-mode');
@@ -358,16 +367,84 @@ window.App = {
   },
 
   setMode(mode) {
-    this.currentMode = mode;
-    this.currentSentenceIndex = 0;
-    document.querySelectorAll('.tier-tab').forEach(tab => {
-      tab.classList.toggle('active', tab.getAttribute('data-mode') === mode);
-    });
-    this.renderWorkspace();
+    const targetMode = (mode === 'exam' || mode === 'advanced') ? 'exam' : 'flow';
+    this.setPracticeMode(targetMode);
   },
 
   switchMode(mode) {
     this.setMode(mode);
+  },
+
+  setPracticeMode(mode) {
+    this.currentMode = mode;
+    this.currentSentenceIndex = 0;
+    document.querySelectorAll('.mode-tab-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.getAttribute('data-mode') === mode);
+    });
+    document.querySelectorAll('.tier-tab').forEach(tab => {
+      tab.classList.toggle('active', tab.getAttribute('data-mode') === mode);
+    });
+
+    if (window.KetAudioPlayer) {
+      window.KetAudioPlayer.pause();
+    }
+
+    if (mode === 'exam') {
+      this.startExamTimer();
+      const fullAudioUrl = `audio/test_${this.currentTestId}/full.mp3`;
+      window.KetAudioPlayer.loadTrack(fullAudioUrl);
+    } else {
+      this.stopExamTimer();
+      const q = this.testData?.questions?.[this.currentQuestionIndex];
+      const qAudio = q ? (q.audio_question || q.audio_file) : null;
+      if (qAudio) window.KetAudioPlayer.loadTrack(qAudio);
+    }
+    this.renderWorkspace();
+  },
+
+  startExamTimer() {
+    if (this.examTimerInterval) return;
+    this.examTimerInterval = setInterval(() => {
+      if (this.examSecondsRemaining > 0) {
+        this.examSecondsRemaining--;
+        this.updateExamTimerDisplay();
+      } else {
+        this.stopExamTimer();
+        alert("⏰ Đã hết 30 phút làm bài thi! Hệ thống sẽ tự động nộp bài thi của bạn.");
+        this.submitExamTest();
+      }
+    }, 1000);
+  },
+
+  stopExamTimer() {
+    if (this.examTimerInterval) {
+      clearInterval(this.examTimerInterval);
+      this.examTimerInterval = null;
+    }
+  },
+
+  updateExamTimerDisplay() {
+    const el = document.getElementById('exam-countdown-timer');
+    if (!el) return;
+    const mins = Math.floor(this.examSecondsRemaining / 60);
+    const secs = this.examSecondsRemaining % 60;
+    el.textContent = `⏱️ ${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+    if (this.examSecondsRemaining < 300) {
+      el.style.background = '#fee2e2';
+      el.style.color = '#dc2626';
+      el.style.borderColor = '#fca5a5';
+    }
+  },
+
+  toggleExamContinuousAudio() {
+    if (window.KetTracker && !window.KetTracker.hasProfile()) {
+      return this.requireStudentProfile(() => this.toggleExamContinuousAudio());
+    }
+    const fullAudioUrl = `audio/test_${this.currentTestId}/full.mp3`;
+    if (!window.KetAudioPlayer.currentSrc || !window.KetAudioPlayer.currentSrc.includes(`test_${this.currentTestId}/full.mp3`)) {
+      window.KetAudioPlayer.loadTrack(fullAudioUrl);
+    }
+    window.KetAudioPlayer.togglePlay();
   },
 
   formatTranscriptHtml(transcript) {
@@ -483,17 +560,104 @@ window.App = {
 
     if (window.KetTracker) window.KetTracker.startQuestionTimer();
 
-    // Auto load audio cho câu hỏi hiện tại
-    const qAudio = q.audio_question || q.audio_file;
-    if (qAudio) {
-      window.KetAudioPlayer.loadTrack(qAudio);
+    if (this.currentMode === 'exam') {
+      // Chế Độ 2: Thi Thử Đề Thi Thật (Exam Simulation)
+      this.renderExamLeftPane();
+      this.renderExamWorkspace();
+    } else {
+      // Chế Độ 1: Luyện Tập Chuyên Sâu (3-Step Flow)
+      const qAudio = q.audio_question || q.audio_file;
+      if (qAudio) {
+        window.KetAudioPlayer.loadTrack(qAudio);
+      }
+      this.renderLeftPane(q);
+      this.renderUnifiedWorkspace(q);
+    }
+  },
+
+  /* ==========================================================================
+     Left Pane in Exam Mode: PDF Viewer with Direct Part Page Tabs
+     ========================================================================== */
+  renderExamLeftPane() {
+    const pane = document.getElementById('pane-left');
+    if (!pane) return;
+
+    const testId = this.currentTestId || 1;
+    const cfg = this.TEST_PAGES_MAP[testId] || { p1: 22, p2: 23, p3: 24, p4: 25, p5: 25, start: 22, end: 25 };
+    const curPage = this.currentExamPdfPage || cfg.start;
+
+    const existingFrame = document.getElementById('exam-pdf-frame');
+    const frameTestId = existingFrame ? parseInt(existingFrame.getAttribute('data-test-id') || '0', 10) : null;
+    const framePage = existingFrame ? parseInt(existingFrame.getAttribute('data-page') || '0', 10) : null;
+
+    if (existingFrame && frameTestId === testId) {
+      const pageIndicator = document.getElementById('exam-pdf-page-indicator');
+      if (pageIndicator) {
+        pageIndicator.textContent = `📖 Test ${testId} · Trang ${curPage} (Exam Mode)`;
+      }
+      const extLink = document.getElementById('exam-pdf-ext-link');
+      if (extLink) {
+        extLink.href = `https://drive.google.com/file/d/1OVNzYe_ZYOm9xVlfBB9nISHOuLF4_joT/view?usp=drive_open#page=${curPage}`;
+      }
+      const controlsContainer = document.getElementById('pdf-header-controls-container');
+      if (controlsContainer) {
+        controlsContainer.innerHTML = `
+          <div style="display:flex; gap:0.25rem; flex-wrap:wrap;">
+            <button class="smart-part-btn ${curPage === cfg.p1 ? 'active' : ''}" onclick="App.setExamPdfPage(${cfg.p1}, 1)">Part 1 (p.${cfg.p1})</button>
+            <button class="smart-part-btn ${curPage === cfg.p2 ? 'active' : ''}" onclick="App.setExamPdfPage(${cfg.p2}, 2)">Part 2 (p.${cfg.p2})</button>
+            <button class="smart-part-btn ${curPage === cfg.p3 ? 'active' : ''}" onclick="App.setExamPdfPage(${cfg.p3}, 3)">Part 3 (p.${cfg.p3})</button>
+            <button class="smart-part-btn ${curPage === cfg.p4 ? 'active' : ''}" onclick="App.setExamPdfPage(${cfg.p4}, 4)">Part 4-5 (p.${cfg.p4})</button>
+          </div>
+        `;
+      }
+      if (framePage !== curPage) {
+        existingFrame.setAttribute('data-page', curPage);
+        existingFrame.src = `https://drive.google.com/file/d/1OVNzYe_ZYOm9xVlfBB9nISHOuLF4_joT/preview#page=${curPage}`;
+      }
+      return;
     }
 
-    // Phần tay trái: Luôn luôn hiển thị PDF Viewer
-    this.renderLeftPane(q);
+    pane.innerHTML = `
+      <div class="lego-card lego-pdf-card" style="height:100%; display:flex; flex-direction:column; padding:0.6rem;">
+        <div class="lego-pdf-header-row" style="margin-bottom:0.5rem;">
+          <div style="display:flex; align-items:center; gap:0.4rem; flex-wrap:wrap;">
+            <span class="part-badge" id="exam-pdf-page-indicator">📖 Test ${testId} · Trang ${curPage} (Exam Mode)</span>
+            <div id="pdf-header-controls-container">
+              <div style="display:flex; gap:0.25rem; flex-wrap:wrap;">
+                <button class="smart-part-btn ${curPage === cfg.p1 ? 'active' : ''}" onclick="App.setExamPdfPage(${cfg.p1}, 1)">Part 1 (p.${cfg.p1})</button>
+                <button class="smart-part-btn ${curPage === cfg.p2 ? 'active' : ''}" onclick="App.setExamPdfPage(${cfg.p2}, 2)">Part 2 (p.${cfg.p2})</button>
+                <button class="smart-part-btn ${curPage === cfg.p3 ? 'active' : ''}" onclick="App.setExamPdfPage(${cfg.p3}, 3)">Part 3 (p.${cfg.p3})</button>
+                <button class="smart-part-btn ${curPage === cfg.p4 ? 'active' : ''}" onclick="App.setExamPdfPage(${cfg.p4}, 4)">Part 4-5 (p.${cfg.p4})</button>
+              </div>
+            </div>
+          </div>
+          <div style="display:flex; gap:0.35rem; align-items:center;">
+            <a id="exam-pdf-ext-link" href="https://drive.google.com/file/d/1OVNzYe_ZYOm9xVlfBB9nISHOuLF4_joT/view?usp=drive_open#page=${curPage}" target="_blank" rel="noopener" class="lego-btn-secondary" style="text-decoration:none; font-size:0.8rem; padding:0.25rem 0.55rem;" title="Mở file PDF trong tab mới">
+              Mở tab mới ↗️
+            </a>
+            <button class="lego-btn-secondary" onclick="App.reloadExamPdf()" style="font-size:0.8rem; padding:0.25rem 0.55rem;" title="Tải lại PDF">
+              🔄 Tải lại
+            </button>
+          </div>
+        </div>
 
-    // Phần tay phải: Flow luyện tập nghe 3 bước
-    this.renderUnifiedWorkspace(q);
+        <!-- Google Drive PDF Viewer Embed -->
+        <div class="lego-pdf-viewer-wrap" style="flex:1; min-height:480px;">
+          <iframe
+            id="exam-pdf-frame"
+            data-page="${curPage}"
+            data-test-id="${testId}"
+            src="https://drive.google.com/file/d/1OVNzYe_ZYOm9xVlfBB9nISHOuLF4_joT/preview#page=${curPage}"
+            width="100%"
+            height="100%"
+            allow="autoplay"
+            loading="lazy"
+            title="Succeed in A2 Key PDF Viewer"
+            style="border:none; width:100%; height:100%; min-height:480px; border-radius:6px;"
+          ></iframe>
+        </div>
+      </div>
+    `;
   },
 
   /* ==========================================================================
@@ -522,6 +686,10 @@ window.App = {
       if (extLink) {
         extLink.href = `https://drive.google.com/file/d/1OVNzYe_ZYOm9xVlfBB9nISHOuLF4_joT/view?usp=drive_open#page=${targetPage}`;
       }
+      const controlsContainer = document.getElementById('pdf-header-controls-container');
+      if (controlsContainer) {
+        controlsContainer.innerHTML = `<span class="badge-session">Cambridge A2 Key PDF</span>`;
+      }
       if (framePage !== targetPage) {
         existingFrame.setAttribute('data-page', targetPage);
         existingFrame.src = `https://drive.google.com/file/d/1OVNzYe_ZYOm9xVlfBB9nISHOuLF4_joT/preview#page=${targetPage}`;
@@ -534,7 +702,9 @@ window.App = {
         <div class="lego-pdf-header-row" style="margin-bottom:0.5rem;">
           <div style="display:flex; align-items:center; gap:0.5rem; flex-wrap:wrap;">
             <span class="part-badge" id="exam-pdf-page-indicator">📖 Test ${testId} · Trang ${targetPage} (Part ${q ? q.part : 1})</span>
-            <span class="badge-session">Cambridge A2 Key PDF</span>
+            <div id="pdf-header-controls-container">
+              <span class="badge-session">Cambridge A2 Key PDF</span>
+            </div>
           </div>
           <div style="display:flex; gap:0.4rem; align-items:center;">
             <a id="exam-pdf-ext-link" href="https://drive.google.com/file/d/1OVNzYe_ZYOm9xVlfBB9nISHOuLF4_joT/view?usp=drive_open#page=${targetPage}" target="_blank" rel="noopener" class="lego-btn-secondary" style="text-decoration:none; font-size:0.8rem; padding:0.3rem 0.65rem;" title="Mở file PDF trong tab mới">
@@ -1210,10 +1380,6 @@ window.App = {
     this.renderUnifiedWorkspace(q);
   },
 
-  renderExamWorkspace(q) {
-    this.renderUnifiedWorkspace(q);
-  },
-
   switchSentence(idx) {
     this.currentSentenceIndex = idx;
     this.renderWorkspace();
@@ -1712,7 +1878,7 @@ window.App = {
   },
 
   /* ==========================================================================
-     Mức 3: Exam Mode Workspace (Phiếu Trả Lời 25 Câu Theo Từng Part)
+     Chế Độ 2: Exam Mode Workspace (Phiếu Trả Lời 25 Câu Toàn Bộ Bài Thi)
      ========================================================================== */
   renderExamWorkspace(q) {
     const pane = document.getElementById('pane-right');
@@ -1733,6 +1899,15 @@ window.App = {
       const pIdx = (item.part >= 1 && item.part <= 5) ? item.part - 1 : 0;
       partsDef[pIdx].questions.push(item);
     });
+
+    const answeredCount = Object.keys(this.userAnswers).filter(k => {
+      const ans = this.userAnswers[k];
+      return ans !== undefined && ans !== null && String(ans).trim() !== '';
+    }).length;
+
+    const mins = Math.floor(this.examSecondsRemaining / 60);
+    const secs = this.examSecondsRemaining % 60;
+    const timerText = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
 
     const sectionsHtml = partsDef.map(pDef => {
       const qCards = pDef.questions.map(item => {
@@ -1776,11 +1951,14 @@ window.App = {
     pane.innerHTML = `
       <div class="question-header">
         <span class="part-badge" style="background:#fee2e2; color:#b91c1c; border-color:#fca5a5;">
-          🎓 Chế Độ Thi Thử (Cambridge Exam Simulation)
+          🎓 Chế Độ Thi Thử Cambridge (Full Test 25 Câu) · Test ${this.currentTestId}
         </span>
-        <span class="stopwatch-badge" style="background:#fef3c7; color:#b45309;">
-          ⏱️ 30:00
-        </span>
+        <div style="display:flex; gap:0.4rem; align-items:center;">
+          <span class="badge-session">📝 Đã làm: ${answeredCount} / 25 câu</span>
+          <span id="exam-countdown-timer" class="stopwatch-badge" style="background:#fef3c7; color:#b45309; font-weight:900;">
+            ⏱️ ${timerText}
+          </span>
+        </div>
       </div>
 
       <!-- Exam Continuous Audio Status Banner -->
@@ -1796,9 +1974,17 @@ window.App = {
             </div>
           </div>
         </div>
-        <button class="lego-btn-green" style="font-size:0.85rem; padding:0.4rem 0.9rem; display:inline-flex; align-items:center; gap:0.35rem;" onclick="window.KetAudioPlayer.togglePlay()">
-          <span>▶️ / ⏸️</span> <span>Nghe bài thi</span>
-        </button>
+        <div style="display:flex; gap:0.4rem; align-items:center; flex-wrap:wrap;">
+          <button class="lego-btn-green" style="font-size:0.85rem; padding:0.42rem 0.95rem; display:inline-flex; align-items:center; gap:0.35rem;" onclick="App.toggleExamContinuousAudio()">
+            <span>▶️ / ⏸️</span> <span>Nghe toàn bài thi</span>
+          </button>
+          <button class="lego-btn-secondary" style="font-size:0.82rem; padding:0.42rem 0.65rem;" onclick="window.KetAudioPlayer.replay5s()">
+            ⏮️ 5s
+          </button>
+          <button class="lego-btn-secondary" style="font-size:0.82rem; padding:0.42rem 0.65rem;" onclick="window.KetAudioPlayer.skip5s()">
+            5s ⏭️
+          </button>
+        </div>
       </div>
 
       <div class="lego-card">
@@ -1811,7 +1997,10 @@ window.App = {
           </span>
         </div>
         ${sectionsHtml}
-        <div style="margin-top:1.5rem; text-align:right;">
+        <div style="margin-top:1.5rem; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.75rem; border-top:1.5px dashed #cbd5e1; padding-top:1rem;">
+          <span style="font-size:0.9rem; font-weight:700; color:#475569;">
+            ${answeredCount === 25 ? '🎉 Bạn đã trả lời đủ cả 25 câu!' : `Bạn đã làm được ${answeredCount}/25 câu. Hãy kiểm tra lại trước khi nộp bài.`}
+          </span>
           <button class="lego-btn-green" style="font-size:1.05rem; padding:0.75rem 1.75rem;" onclick="App.submitExamTest()">
             Nộp Bài Thi (Finish) 🚀
           </button>
@@ -1834,6 +2023,23 @@ window.App = {
       if (!frame.src.includes(`#page=${pageNum}`)) {
         frame.src = targetSrc;
       }
+    }
+
+    const pageIndicator = document.getElementById('exam-pdf-page-indicator');
+    if (pageIndicator) {
+      pageIndicator.textContent = `📖 Test ${testId} · Trang ${pageNum} (Part ${partNum || (pageNum === cfg.p1 ? 1 : pageNum === cfg.p2 ? 2 : pageNum === cfg.p3 ? 3 : 4)})`;
+    }
+
+    const controlsContainer = document.getElementById('pdf-header-controls-container');
+    if (controlsContainer && this.currentMode === 'exam') {
+      controlsContainer.innerHTML = `
+        <div style="display:flex; gap:0.25rem; flex-wrap:wrap;">
+          <button class="smart-part-btn ${pageNum === cfg.p1 ? 'active' : ''}" onclick="App.setExamPdfPage(${cfg.p1}, 1)">Part 1 (p.${cfg.p1})</button>
+          <button class="smart-part-btn ${pageNum === cfg.p2 ? 'active' : ''}" onclick="App.setExamPdfPage(${cfg.p2}, 2)">Part 2 (p.${cfg.p2})</button>
+          <button class="smart-part-btn ${pageNum === cfg.p3 ? 'active' : ''}" onclick="App.setExamPdfPage(${cfg.p3}, 3)">Part 3 (p.${cfg.p3})</button>
+          <button class="smart-part-btn ${pageNum === cfg.p4 ? 'active' : ''}" onclick="App.setExamPdfPage(${cfg.p4}, 4)">Part 4-5 (p.${cfg.p4})</button>
+        </div>
+      `;
     }
 
     this.updateExamPdfNavUI(partNum);
@@ -1926,10 +2132,11 @@ window.App = {
         result: `CHỌN: ${val}`
       });
     }
-    this.renderExamWorkspace(this.testData.questions[this.currentQuestionIndex]);
+    this.renderExamWorkspace();
   },
 
   submitExamTest() {
+    this.stopExamTimer();
     // Smart Intercept: Yêu cầu học sinh nhập tên & email trước khi nộp bài
     if (window.KetTracker && !window.KetTracker.hasProfile()) {
       return this.requireStudentProfile(() => this.submitExamTest());

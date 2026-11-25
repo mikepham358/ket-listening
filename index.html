@@ -66,22 +66,29 @@
     </div>
   </header>
 
-  <!-- Unified Practice Flow Bar -->
+  <!-- 2 Practice Modes Bar -->
   <nav id="mode-switcher-bar">
-    <div style="display:flex; align-items:center; gap:0.6rem; flex-wrap:wrap;">
-      <span style="font-weight:900; font-size:0.92rem; color:var(--lego-blue); display:flex; align-items:center; gap:0.35rem;">
-        <span>🎧</span> Flow Luyện Tập Toàn Diện:
-      </span>
-      <div class="flow-summary-steps">
-        <span class="flow-step-badge">1️⃣ Làm Bài Thi (PDF)</span>
-        <span style="color:#94a3b8; font-weight:800;">➔</span>
-        <span class="flow-step-badge">2️⃣ Bóc Tách Bẫy & Transcript</span>
-        <span style="color:#94a3b8; font-weight:800;">➔</span>
-        <span class="flow-step-badge">3️⃣ Paraphrasing & Phân Tích</span>
-      </div>
+    <div class="mode-switcher-tabs">
+      <button class="mode-tab-btn active" data-mode="flow" onclick="App.setPracticeMode('flow')">
+        <span class="mode-tab-icon">🎯</span>
+        <div class="mode-tab-text">
+          <span class="mode-tab-title">Chế Độ 1: Luyện Tập Chuyên Sâu</span>
+          <span class="mode-tab-desc">3 Bước từng câu · Bóc tách bẫy transcript & Paraphrasing</span>
+        </div>
+      </button>
+      <button class="mode-tab-btn" data-mode="exam" onclick="App.setPracticeMode('exam')">
+        <span class="mode-tab-icon">🎓</span>
+        <div class="mode-tab-text">
+          <span class="mode-tab-title">Chế Độ 2: Thi Thử Đề Thi Thật (Full Test)</span>
+          <span class="mode-tab-desc">Phòng thi Cambridge: Audio liên tục 23' · Phiếu làm bài 25 câu · Bấm giờ 30:00</span>
+        </div>
+      </button>
     </div>
-    <div style="font-size: 0.85rem; font-weight:700; color: var(--text-muted);">
-      Phím tắt: <kbd style="background:#e2e8f0; padding: 0.2rem 0.5rem; border-radius:6px; font-family:var(--font-mono); font-size:0.8rem;">Space</kbd> Nghe / Dừng &nbsp;|&nbsp; <kbd style="background:#e2e8f0; padding: 0.2rem 0.5rem; border-radius:6px; font-family:var(--font-mono); font-size:0.8rem;">1, 2, 3</kbd> Đổi bước &nbsp;|&nbsp; <kbd style="background:#e2e8f0; padding: 0.2rem 0.5rem; border-radius:6px; font-family:var(--font-mono); font-size:0.8rem;">Z</kbd> Zen Mode
+    <div style="font-size: 0.82rem; font-weight:700; color: var(--text-muted); display:flex; align-items:center; gap:0.5rem; flex-wrap:wrap;">
+      <span>Phím tắt:</span>
+      <kbd style="background:#e2e8f0; padding: 0.15rem 0.45rem; border-radius:5px; font-family:var(--font-mono); font-size:0.75rem;">Space</kbd> Nghe/Dừng
+      <kbd style="background:#e2e8f0; padding: 0.15rem 0.45rem; border-radius:5px; font-family:var(--font-mono); font-size:0.75rem;">1, 2, 3</kbd> Đổi bước
+      <kbd style="background:#e2e8f0; padding: 0.15rem 0.45rem; border-radius:5px; font-family:var(--font-mono); font-size:0.75rem;">Z</kbd> Zen Mode
     </div>
   </nav>
 

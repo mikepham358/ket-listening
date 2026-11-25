@@ -239,13 +239,80 @@ body {
 /* ==========================================================================
    3-Tier Mode Switcher (Lego Brick Tabs)
    ========================================================================== */
+/* ==========================================================================
+   2-Mode Practice Switcher (Lego Tactile Tabs)
+   ========================================================================== */
 #mode-switcher-bar {
   background: #f8fafc;
   border-bottom: 2px solid var(--border-subtle);
-  padding: 0.6rem 1.5rem;
+  padding: 0.6rem 1.25rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.mode-switcher-tabs {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.mode-tab-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  background: #ffffff;
+  color: var(--text-secondary);
+  border: 2px solid var(--border-strong);
+  border-bottom: 4px solid #cbd5e1;
+  border-radius: var(--radius-md);
+  padding: 0.45rem 0.95rem;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  user-select: none;
+  text-align: left;
+}
+
+.mode-tab-btn:hover {
+  background: #f8fafc;
+  transform: translateY(-1px);
+}
+
+.mode-tab-btn.active {
+  background: #eff6ff;
+  border-color: var(--lego-blue);
+  border-bottom: 4px solid var(--lego-blue-shadow);
+  color: var(--lego-blue);
+  box-shadow: 0 2px 8px rgba(0, 109, 204, 0.2);
+}
+
+.mode-tab-icon {
+  font-size: 1.45rem;
+  line-height: 1;
+}
+
+.mode-tab-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.mode-tab-title {
+  font-size: 0.88rem;
+  font-weight: 900;
+  color: inherit;
+}
+
+.mode-tab-desc {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #64748b;
+}
+
+.mode-tab-btn.active .mode-tab-desc {
+  color: #0369a1;
 }
 
 .tier-tabs {
