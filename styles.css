@@ -742,6 +742,11 @@ body {
 .lego-stud.green { background: var(--lego-green); }
 .lego-stud.blue { background: var(--lego-blue); }
 
+.lego-dict-card {
+  max-width: 640px !important;
+  width: 95% !important;
+}
+
 .lego-modal-title-row {
   display: flex;
   justify-content: space-between;
@@ -763,20 +768,108 @@ body {
   color: var(--text-secondary);
 }
 
+/* Mode Selector Tabs */
+.lego-dict-mode-tabs {
+  display: flex;
+  gap: 0.4rem;
+  margin-bottom: 0.65rem;
+  flex-wrap: wrap;
+}
+
+.lego-dict-mode-btn {
+  background: #f1f5f9;
+  border: 2px solid #cbd5e1;
+  border-bottom: 3px solid #cbd5e1;
+  border-radius: var(--radius-full);
+  padding: 0.3rem 0.8rem;
+  font-size: 0.82rem;
+  font-weight: 800;
+  cursor: pointer;
+  color: #475569;
+  transition: all 0.15s ease;
+}
+
+.lego-dict-mode-btn:hover {
+  background: #e2e8f0;
+}
+
+.lego-dict-mode-btn.active {
+  background: var(--lego-blue);
+  color: #ffffff;
+  border-color: #004499;
+  border-bottom: 3px solid #003377;
+}
+
 .lego-search-box-row {
   display: flex;
   gap: 0.5rem;
 }
 
-.lego-search-box-row input {
+.lego-search-input-wrap {
+  position: relative;
   flex: 1;
+  display: flex;
+  align-items: center;
+}
+
+.lego-search-input-wrap input {
+  width: 100%;
   background: #ffffff;
   border: 2px solid var(--border-strong);
   border-radius: var(--radius-md);
-  padding: 0.55rem 0.85rem;
+  padding: 0.55rem 2.2rem 0.55rem 0.85rem;
   font-size: 0.95rem;
   font-weight: 600;
   outline: none;
+}
+
+.lego-search-input-wrap input:focus {
+  border-color: var(--lego-blue);
+  box-shadow: 0 0 0 3px rgba(0, 85, 191, 0.15);
+}
+
+.lego-dict-clear-btn {
+  position: absolute;
+  right: 8px;
+  background: #e2e8f0;
+  border: none;
+  border-radius: 50%;
+  width: 22px;
+  height: 22px;
+  font-size: 0.72rem;
+  font-weight: 800;
+  cursor: pointer;
+  color: #475569;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Quick Recommendation Chips */
+.lego-chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-top: 0.65rem;
+  align-items: center;
+}
+
+.lego-chip {
+  background: #f8fafc;
+  border: 1.5px solid #cbd5e1;
+  border-radius: var(--radius-full);
+  padding: 0.15rem 0.6rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #475569;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.lego-chip:hover {
+  background: #e0f2fe;
+  color: #0369a1;
+  border-color: #7dd3fc;
 }
 
 .lego-modal-body {
@@ -788,9 +881,19 @@ body {
 }
 
 .lego-word-title {
-  font-size: 1.8rem;
+  font-size: 1.85rem;
   font-weight: 900;
   color: var(--lego-blue);
+  text-transform: lowercase;
+}
+
+.lego-pos-badge {
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: #64748b;
+  background: #f1f5f9;
+  border-radius: 6px;
+  padding: 0.15rem 0.45rem;
   text-transform: lowercase;
 }
 
@@ -834,6 +937,179 @@ body {
   padding: 0.25rem 0.75rem;
   font-size: 0.92rem;
   font-weight: 800;
+}
+
+/* Vietnamese - English Banner */
+.lego-vi-banner {
+  background: #eff6ff;
+  border: 2px solid #bfdbfe;
+  border-left: 5px solid #2563eb;
+  border-radius: 10px;
+  padding: 0.75rem 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.lego-vi-banner-title {
+  font-size: 0.95rem;
+  color: #1e3a8a;
+}
+
+.lego-vi-alts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-top: 0.5rem;
+  align-items: center;
+}
+
+/* Thesaurus Section */
+.lego-thesaurus-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+  margin-top: 0.65rem;
+}
+
+@media (max-width: 600px) {
+  .lego-thesaurus-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.lego-thesaurus-box {
+  border-radius: 12px;
+  padding: 0.75rem;
+  border: 2px solid #e2e8f0;
+}
+
+.lego-thesaurus-box.syn-box {
+  border-color: #bbf7d0;
+  background: #f0fdf4;
+}
+
+.lego-thesaurus-box.ant-box {
+  border-color: #fecaca;
+  background: #fef2f2;
+}
+
+.lego-thesaurus-col-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.85rem;
+  font-weight: 800;
+  margin-bottom: 0.5rem;
+}
+
+.lego-badge-count {
+  background: rgba(0, 0, 0, 0.07);
+  padding: 0.1rem 0.45rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 800;
+}
+
+.lego-thesaurus-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.lego-thesaurus-pill {
+  border: none;
+  cursor: pointer;
+  font-size: 0.82rem;
+  font-weight: 800;
+  border-radius: 8px;
+  padding: 0.3rem 0.65rem;
+  transition: all 0.1s ease;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.lego-thesaurus-pill.syn {
+  background: #dcfce7;
+  color: #15803d;
+  border: 1.5px solid #86efac;
+  border-bottom: 3px solid #4ade80;
+}
+
+.lego-thesaurus-pill.syn:hover {
+  background: #bbf7d0;
+}
+
+.lego-thesaurus-pill.syn:active {
+  transform: translateY(2px);
+  border-bottom-width: 1px;
+}
+
+.lego-thesaurus-pill.ant {
+  background: #fee2e2;
+  color: #b91c1c;
+  border: 1.5px solid #fca5a5;
+  border-bottom: 3px solid #f87171;
+}
+
+.lego-thesaurus-pill.ant:hover {
+  background: #fecaca;
+}
+
+.lego-thesaurus-pill.ant:active {
+  transform: translateY(2px);
+  border-bottom-width: 1px;
+}
+
+.lego-thesaurus-pill.alt {
+  background: #dbeafe;
+  color: #1e40af;
+  border: 1.5px solid #93c5fd;
+  border-bottom: 3px solid #60a5fa;
+}
+
+.lego-thesaurus-pill.alt:hover {
+  background: #bfdbfe;
+}
+
+.lego-thesaurus-pill.alt:active {
+  transform: translateY(2px);
+  border-bottom-width: 1px;
+}
+
+.lego-thesaurus-tip {
+  font-size: 0.78rem;
+  color: #64748b;
+  font-weight: 600;
+  margin-top: 0.65rem;
+  text-align: center;
+}
+
+/* Welcome Box */
+.lego-dict-welcome-box {
+  text-align: center;
+  padding: 1.5rem 1rem;
+}
+
+.lego-thesaurus-features-summary {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  max-width: 400px;
+  margin: 1rem auto 0 auto;
+  text-align: left;
+  background: #f8fafc;
+  border: 2px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 0.75rem 1rem;
+  font-size: 0.85rem;
+  color: #334155;
+}
+
+.lego-feat-item {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
 }
 
 .lego-dict-section {
