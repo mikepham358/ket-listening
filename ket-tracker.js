@@ -17,6 +17,8 @@
 
   // Webhook Google Apps Script mặc định (kết nối trực tiếp tới Google Sheets Live Telemetry)
   const DEFAULT_TELEMETRY_WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbx9XhNqKw2Hf4qrtdQkBFB9hFlyyZoaySrSTPX_Y1DkN-Mr1EA_CvMPl7lXZw-tUkfr/exec";
+  const TARGET_SHEET_ID = "1xHRZSOdA_5KtqWrOPxJjgPy4WK08l4XNgfoFg4yPA_U";
+  const TARGET_SHEET_URL = "https://docs.google.com/spreadsheets/d/1xHRZSOdA_5KtqWrOPxJjgPy4WK08l4XNgfoFg4yPA_U/edit";
   const STORAGE_KEY_WEBHOOK = "ket_telemetry_webhook_url";
   const STORAGE_KEY_SESSION = "ket_telemetry_session_id";
   const STORAGE_KEY_PROFILE = "ket_student_profile_v1";
@@ -160,6 +162,7 @@
     if (extra.mode) modeText = extra.mode;
 
     const payload = {
+      sheet_id: TARGET_SHEET_ID,
       session_id: getSessionId(),
       timestamp: new Date().toISOString(),
       student_name: profile.student_name ? profile.student_name.trim() : "Khách (Chưa nhập tên)",
@@ -208,6 +211,7 @@
 
     const profile = getProfile();
     const payload = {
+      sheet_id: TARGET_SHEET_ID,
       session_id: getSessionId(),
       timestamp: new Date().toISOString(),
       student_name: profile.student_name || "Thầy Mike Pham (Admin Test)",
@@ -285,6 +289,8 @@
     startQuestionTimer: startQuestionTimer,
     getQuestionDuration: getQuestionDuration,
     incrementSessionCounter: incrementSessionCounter,
-    getSessionCounter: getSessionCounter
+    getSessionCounter: getSessionCounter,
+    TARGET_SHEET_ID: TARGET_SHEET_ID,
+    TARGET_SHEET_URL: TARGET_SHEET_URL
   };
 }));

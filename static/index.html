@@ -213,18 +213,26 @@
         </form>
 
         <!-- Telemetry Status Bar -->
-        <div class="telemetry-status-box">
-          <div style="display:flex; align-items:center; gap:0.5rem;">
-            <span class="status-dot-live"></span>
-            <span>Google Sheets Telemetry: <strong>Sẵn sàng</strong></span>
+        <div class="telemetry-status-box" style="flex-direction:column; gap:0.6rem; align-items:stretch;">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <div style="display:flex; align-items:center; gap:0.5rem;">
+              <span class="status-dot-live"></span>
+              <span>Google Sheets Telemetry: <strong>Đã liên kết</strong></span>
+            </div>
+            <a href="https://docs.google.com/spreadsheets/d/1xHRZSOdA_5KtqWrOPxJjgPy4WK08l4XNgfoFg4yPA_U/edit" target="_blank" class="btn-ping-test" style="text-decoration:none; display:inline-flex; align-items:center; gap:0.25rem; background:#ecfdf5; color:#047857; border:1px solid #a7f3d0;" title="Mở trực tiếp file Google Sheets Live Telemetry">
+              📊 Mở KET - Live Telemetry ↗
+            </a>
           </div>
-          <div style="display:flex; gap:0.4rem; align-items:center;">
-            <button type="button" onclick="App.promptCustomWebhook()" class="btn-ping-test" title="Đổi URL Google Apps Script Webhook nếu muốn dùng bảng tính riêng">
-              ⚙️ Webhook URL
-            </button>
-            <button type="button" onclick="KetTracker.testPing().then(r => alert(r.message))" class="btn-ping-test" title="Gửi 1 dòng test ngầm lên Google Sheets">
-              ⚡ Gửi Ping Thử
-            </button>
+          <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px dashed #e2e8f0; padding-top:0.5rem; font-size:0.75rem;">
+            <span style="color:#64748b;">Doc ID: <code style="font-family:var(--font-mono); font-size:0.72rem; background:#f1f5f9; padding:0.1rem 0.3rem; border-radius:4px;">1xHRZSO...yPA_U</code></span>
+            <div style="display:flex; gap:0.35rem;">
+              <button type="button" onclick="App.promptCustomWebhook()" class="btn-ping-test" title="Đổi URL Google Apps Script Webhook nếu muốn">
+                ⚙️ Webhook URL
+              </button>
+              <button type="button" onclick="KetTracker.testPing().then(r => alert(r.message))" class="btn-ping-test" title="Gửi 1 dòng test ngầm lên Google Sheets">
+                ⚡ Gửi Ping Thử
+              </button>
+            </div>
           </div>
         </div>
       </div>

@@ -1,27 +1,41 @@
 /**
  * =========================================================================
  * SUCCEED IN A2 KEY LISTENING - REAL-TIME TELEMETRY & BIG DATA TRACKER
- * Target Google Sheet: Succeed in A2 Key - Live Telemetry
+ * Target Google Sheet: KET - Live Telemetry
+ * Doc ID: 1xHRZSOdA_5KtqWrOPxJjgPy4WK08l4XNgfoFg4yPA_U
+ * Sheet URL: https://docs.google.com/spreadsheets/d/1xHRZSOdA_5KtqWrOPxJjgPy4WK08l4XNgfoFg4yPA_U/edit
  * Tác giả: Thầy Mike Pham & Antigravity AI
  * =========================================================================
  * 
- * HƯỚNG DẪN KÍCH HOẠT (CHỈ CẦN LÀM 1 LẦN DUY NHẤT TRÊN GOOGLE DRIVE):
- * 1. Mở một trang tính Google Sheet mới (hoặc dùng trang tính hiện có).
- * 2. Đổi tên trang tính (sheet tab) thành: Live_Telemetry.
+ * HƯỚNG DẪN KÍCH HOẠT (CHỈ 1 PHÚT DUY NHẤT TRÊN GOOGLE DRIVE):
+ * 1. Mở file Google Sheet:
+ *    https://docs.google.com/spreadsheets/d/1xHRZSOdA_5KtqWrOPxJjgPy4WK08l4XNgfoFg4yPA_U/edit
+ * 2. Đổi tên trang tính đầu tiên thành: Live_Telemetry.
  * 3. Vào menu: Tiện ích mở rộng (Extensions) -> Apps Script.
  * 4. Xóa toàn bộ nội dung trong file Code.gs, dán toàn bộ đoạn mã này vào.
  * 5. Bấm biểu tượng 💾 Lưu (Ctrl + S hoặc Cmd + S).
  * 6. Bấm nút "Triển khai" (Deploy) màu xanh ở góc trên bên phải -> "Quản lý bản triển khai mới" (New deployment).
- * 7. Chọn loại (bánh răng): "Ứng dụng web" (Web app).
+ * 7. Chọn loại (biểu tượng bánh răng ⚙️): "Ứng dụng web" (Web app).
  *    - Mô tả: Succeed in A2 Key Live Telemetry v1
- *    - Thực thi dưới dạng (Execute as): "Tôi" (My account - email của bạn)
- *    - Ai có quyền truy cập (Who has access): "Bất kỳ ai" (Anyone) -> BẮT BUỘC ĐỂ GITHUB PAGES GỬI ĐƯỢC DỮ LIỆU
+ *    - Thực thi dưới dạng (Execute as): "Tôi" (My account - mikepham358@gmail.com)
+ *    - Ai có quyền truy cập (Who has access): "Bất kỳ ai" (Anyone) -> RẤT QUAN TRỌNG ĐỂ GITHUB PAGES GỬI ĐƯỢC DỮ LIỆU
  * 8. Bấm "Triển khai", cấp quyền truy cập tài khoản Google khi được hỏi.
  * 9. Sao chép "URL Ứng dụng web" (dạng https://script.google.com/macros/s/AKfycb.../exec)
- *    và dán vào cài đặt Webhook trên ứng dụng hoặc lưu vào localStorage('ket_telemetry_webhook_url').
+ *    và dán vào nút ⚙️ Webhook URL trên ứng dụng web, hoặc cập nhật hằng số DEFAULT_TELEMETRY_WEBHOOK_URL trong ket-tracker.js.
  */
 
+var TARGET_DOC_ID = "1xHRZSOdA_5KtqWrOPxJjgPy4WK08l4XNgfoFg4yPA_U";
 var SHEET_NAME = "Live_Telemetry";
+
+function getTargetSpreadsheet(data) {
+  var id = (data && data.sheet_id) ? data.sheet_id : TARGET_DOC_ID;
+  try {
+    if (id) {
+      return SpreadsheetApp.openById(id);
+    }
+  } catch (err) {}
+  return SpreadsheetApp.getActiveSpreadsheet();
+}
 
 function setupSheetHeaders(sheet) {
   if (sheet.getLastRow() === 0) {
@@ -81,13 +95,6 @@ function doPost(e) {
   }
 
   try {
-    var ss = SpreadsheetApp.getActiveSpreadsheet();
-    var sheet = ss.getSheetByName(SHEET_NAME);
-    if (!sheet) {
-      sheet = ss.insertSheet(SHEET_NAME);
-    }
-    setupSheetHeaders(sheet);
-
     var data = {};
     if (e && e.postData && e.postData.contents) {
       try {
@@ -98,6 +105,13 @@ function doPost(e) {
     } else if (e && e.parameter) {
       data = e.parameter;
     }
+
+    var ss = getTargetSpreadsheet(data);
+    var sheet = ss.getSheetByName(SHEET_NAME);
+    if (!sheet) {
+      sheet = ss.insertSheet(SHEET_NAME);
+    }
+    setupSheetHeaders(sheet);
 
     // Định dạng thời gian theo múi giờ Việt Nam (UTC+7)
     var timestampStr = Utilities.formatDate(new Date(), "Asia/Ho_Chi_Minh", "yyyy-MM-dd HH:mm:ss");
@@ -152,7 +166,8 @@ function doPost(e) {
     return ContentService.createTextOutput(JSON.stringify({
       status: "success",
       row: newRow,
-      timestamp: timestampStr
+      timestamp: timestampStr,
+      sheet_id: ss.getId()
     })).setMimeType(ContentService.MimeType.JSON);
 
   } catch (error) {
@@ -167,8 +182,8 @@ function doPost(e) {
 }
 
 function doGet(e) {
-  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var ss = getTargetSpreadsheet();
   var sheet = ss.getSheetByName(SHEET_NAME);
   var count = sheet ? Math.max(0, sheet.getLastRow() - 1) : 0;
-  return ContentService.createTextOutput("✅ Succeed in A2 Key Listening Live Telemetry is ACTIVE! Total recorded events: " + count);
+  return ContentService.createTextOutput("✅ Succeed in A2 Key Listening Live Telemetry (Sheet: KET - Live Telemetry [1xHRZSOdA_5KtqWrOPxJjgPy4WK08l4XNgfoFg4yPA_U]) is ACTIVE! Total recorded events: " + count);
 }
