@@ -319,8 +319,8 @@ window.KetDictionary = {
     const [freeDictRes, gTranslateRes, synRes, antRes] = await Promise.allSettled([
       fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${encodeURIComponent(word)}`).then(r => r.ok ? r.json() : null),
       fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=vi&dt=t&dt=bd&dt=ss&dt=md&dt=ex&q=${encodeURIComponent(word)}`).then(r => r.ok ? r.json() : null),
-      fetch(`https://api.datamuse.com/words?rel_syn=${encodeURIComponent(word)}&max=10`).then(r => r.ok ? r.json() : []),
-      fetch(`https://api.datamuse.com/words?rel_ant=${encodeURIComponent(word)}&max=10`).then(r => r.ok ? r.json() : [])
+      fetch(`https://api.datamuse.com/words?rel_syn=${encodeURIComponent(word)}&max=10&_t=${Date.now()}`).then(r => r.ok ? r.json() : []),
+      fetch(`https://api.datamuse.com/words?rel_ant=${encodeURIComponent(word)}&max=10&_t=${Date.now()}`).then(r => r.ok ? r.json() : [])
     ]);
 
     let ipa = '';
