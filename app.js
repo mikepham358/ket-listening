@@ -95,9 +95,24 @@ window.App = {
     }
 
     // Audio Toolbar Buttons
-    document.getElementById('audio-play-btn')?.addEventListener('click', () => window.KetAudioPlayer.togglePlay());
-    document.getElementById('audio-replay-btn')?.addEventListener('click', () => window.KetAudioPlayer.replay5s());
-    document.getElementById('audio-forward-btn')?.addEventListener('click', () => window.KetAudioPlayer.skip5s());
+    document.getElementById('audio-play-btn')?.addEventListener('click', () => {
+      if (window.KetTracker && !window.KetTracker.hasProfile()) {
+        return this.requireStudentProfile(() => window.KetAudioPlayer.togglePlay());
+      }
+      window.KetAudioPlayer.togglePlay();
+    });
+    document.getElementById('audio-replay-btn')?.addEventListener('click', () => {
+      if (window.KetTracker && !window.KetTracker.hasProfile()) {
+        return this.requireStudentProfile(() => window.KetAudioPlayer.replay5s());
+      }
+      window.KetAudioPlayer.replay5s();
+    });
+    document.getElementById('audio-forward-btn')?.addEventListener('click', () => {
+      if (window.KetTracker && !window.KetTracker.hasProfile()) {
+        return this.requireStudentProfile(() => window.KetAudioPlayer.skip5s());
+      }
+      window.KetAudioPlayer.skip5s();
+    });
     document.getElementById('audio-speed-btn')?.addEventListener('click', () => window.KetAudioPlayer.cycleSpeed());
     
     const progBar = document.getElementById('audio-progress-bar');
@@ -106,12 +121,35 @@ window.App = {
         window.KetAudioPlayer.seek(parseFloat(e.target.value));
       });
     }
+
+    // Intercept backdrop clicks on student profile modal
+    const profileModal = document.getElementById('modal-student-profile');
+    if (profileModal) {
+      profileModal.addEventListener('click', (e) => {
+        if (e.target === profileModal) {
+          if (window.KetTracker && !window.KetTracker.hasProfile()) {
+            alert("⚠️ Bạn bắt buộc phải điền đầy đủ Thông Tin Học Sinh trước khi bắt đầu thực hành nhé!");
+            document.getElementById('input-student-name')?.focus();
+          } else {
+            this.closeStudentProfileModal();
+          }
+        }
+      });
+    }
   },
 
   /* ==========================================================================
-     Hồ Sơ Học Sinh & Live Telemetry Smart Interceptor
+     Thông Tin Học Sinh & Bắt Buộc Onboarding Trước Khi Thực Hành
      ========================================================================== */
   initStudentProfile() {
+    // Check URL query param for quick reset in tests or classroom: ?reset_profile=1
+    if (window.location.search.includes('reset_profile=1')) {
+      try {
+        localStorage.removeItem('ket_student_profile_v1');
+      } catch (e) {}
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+
     // Setup target selector chips
     const targetGrid = document.getElementById('profile-target-selector');
     if (targetGrid) {
@@ -125,13 +163,13 @@ window.App = {
 
     this.updateHeaderProfileBadge();
 
-    // Check if user has entered profile; if not, gently prompt after 700ms
+    // BẮT BUỘC: Nếu chưa có thông tin học sinh, mở modal ngay lập tức và chặn thực hành
     if (window.KetTracker && !window.KetTracker.hasProfile()) {
       setTimeout(() => {
         if (!window.KetTracker.hasProfile()) {
-          this.openStudentProfileModal({ autoPrompt: true });
+          this.openStudentProfileModal({ required: true });
         }
-      }, 700);
+      }, 150);
     }
   },
 
@@ -145,11 +183,11 @@ window.App = {
       btnProfile.classList.remove('unregistered');
       const shortTarget = (prof.target_score || 'Distinction').split(' ')[0];
       nameEl.textContent = `${prof.student_name.trim()} · ${shortTarget} ✏️`;
-      btnProfile.title = `Học sinh: ${prof.student_name} (${prof.student_email || 'Chưa có email'}) · Bấm để đổi thông tin`;
+      btnProfile.title = `Học sinh: ${prof.student_name} (${prof.student_email || 'Chưa có email'}) · Bấm để sửa Thông Tin Học Sinh`;
     } else {
       btnProfile.classList.add('unregistered');
-      nameEl.textContent = 'Nhập Tên Học Sinh ✍️';
-      btnProfile.title = 'Nhập họ tên & email để lưu kết quả và đồng bộ lên Google Sheets Live Telemetry';
+      nameEl.textContent = 'Thông Tin Học Sinh ✍️';
+      btnProfile.title = 'Bắt buộc nhập Thông Tin Học Sinh trước khi thực hành';
     }
   },
 
@@ -157,6 +195,13 @@ window.App = {
     this._profileModalPendingAction = opts.pendingAction || null;
     const modal = document.getElementById('modal-student-profile');
     if (!modal) return;
+
+    const hasProfile = window.KetTracker ? window.KetTracker.hasProfile() : false;
+    const closeBtn = document.getElementById('modal-profile-close-btn');
+    if (closeBtn) {
+      // Ẩn nút đóng ✕ nếu học sinh chưa điền thông tin (bắt buộc)
+      closeBtn.style.display = hasProfile ? 'inline-flex' : 'none';
+    }
 
     const prof = window.KetTracker ? window.KetTracker.getProfile() : {};
     const inputName = document.getElementById('input-student-name');
@@ -173,6 +218,12 @@ window.App = {
       });
     }
 
+    // Show or hide change student reset link
+    const resetLink = document.getElementById('profile-reset-link');
+    if (resetLink) {
+      resetLink.style.display = hasProfile ? 'block' : 'none';
+    }
+
     // Hide previous error messages
     const errName = document.getElementById('error-student-name');
     const errEmail = document.getElementById('error-student-email');
@@ -185,16 +236,34 @@ window.App = {
     }, 150);
   },
 
+  clearStudentProfile() {
+    if (confirm("Bạn có chắc chắn muốn xóa thông tin học sinh hiện tại để đổi sang học sinh mới không?")) {
+      try {
+        localStorage.removeItem('ket_student_profile_v1');
+      } catch (e) {}
+      this.updateHeaderProfileBadge();
+      const inputName = document.getElementById('input-student-name');
+      const inputEmail = document.getElementById('input-student-email');
+      if (inputName) inputName.value = '';
+      if (inputEmail) inputEmail.value = '';
+      this.openStudentProfileModal({ required: true });
+    }
+  },
+
   closeStudentProfileModal() {
+    if (window.KetTracker && !window.KetTracker.hasProfile()) {
+      alert("⚠️ Bạn bắt buộc phải điền đầy đủ Thông Tin Học Sinh trước khi bắt đầu thực hành nhé!");
+      const inputName = document.getElementById('input-student-name');
+      if (inputName) inputName.focus();
+      return;
+    }
     const modal = document.getElementById('modal-student-profile');
     if (modal) modal.style.display = 'none';
     this._profileModalPendingAction = null;
   },
 
   skipOrCloseProfileModal() {
-    const modal = document.getElementById('modal-student-profile');
-    if (modal) modal.style.display = 'none';
-    this._profileModalPendingAction = null;
+    this.closeStudentProfileModal();
   },
 
   saveStudentProfileFromForm() {
@@ -262,13 +331,14 @@ window.App = {
 
   requireStudentProfile(action) {
     if (window.KetTracker && window.KetTracker.hasProfile()) {
-      action();
-    } else {
-      this.openStudentProfileModal({
-        requiredForAction: true,
-        pendingAction: action
-      });
+      if (typeof action === 'function') action();
+      return true;
     }
+    this.openStudentProfileModal({
+      requiredForAction: true,
+      pendingAction: action
+    });
+    return false;
   },
 
   promptCustomWebhook() {
@@ -585,6 +655,7 @@ window.App = {
             autocomplete="off"
             autocorrect="off"
             spellcheck="false"
+            onfocus="if(window.KetTracker && !window.KetTracker.hasProfile()){ this.blur(); App.requireStudentProfile(); }"
           />
         </div>
 
@@ -648,12 +719,14 @@ window.App = {
       </div>
     `;
 
-    // Focus input field and place cursor at end
+    // Focus input field only if student has registered profile
     const inputEl = document.getElementById(`dictation-input-${sKey}`);
     if (inputEl) {
-      inputEl.focus();
-      const valLen = inputEl.value.length;
-      inputEl.setSelectionRange(valLen, valLen);
+      if (window.KetTracker && window.KetTracker.hasProfile()) {
+        inputEl.focus();
+        const valLen = inputEl.value.length;
+        inputEl.setSelectionRange(valLen, valLen);
+      }
       inputEl.addEventListener('keydown', (e) => {
         if (e.key === 'Enter') {
           this.checkSentenceDictation();
@@ -672,6 +745,9 @@ window.App = {
   },
 
   replayCurrentSentence() {
+    if (window.KetTracker && !window.KetTracker.hasProfile()) {
+      return this.requireStudentProfile(() => this.replayCurrentSentence());
+    }
     const q = this.testData.questions[this.currentQuestionIndex];
     if (!q) return;
     const sentences = q.dictation_sentences || [];
@@ -684,6 +760,9 @@ window.App = {
   },
 
   playSentenceSlow() {
+    if (window.KetTracker && !window.KetTracker.hasProfile()) {
+      return this.requireStudentProfile(() => this.playSentenceSlow());
+    }
     const q = this.testData.questions[this.currentQuestionIndex];
     if (!q) return;
     const sentences = q.dictation_sentences || [];
@@ -804,6 +883,9 @@ window.App = {
   },
 
   giveLetterHint() {
+    if (window.KetTracker && !window.KetTracker.hasProfile()) {
+      return this.requireStudentProfile(() => this.giveLetterHint());
+    }
     const q = this.testData.questions[this.currentQuestionIndex];
     if (!q) return;
     const sKey = `${q.id}_${this.currentSentenceIndex}`;
@@ -850,6 +932,9 @@ window.App = {
   },
 
   revealNextWord() {
+    if (window.KetTracker && !window.KetTracker.hasProfile()) {
+      return this.requireStudentProfile(() => this.revealNextWord());
+    }
     const q = this.testData.questions[this.currentQuestionIndex];
     if (!q) return;
     const sKey = `${q.id}_${this.currentSentenceIndex}`;
@@ -993,11 +1078,17 @@ window.App = {
   },
 
   selectOption(qId, key) {
+    if (window.KetTracker && !window.KetTracker.hasProfile()) {
+      return this.requireStudentProfile(() => this.selectOption(qId, key));
+    }
     this.userAnswers[qId] = key;
     this.renderIntermediateWorkspace(this.testData.questions[this.currentQuestionIndex]);
   },
 
   recordTextAnswer(qId, val) {
+    if (window.KetTracker && !window.KetTracker.hasProfile()) {
+      return this.requireStudentProfile(() => this.recordTextAnswer(qId, val));
+    }
     this.userAnswers[qId] = val.trim();
   },
 
@@ -1284,6 +1375,9 @@ window.App = {
   },
 
   recordExamAnswer(qId, val) {
+    if (window.KetTracker && !window.KetTracker.hasProfile()) {
+      return this.requireStudentProfile(() => this.recordExamAnswer(qId, val));
+    }
     this.userAnswers[qId] = val;
     if (window.KetTracker) {
       window.KetTracker.track('EXAM_ANSWER', {
@@ -1367,7 +1461,26 @@ window.App = {
   },
 
   handleKeydown(e) {
+    if (e.code === 'Escape') {
+      const modal = document.getElementById('modal-student-profile');
+      if (modal && modal.style.display !== 'none') {
+        if (window.KetTracker && !window.KetTracker.hasProfile()) {
+          e.preventDefault();
+          alert("⚠️ Bạn bắt buộc phải điền đầy đủ Thông Tin Học Sinh trước khi bắt đầu thực hành nhé!");
+          document.getElementById('input-student-name')?.focus();
+          return;
+        }
+      }
+    }
+
     if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+
+    if (e.code === 'Space' || e.code === 'KeyR' || e.code === 'ArrowLeft' || e.code === 'ArrowRight') {
+      if (window.KetTracker && !window.KetTracker.hasProfile()) {
+        e.preventDefault();
+        return this.requireStudentProfile();
+      }
+    }
 
     if (e.code === 'Space' || e.code === 'KeyR') {
       e.preventDefault();

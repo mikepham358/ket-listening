@@ -6,8 +6,8 @@ window.I18N = {
     vi: {
       app_title: "Succeed in A2 Key Listening",
       subtitle: "Luyện Kỹ Năng Nghe A2 Key Chuẩn Cambridge",
-      student_profile: "Hồ sơ học sinh",
-      enter_name: "Nhập Tên Học Sinh ✍️",
+      student_profile: "Thông Tin Học Sinh",
+      enter_name: "Thông Tin Học Sinh ✍️",
       mode_beginner: "Mức 1: Beginner",
       mode_beginner_desc: "Luyện tai nhạy & chép chính tả (Dictation & Cloze)",
       mode_intermediate: "Mức 2: Intermediate",
@@ -52,8 +52,8 @@ window.I18N = {
     en: {
       app_title: "Succeed in A2 Key Listening",
       subtitle: "Cambridge A2 Key Listening Practice App",
-      student_profile: "Student Profile",
-      enter_name: "Enter Student Name ✍️",
+      student_profile: "Student Information",
+      enter_name: "Student Information ✍️",
       mode_beginner: "Tier 1: Beginner",
       mode_beginner_desc: "Ear training, Dictation & Cloze Gap-Fill",
       mode_intermediate: "Tier 2: Intermediate",
