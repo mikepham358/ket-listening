@@ -10,6 +10,7 @@ window.App = {
   sentenceAnswers: {}, // { `${qId}_${sIdx}`: text }
   sentenceSolved: {}, // { `${qId}_${sIdx}`: boolean }
   sentenceAttempts: {}, // { `${qId}_${sIdx}`: failCount }
+  lastHintConsumed: {}, // { `${qId}_${sIdx}`: boolean }
   socraticHintsRevealed: {}, // { qId: tierNumber }
   examTimerInterval: null,
   examSecondsRemaining: 30 * 60, // 30 mins
@@ -37,6 +38,7 @@ window.App = {
     this.sentenceAnswers = {};
     this.sentenceSolved = {};
     this.sentenceAttempts = {};
+    this.lastHintConsumed = {};
     this.socraticHintsRevealed = {};
 
     try {
@@ -361,21 +363,21 @@ window.App = {
         <!-- Diff & Feedback Container -->
         <div id="dictation-diff-${sKey}" class="dict-diff-result" style="display:${isSolved || savedText ? 'block' : 'none'};"></div>
 
-        <!-- Action Buttons & Conditional 3-Attempt Gate -->
+        <!-- Action Buttons & Conditional 3-Attempt Gate (1-Time Use with Loop) -->
         <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem; margin-top:1.25rem;">
           <div style="display:flex; gap:0.45rem; align-items:center; flex-wrap:wrap;">
             ${isUnlocked ? `
-              <button class="lego-btn-yellow" onclick="App.giveLetterHint()">
-                💡 Gợi ý chữ cái đầu
+              <button class="lego-btn-yellow" onclick="App.giveLetterHint()" title="Kích hoạt 1 lần duy nhất: gợi ý chữ cái đầu cho cả câu">
+                💡 Gợi ý chữ cái đầu (1 lần)
               </button>
-              <button class="lego-btn-orange" onclick="App.revealNextWord()">
-                🔤 Mở 1 từ kế tiếp
+              <button class="lego-btn-orange" onclick="App.revealNextWord()" title="Kích hoạt 1 lần duy nhất: mở 1 từ kế tiếp">
+                🔤 Mở 1 từ kế tiếp (1 lần)
               </button>
             ` : `
-              <button class="lego-btn-locked" onclick="App.notifyHintLocked(${attempts})" title="Chỉ kích hoạt sau khi thử sai 3 lần">
+              <button class="lego-btn-locked" onclick="App.notifyHintLocked(${attempts})" title="Chỉ kích hoạt 1 lần sau khi thử sai 3 lần">
                 🔒 Gợi ý chữ cái (${attempts}/3)
               </button>
-              <button class="lego-btn-locked" onclick="App.notifyHintLocked(${attempts})" title="Chỉ kích hoạt sau khi thử sai 3 lần">
+              <button class="lego-btn-locked" onclick="App.notifyHintLocked(${attempts})" title="Chỉ kích hoạt 1 lần sau khi thử sai 3 lần">
                 🔒 Mở 1 từ (${attempts}/3)
               </button>
             `}
@@ -389,12 +391,17 @@ window.App = {
 
         ${!isUnlocked && attempts > 0 ? `
           <div style="margin-top:0.6rem; font-size:0.82rem; font-weight:700; color:#b45309;">
-            💪 Bạn đã thử ${attempts}/3 lần. Thử thêm ${3 - attempts} lần nữa để mở khóa trợ giúp (Gợi ý chữ cái & Mở từ)!
+            💪 Bạn đã thử ${attempts}/3 lần. Thử thêm ${3 - attempts} lần nữa để mở khóa 1 lần trợ giúp tiếp theo!
+          </div>
+        ` : ''}
+        ${!isUnlocked && attempts === 0 && this.lastHintConsumed[sKey] ? `
+          <div style="margin-top:0.6rem; font-size:0.82rem; font-weight:700; color:#0369a1; background:#e0f2fe; padding:0.4rem 0.75rem; border-radius:8px; border:1.5px solid #bae6fd;">
+            🎯 Bạn vừa dùng 1 lần trợ giúp! Nút trợ giúp đã khóa lại (0/3). Hãy nghe lại bằng đôi tai và thử sai 3 lần để mở khóa lần tiếp theo nhé!
           </div>
         ` : ''}
         ${isUnlocked ? `
-          <div style="margin-top:0.6rem; font-size:0.82rem; font-weight:800; color:#15803d;">
-            🎉 Bạn đã thử đủ 3 lần! Nút Gợi ý chữ cái và Mở từ đã được mở khóa!
+          <div style="margin-top:0.6rem; font-size:0.82rem; font-weight:800; color:#15803d; background:#dcfce7; padding:0.45rem 0.75rem; border-radius:8px; border:1.5px solid #86efac;">
+            🎉 Bạn đã thử sai đủ 3 lần! Đã mở khóa <strong>1 lần trợ giúp duy nhất</strong> (chọn 1 trong 2 nút ở trên). Sau khi dùng, nút sẽ tự động khóa lại để bạn tiếp tục tự luyện nghe!
           </div>
         ` : ''}
       </div>
@@ -413,10 +420,12 @@ window.App = {
       </div>
     `;
 
-    // Focus input field
+    // Focus input field and place cursor at end
     const inputEl = document.getElementById(`dictation-input-${sKey}`);
     if (inputEl) {
       inputEl.focus();
+      const valLen = inputEl.value.length;
+      inputEl.setSelectionRange(valLen, valLen);
       inputEl.addEventListener('keydown', (e) => {
         if (e.key === 'Enter') {
           this.checkSentenceDictation();
@@ -561,8 +570,16 @@ window.App = {
       return first + '_'.repeat(Math.max(1, w.length - 1));
     });
 
-    inputEl.value = hints.join(' ');
-    inputEl.focus();
+    const hintText = hints.join(' ');
+    inputEl.value = hintText;
+    this.sentenceAnswers[sKey] = hintText;
+
+    // Reset số lần thử sai về 0 để tạo vòng lặp: dùng 1 lần xong phải thử sai tiếp 3 lần!
+    this.sentenceAttempts[sKey] = 0;
+    this.lastHintConsumed[sKey] = true;
+
+    // Tự động render lại để khóa nút ngay lập tức
+    this.renderBeginnerWorkspace(q);
   },
 
   revealNextWord() {
@@ -581,24 +598,32 @@ window.App = {
     const inputEl = document.getElementById(`dictation-input-${sKey}`);
     if (!inputEl) return;
 
-    const currentWords = inputEl.value.trim().split(/\s+/);
+    const currentWords = inputEl.value.trim() ? inputEl.value.trim().split(/\s+/) : [];
     const targetWords = curSent.text.split(/\s+/);
 
     let nextIdx = 0;
-    while (nextIdx < targetWords.length && nextIdx < currentWords.length && currentWords[nextIdx].toLowerCase() === targetWords[nextIdx].toLowerCase()) {
+    while (nextIdx < targetWords.length && nextIdx < currentWords.length && currentWords[nextIdx].toLowerCase().replace(/[.,!?;:'"]/g, '') === targetWords[nextIdx].toLowerCase().replace(/[.,!?;:'"]/g, '')) {
       nextIdx++;
     }
 
     if (nextIdx < targetWords.length) {
       currentWords[nextIdx] = targetWords[nextIdx];
-      inputEl.value = currentWords.join(' ');
-      inputEl.focus();
+      const newText = currentWords.join(' ');
+      inputEl.value = newText;
+      this.sentenceAnswers[sKey] = newText;
     }
+
+    // Reset số lần thử sai về 0 để tạo vòng lặp: dùng 1 lần xong phải thử sai tiếp 3 lần!
+    this.sentenceAttempts[sKey] = 0;
+    this.lastHintConsumed[sKey] = true;
+
+    // Tự động render lại để khóa nút ngay lập tức
+    this.renderBeginnerWorkspace(q);
   },
 
   notifyHintLocked(attempts) {
     const remaining = Math.max(0, 3 - attempts);
-    alert(`🔒 Quyền trợ giúp đang bị khóa!\n\nBạn cần tự nghe và thử gõ thêm ${remaining} lần nữa (đã thử sai: ${attempts}/3 lần) để kích hoạt nút Gợi ý chữ cái & Mở từ nhé!\n\nHãy tập trung luyện đôi tai của mình trước nào! 💪`);
+    alert(`🔒 Quyền trợ giúp đang bị khóa!\n\nBạn cần tự nghe và thử gõ thêm ${remaining} lần nữa (đã thử: ${attempts}/3 lần) để kích hoạt 1 lần trợ giúp tiếp theo nhé!\n\nSau khi dùng 1 lần, nút sẽ lại khóa để bạn tiếp tục tự luyện tai nghe! 💪`);
   },
 
   /* ==========================================================================
